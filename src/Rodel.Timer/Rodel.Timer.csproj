@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <PublishAot>true</PublishAot>
+    <SproutPackageFormat>Msix</SproutPackageFormat>
+    <SproutAppxVersion>2.0.0.0</SproutAppxVersion>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">$(NETCoreSdkRuntimeIdentifier)</RuntimeIdentifier>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK.Foundation" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" />
+    <PackageReference Include="Sprout" />
+    <PackageReference Include="Sprout.Backend.D2D" />
+    <PackageReference Include="Sprout.Packaging" />
+    <PackageReference Include="Sprout.WindowsAppSDK" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Rodel.Timer.Core\Rodel.Timer.Core.csproj" />
+  </ItemGroup>
+
+</Project>

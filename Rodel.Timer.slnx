@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Rodel.Timer.Core/Rodel.Timer.Core.csproj" />
+    <Project Path="src/Rodel.Timer/Rodel.Timer.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Rodel.Timer.Core.Tests/Rodel.Timer.Core.Tests.csproj" />
+  </Folder>
+</Solution>
