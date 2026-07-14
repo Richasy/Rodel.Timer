@@ -24,7 +24,7 @@ public sealed class App : Application
     {
         _window = OpenWindow(new WindowSpec
         {
-            Title = "Rodel.Timer",
+            Title = Resources.AppName,
             Size = new Size(720f, 480f),
             SystemBackdrop = SystemBackdrop.Mica,
         });

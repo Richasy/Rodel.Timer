@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <data name="AppName" xml:space="preserve"><value>Rodel 计时器</value></data>
+  <data name="AppDescription" xml:space="preserve"><value>专注、简洁的 Windows 正向计时器</value></data>
+  <data name="PreparingData" xml:space="preserve"><value>正在准备计时数据…</value></data>
+  <data name="DataLoadErrorTitle" xml:space="preserve"><value>Rodel 计时器无法加载数据</value></data>
+  <data name="Folders" xml:space="preserve"><value>分组</value></data>
+  <data name="FoldersHelp" xml:space="preserve"><value>显示或隐藏计时器分组</value></data>
+  <data name="History" xml:space="preserve"><value>历史记录</value></data>
+  <data name="HistoryHelp" xml:space="preserve"><value>显示或隐藏当前分组的计时历史</value></data>
+  <data name="Settings" xml:space="preserve"><value>设置</value></data>
+  <data name="SettingsHelp" xml:space="preserve"><value>主题、语言、字体和每日目标</value></data>
+  <data name="SessionTitle" xml:space="preserve"><value>计时标题</value></data>
+  <data name="SessionTitlePlaceholder" xml:space="preserve"><value>你正在做什么？</value></data>
+  <data name="SessionTitleHelp" xml:space="preserve"><value>与本次计时一起保存的标题</value></data>
+  <data name="UntitledSession" xml:space="preserve"><value>未命名</value></data>
+  <data name="StartTimer" xml:space="preserve"><value>开始计时</value></data>
+  <data name="StartTimerHelp" xml:space="preserve"><value>开始记录当前任务的用时</value></data>
+  <data name="StopTimer" xml:space="preserve"><value>停止计时</value></data>
+  <data name="StopTimerHelp" xml:space="preserve"><value>停止计时并将完成的记录添加到历史</value></data>
+  <data name="TimerReady" xml:space="preserve"><value>准备就绪</value></data>
+  <data name="TimerRunning" xml:space="preserve"><value>计时中</value></data>
+  <data name="TimerStartedAnnouncement" xml:space="preserve"><value>已开始计时。</value></data>
+  <data name="TimerStoppedAnnouncement" xml:space="preserve"><value>已在 {0} 停止计时。</value></data>
+  <data name="HistoryAddedAnnouncement" xml:space="preserve"><value>已添加到历史记录。</value></data>
+  <data name="CurrentFolder" xml:space="preserve"><value>当前分组</value></data>
+  <data name="Today" xml:space="preserve"><value>今天</value></data>
+  <data name="DailyTarget" xml:space="preserve"><value>每日目标</value></data>
+  <data name="TodayTotal" xml:space="preserve"><value>今日累计</value></data>
+  <data name="MinutesUnit" xml:space="preserve"><value>分钟</value></data>
+  <data name="CompactOverlay" xml:space="preserve"><value>紧凑悬浮窗</value></data>
+  <data name="ExitCompactOverlay" xml:space="preserve"><value>退出紧凑悬浮窗</value></data>
+  <data name="CompactOverlayHelp" xml:space="preserve"><value>在始终置顶的小窗口中仅显示必要的计时控件</value></data>
+  <data name="AddFolder" xml:space="preserve"><value>添加分组</value></data>
+  <data name="AddFolderHelp" xml:space="preserve"><value>创建用于整理计时记录的分组</value></data>
+  <data name="EditFolder" xml:space="preserve"><value>编辑分组</value></data>
+  <data name="DeleteFolder" xml:space="preserve"><value>删除分组</value></data>
+  <data name="FolderName" xml:space="preserve"><value>分组名称</value></data>
+  <data name="FolderNamePlaceholder" xml:space="preserve"><value>为分组命名</value></data>
+  <data name="ChooseIcon" xml:space="preserve"><value>选择图标</value></data>
+  <data name="DefaultFolder" xml:space="preserve"><value>默认</value></data>
+  <data name="DeleteFolderTitle" xml:space="preserve"><value>删除分组？</value></data>
+  <data name="DeleteFolderMessage" xml:space="preserve"><value>该分组中的所有计时历史也会被删除，此操作无法撤销。</value></data>
+  <data name="LastFolderError" xml:space="preserve"><value>至少需要保留一个计时器分组。</value></data>
+  <data name="FolderAddedAnnouncement" xml:space="preserve"><value>已添加分组。</value></data>
+  <data name="FolderUpdatedAnnouncement" xml:space="preserve"><value>已更新分组。</value></data>
+  <data name="FolderDeletedAnnouncement" xml:space="preserve"><value>已删除分组。</value></data>
+  <data name="NoHistory" xml:space="preserve"><value>这个分组还没有计时记录。</value></data>
+  <data name="MoveHistory" xml:space="preserve"><value>移动记录</value></data>
+  <data name="MoveToFolder" xml:space="preserve"><value>移动到分组</value></data>
+  <data name="DeleteHistory" xml:space="preserve"><value>删除记录</value></data>
+  <data name="DeleteHistoryTitle" xml:space="preserve"><value>删除这条记录？</value></data>
+  <data name="DeleteHistoryMessage" xml:space="preserve"><value>这条计时历史将被永久删除。</value></data>
+  <data name="HistoryMovedAnnouncement" xml:space="preserve"><value>已移动记录。</value></data>
+  <data name="HistoryDeletedAnnouncement" xml:space="preserve"><value>已删除记录。</value></data>
+  <data name="Duration" xml:space="preserve"><value>用时</value></data>
+  <data name="Created" xml:space="preserve"><value>创建时间</value></data>
+  <data name="MoreActions" xml:space="preserve"><value>{0} 的更多操作</value></data>
+  <data name="Theme" xml:space="preserve"><value>主题</value></data>
+  <data name="ThemeSystem" xml:space="preserve"><value>跟随系统</value></data>
+  <data name="ThemeLight" xml:space="preserve"><value>浅色</value></data>
+  <data name="ThemeDark" xml:space="preserve"><value>深色</value></data>
+  <data name="Font" xml:space="preserve"><value>字体</value></data>
+  <data name="Language" xml:space="preserve"><value>语言</value></data>
+  <data name="LanguageEnglish" xml:space="preserve"><value>英语</value></data>
+  <data name="LanguageChinese" xml:space="preserve"><value>简体中文</value></data>
+  <data name="DailyTargetMinutes" xml:space="preserve"><value>每日目标分钟数</value></data>
+  <data name="OpenSource" xml:space="preserve"><value>开源仓库</value></data>
+  <data name="OpenSourceHelp" xml:space="preserve"><value>在 GitHub 上打开 Rodel 计时器源代码</value></data>
+  <data name="WhatsNewTitle" xml:space="preserve"><value>新版内容</value></data>
+  <data name="WhatsNewBody" xml:space="preserve"><value>Rodel 计时器现已基于 Sprout 完整重写，采用 Fluent Design，支持实时语言和主题切换、无障碍控件，并可安全迁移现有 Work-Timer 数据。</value></data>
+  <data name="Save" xml:space="preserve"><value>保存</value></data>
+  <data name="Cancel" xml:space="preserve"><value>取消</value></data>
+  <data name="Delete" xml:space="preserve"><value>删除</value></data>
+  <data name="Done" xml:space="preserve"><value>完成</value></data>
+  <data name="Retry" xml:space="preserve"><value>重试</value></data>
+  <data name="SaveFailed" xml:space="preserve"><value>无法保存你的更改。</value></data>
+  <data name="MigrationWarnings" xml:space="preserve"><value>有 {0} 条迁移警告需要检查。</value></data>
+</root>

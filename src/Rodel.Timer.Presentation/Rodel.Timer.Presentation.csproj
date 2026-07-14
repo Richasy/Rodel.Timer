@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <RootNamespace>Rodel.Timer.Presentation</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Sprout" />
+    <PackageReference Include="Sprout.FluentIcon" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Rodel.Timer.Core\Rodel.Timer.Core.csproj" />
+  </ItemGroup>
+</Project>

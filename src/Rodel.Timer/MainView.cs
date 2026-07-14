@@ -18,8 +18,8 @@ public sealed partial class MainView : Control
     /// <summary>Creates the view in its initial "preparing data" state.</summary>
     public MainView()
     {
-        Heading = "Rodel Timer";
-        Status = "Preparing your timer data...";
+        Heading = Resources.AppName;
+        Status = Resources.PreparingData;
     }
 
     /// <summary>The view's current title text.</summary>
@@ -60,7 +60,7 @@ public sealed partial class MainView : Control
     public void ShowDataError(string message)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(message);
-        Heading = "Rodel Timer could not load its data";
+        Heading = Resources.DataLoadErrorTitle;
         Status = message;
     }
 

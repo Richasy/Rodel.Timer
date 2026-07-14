@@ -8,6 +8,8 @@
     <PublishAot>true</PublishAot>
     <SproutPackageFormat>Msix</SproutPackageFormat>
     <SproutAppxVersion>2.0.0.0</SproutAppxVersion>
+    <SproutDefaultLanguage>en-US</SproutDefaultLanguage>
+    <SproutLocalizationNamespace>Rodel.Timer</SproutLocalizationNamespace>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">$(NETCoreSdkRuntimeIdentifier)</RuntimeIdentifier>
   </PropertyGroup>
@@ -17,12 +19,14 @@
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" />
     <PackageReference Include="Sprout" />
     <PackageReference Include="Sprout.Backend.D2D" />
+    <PackageReference Include="Sprout.FluentIcon" />
     <PackageReference Include="Sprout.Packaging" />
     <PackageReference Include="Sprout.WindowsAppSDK" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Rodel.Timer.Core\Rodel.Timer.Core.csproj" />
+    <ProjectReference Include="..\Rodel.Timer.Presentation\Rodel.Timer.Presentation.csproj" />
   </ItemGroup>
 
 </Project>

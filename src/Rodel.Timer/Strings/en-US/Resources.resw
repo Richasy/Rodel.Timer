@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <data name="AppName" xml:space="preserve"><value>Rodel Timer</value></data>
+  <data name="AppDescription" xml:space="preserve"><value>A focused forward timer for Windows</value></data>
+  <data name="PreparingData" xml:space="preserve"><value>Preparing your timer data…</value></data>
+  <data name="DataLoadErrorTitle" xml:space="preserve"><value>Rodel Timer could not load its data</value></data>
+  <data name="Folders" xml:space="preserve"><value>Folders</value></data>
+  <data name="FoldersHelp" xml:space="preserve"><value>Show or hide the timer folders</value></data>
+  <data name="History" xml:space="preserve"><value>History</value></data>
+  <data name="HistoryHelp" xml:space="preserve"><value>Show or hide the current folder's timer history</value></data>
+  <data name="Settings" xml:space="preserve"><value>Settings</value></data>
+  <data name="SettingsHelp" xml:space="preserve"><value>Theme, language, font, and daily target</value></data>
+  <data name="SessionTitle" xml:space="preserve"><value>Session title</value></data>
+  <data name="SessionTitlePlaceholder" xml:space="preserve"><value>What are you working on?</value></data>
+  <data name="SessionTitleHelp" xml:space="preserve"><value>The title saved with this timer session</value></data>
+  <data name="UntitledSession" xml:space="preserve"><value>Untitled</value></data>
+  <data name="StartTimer" xml:space="preserve"><value>Start timer</value></data>
+  <data name="StartTimerHelp" xml:space="preserve"><value>Start timing the current session</value></data>
+  <data name="StopTimer" xml:space="preserve"><value>Stop timer</value></data>
+  <data name="StopTimerHelp" xml:space="preserve"><value>Stop timing and add the completed session to history</value></data>
+  <data name="TimerReady" xml:space="preserve"><value>Ready</value></data>
+  <data name="TimerRunning" xml:space="preserve"><value>Timing</value></data>
+  <data name="TimerStartedAnnouncement" xml:space="preserve"><value>Timer started.</value></data>
+  <data name="TimerStoppedAnnouncement" xml:space="preserve"><value>Timer stopped at {0}.</value></data>
+  <data name="HistoryAddedAnnouncement" xml:space="preserve"><value>Session added to history.</value></data>
+  <data name="CurrentFolder" xml:space="preserve"><value>Current folder</value></data>
+  <data name="Today" xml:space="preserve"><value>Today</value></data>
+  <data name="DailyTarget" xml:space="preserve"><value>Daily target</value></data>
+  <data name="TodayTotal" xml:space="preserve"><value>Today's total</value></data>
+  <data name="MinutesUnit" xml:space="preserve"><value>min</value></data>
+  <data name="CompactOverlay" xml:space="preserve"><value>Compact overlay</value></data>
+  <data name="ExitCompactOverlay" xml:space="preserve"><value>Exit compact overlay</value></data>
+  <data name="CompactOverlayHelp" xml:space="preserve"><value>Show only the essential timer controls in a small always-on-top window</value></data>
+  <data name="AddFolder" xml:space="preserve"><value>Add folder</value></data>
+  <data name="AddFolderHelp" xml:space="preserve"><value>Create a folder for organizing timer sessions</value></data>
+  <data name="EditFolder" xml:space="preserve"><value>Edit folder</value></data>
+  <data name="DeleteFolder" xml:space="preserve"><value>Delete folder</value></data>
+  <data name="FolderName" xml:space="preserve"><value>Folder name</value></data>
+  <data name="FolderNamePlaceholder" xml:space="preserve"><value>Name this folder</value></data>
+  <data name="ChooseIcon" xml:space="preserve"><value>Choose an icon</value></data>
+  <data name="DefaultFolder" xml:space="preserve"><value>Default</value></data>
+  <data name="DeleteFolderTitle" xml:space="preserve"><value>Delete folder?</value></data>
+  <data name="DeleteFolderMessage" xml:space="preserve"><value>All timer history in this folder will also be deleted. This action cannot be undone.</value></data>
+  <data name="LastFolderError" xml:space="preserve"><value>At least one timer folder is required.</value></data>
+  <data name="FolderAddedAnnouncement" xml:space="preserve"><value>Folder added.</value></data>
+  <data name="FolderUpdatedAnnouncement" xml:space="preserve"><value>Folder updated.</value></data>
+  <data name="FolderDeletedAnnouncement" xml:space="preserve"><value>Folder deleted.</value></data>
+  <data name="NoHistory" xml:space="preserve"><value>No sessions in this folder yet.</value></data>
+  <data name="MoveHistory" xml:space="preserve"><value>Move session</value></data>
+  <data name="MoveToFolder" xml:space="preserve"><value>Move to folder</value></data>
+  <data name="DeleteHistory" xml:space="preserve"><value>Delete session</value></data>
+  <data name="DeleteHistoryTitle" xml:space="preserve"><value>Delete this session?</value></data>
+  <data name="DeleteHistoryMessage" xml:space="preserve"><value>This timer history entry will be permanently deleted.</value></data>
+  <data name="HistoryMovedAnnouncement" xml:space="preserve"><value>Session moved.</value></data>
+  <data name="HistoryDeletedAnnouncement" xml:space="preserve"><value>Session deleted.</value></data>
+  <data name="Duration" xml:space="preserve"><value>Duration</value></data>
+  <data name="Created" xml:space="preserve"><value>Created</value></data>
+  <data name="MoreActions" xml:space="preserve"><value>More actions for {0}</value></data>
+  <data name="Theme" xml:space="preserve"><value>Theme</value></data>
+  <data name="ThemeSystem" xml:space="preserve"><value>Use system setting</value></data>
+  <data name="ThemeLight" xml:space="preserve"><value>Light</value></data>
+  <data name="ThemeDark" xml:space="preserve"><value>Dark</value></data>
+  <data name="Font" xml:space="preserve"><value>Font</value></data>
+  <data name="Language" xml:space="preserve"><value>Language</value></data>
+  <data name="LanguageEnglish" xml:space="preserve"><value>English</value></data>
+  <data name="LanguageChinese" xml:space="preserve"><value>Simplified Chinese</value></data>
+  <data name="DailyTargetMinutes" xml:space="preserve"><value>Daily target in minutes</value></data>
+  <data name="OpenSource" xml:space="preserve"><value>Open source repository</value></data>
+  <data name="OpenSourceHelp" xml:space="preserve"><value>Open the Rodel Timer source code on GitHub</value></data>
+  <data name="WhatsNewTitle" xml:space="preserve"><value>What's new</value></data>
+  <data name="WhatsNewBody" xml:space="preserve"><value>Rodel Timer is a complete Sprout-based rewrite with Fluent Design, live language and theme switching, accessible controls, and safe migration of your existing Work-Timer data.</value></data>
+  <data name="Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Done" xml:space="preserve"><value>Done</value></data>
+  <data name="Retry" xml:space="preserve"><value>Retry</value></data>
+  <data name="SaveFailed" xml:space="preserve"><value>Your changes could not be saved.</value></data>
+  <data name="MigrationWarnings" xml:space="preserve"><value>{0} migration warning(s) require review.</value></data>
+</root>
