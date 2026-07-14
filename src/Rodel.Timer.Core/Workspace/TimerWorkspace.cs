@@ -6,6 +6,16 @@ using Rodel.Timer.Core.Settings;
 
 namespace Rodel.Timer.Core.Workspace;
 
+/// <summary>
+/// The mutable aggregate root for one user's timer data: its folders, history entries, selected folder,
+/// and preferences. A workspace enforces its invariants on every mutation so it is never observed in an
+/// invalid state: at least one folder always exists (the last folder cannot be removed), folder and entry
+/// ids are unique, every entry's <see cref="History.TimerEntry.FolderId"/> refers to an existing folder
+/// (removing a folder cascades to delete its entries), and <see cref="SelectedFolderId"/> always refers to
+/// an existing folder (falling back to the first remaining folder if the selected one is removed).
+/// A workspace is created fresh via <see cref="Create"/> or rebuilt from already-valid data via
+/// <see cref="Restore"/>; there is no public parameterless or partially-constructed state.
+/// </summary>
 public sealed class TimerWorkspace
 {
     private readonly List<TimerFolder> _folders;
@@ -27,14 +37,26 @@ public sealed class TimerWorkspace
         Preferences = preferences;
     }
 
+    /// <summary>The workspace's folders, in their current order. Always contains at least one folder.</summary>
     public IReadOnlyList<TimerFolder> Folders => _folderView;
 
+    /// <summary>The workspace's history entries. Every entry's folder is guaranteed to exist in <see cref="Folders"/>.</summary>
     public IReadOnlyList<TimerEntry> Entries => _entryView;
 
+    /// <summary>The identifier of the currently selected folder. Always refers to an existing entry in <see cref="Folders"/>.</summary>
     public Guid SelectedFolderId { get; private set; }
 
+    /// <summary>The workspace's current preferences.</summary>
     public TimerPreferences Preferences { get; private set; }
 
+    /// <summary>
+    /// Creates a brand-new workspace containing only <paramref name="initialFolder"/>, selected by default,
+    /// with no history entries.
+    /// </summary>
+    /// <param name="initialFolder">The workspace's first (and initially only) folder.</param>
+    /// <param name="preferences">The initial preferences, or <see langword="null"/> to use <see cref="TimerPreferences.Default"/>.</param>
+    /// <returns>A new, valid <see cref="TimerWorkspace"/>.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="initialFolder"/> is <see langword="null"/>.</exception>
     public static TimerWorkspace Create(
         TimerFolder initialFolder,
         TimerPreferences? preferences = null)
@@ -47,6 +69,17 @@ public sealed class TimerWorkspace
             preferences ?? TimerPreferences.Default);
     }
 
+    /// <summary>
+    /// Rebuilds a workspace from previously validated data (loaded from a repository or migrated from
+    /// legacy data), re-validating every invariant before returning.
+    /// </summary>
+    /// <param name="folders">The folders to restore. Must be non-empty, contain no null entries, and have unique ids.</param>
+    /// <param name="entries">The history entries to restore. Must contain no null entries, must have unique ids, and each must reference a folder present in <paramref name="folders"/>.</param>
+    /// <param name="selectedFolderId">The folder to select. Must reference a folder present in <paramref name="folders"/>.</param>
+    /// <param name="preferences">The preferences to restore.</param>
+    /// <returns>A restored, valid <see cref="TimerWorkspace"/>.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="folders"/>, <paramref name="entries"/>, or <paramref name="preferences"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException">Any workspace invariant listed above is violated.</exception>
     public static TimerWorkspace Restore(
         IEnumerable<TimerFolder> folders,
         IEnumerable<TimerEntry> entries,
@@ -64,12 +97,19 @@ public sealed class TimerWorkspace
         return new TimerWorkspace(folderList, entryList, selectedFolderId, preferences);
     }
 
+    /// <summary>Selects <paramref name="folderId"/> as the current folder.</summary>
+    /// <param name="folderId">The folder to select.</param>
+    /// <exception cref="KeyNotFoundException"><paramref name="folderId"/> does not exist in <see cref="Folders"/>.</exception>
     public void SelectFolder(Guid folderId)
     {
         EnsureFolderExists(folderId);
         SelectedFolderId = folderId;
     }
 
+    /// <summary>Adds <paramref name="folder"/> to the workspace.</summary>
+    /// <param name="folder">The folder to add. Its id must not already exist in <see cref="Folders"/>.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="folder"/> is <see langword="null"/>.</exception>
+    /// <exception cref="InvalidOperationException">A folder with the same id already exists.</exception>
     public void AddFolder(TimerFolder folder)
     {
         ArgumentNullException.ThrowIfNull(folder);
@@ -81,6 +121,10 @@ public sealed class TimerWorkspace
         _folders.Add(folder);
     }
 
+    /// <summary>Replaces the existing folder with the same id as <paramref name="folder"/>.</summary>
+    /// <param name="folder">The updated folder. A folder with this id must already exist.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="folder"/> is <see langword="null"/>.</exception>
+    /// <exception cref="KeyNotFoundException">No folder with <paramref name="folder"/>'s id exists.</exception>
     public void UpdateFolder(TimerFolder folder)
     {
         ArgumentNullException.ThrowIfNull(folder);
@@ -88,6 +132,14 @@ public sealed class TimerWorkspace
         _folders[index] = folder;
     }
 
+    /// <summary>
+    /// Removes the folder identified by <paramref name="folderId"/> and cascade-deletes every history entry
+    /// that belonged to it. If the removed folder was selected, the first remaining folder becomes selected.
+    /// </summary>
+    /// <param name="folderId">The folder to remove.</param>
+    /// <returns>The number of history entries removed along with the folder.</returns>
+    /// <exception cref="InvalidOperationException">The workspace has only one folder; the last folder cannot be removed.</exception>
+    /// <exception cref="KeyNotFoundException"><paramref name="folderId"/> does not exist in <see cref="Folders"/>.</exception>
     public int RemoveFolder(Guid folderId)
     {
         if (_folders.Count == 1)
@@ -107,6 +159,11 @@ public sealed class TimerWorkspace
         return removedEntryCount;
     }
 
+    /// <summary>Adds <paramref name="entry"/> to the workspace.</summary>
+    /// <param name="entry">The entry to add. Its <see cref="TimerEntry.FolderId"/> must reference an existing folder, and its id must not already exist in <see cref="Entries"/>.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="entry"/> is <see langword="null"/>.</exception>
+    /// <exception cref="KeyNotFoundException"><paramref name="entry"/>'s folder does not exist.</exception>
+    /// <exception cref="InvalidOperationException">An entry with the same id already exists.</exception>
     public void AddEntry(TimerEntry entry)
     {
         ArgumentNullException.ThrowIfNull(entry);
@@ -120,12 +177,19 @@ public sealed class TimerWorkspace
         _entries.Add(entry);
     }
 
+    /// <summary>Removes the history entry identified by <paramref name="entryId"/>.</summary>
+    /// <param name="entryId">The entry to remove.</param>
+    /// <exception cref="KeyNotFoundException"><paramref name="entryId"/> does not exist in <see cref="Entries"/>.</exception>
     public void RemoveEntry(Guid entryId)
     {
         int index = FindEntryIndex(entryId);
         _entries.RemoveAt(index);
     }
 
+    /// <summary>Moves the history entry identified by <paramref name="entryId"/> to <paramref name="folderId"/>.</summary>
+    /// <param name="entryId">The entry to move.</param>
+    /// <param name="folderId">The destination folder. Must already exist.</param>
+    /// <exception cref="KeyNotFoundException"><paramref name="folderId"/> or <paramref name="entryId"/> does not exist.</exception>
     public void MoveEntry(Guid entryId, Guid folderId)
     {
         EnsureFolderExists(folderId);
@@ -138,12 +202,27 @@ public sealed class TimerWorkspace
         }
     }
 
+    /// <summary>Returns every history entry belonging to <paramref name="folderId"/>.</summary>
+    /// <param name="folderId">The folder whose entries to return. Must already exist.</param>
+    /// <returns>The entries belonging to the folder, in no particular order.</returns>
+    /// <exception cref="KeyNotFoundException"><paramref name="folderId"/> does not exist.</exception>
     public IReadOnlyList<TimerEntry> GetEntries(Guid folderId)
     {
         EnsureFolderExists(folderId);
         return _entries.Where(entry => entry.FolderId == folderId).ToArray();
     }
 
+    /// <summary>
+    /// Computes the total duration of every entry across all folders whose <see cref="TimerEntry.CreatedAt"/>,
+    /// converted to <paramref name="timeZone"/>, falls on <paramref name="date"/>. Because entries store an
+    /// absolute <see cref="DateTimeOffset"/>, the calendar date a given entry counts toward depends on the
+    /// caller-supplied time zone — the same instant can fall on different local dates in different zones.
+    /// </summary>
+    /// <param name="date">The local calendar date to total.</param>
+    /// <param name="timeZone">The time zone used to convert each entry's timestamp to a local date.</param>
+    /// <returns>The summed duration of all matching entries.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="timeZone"/> is <see langword="null"/>.</exception>
+    /// <exception cref="OverflowException">The summed duration overflows <see cref="long"/> seconds.</exception>
     public TimeSpan GetTotalDuration(DateOnly date, TimeZoneInfo timeZone)
     {
         ArgumentNullException.ThrowIfNull(timeZone);
@@ -161,6 +240,9 @@ public sealed class TimerWorkspace
         return TimeSpan.FromSeconds(totalSeconds);
     }
 
+    /// <summary>Replaces <see cref="Preferences"/> with <paramref name="preferences"/>.</summary>
+    /// <param name="preferences">The new preferences.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="preferences"/> is <see langword="null"/>.</exception>
     public void UpdatePreferences(TimerPreferences preferences)
     {
         ArgumentNullException.ThrowIfNull(preferences);

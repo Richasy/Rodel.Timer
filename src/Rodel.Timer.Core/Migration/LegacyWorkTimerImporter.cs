@@ -8,12 +8,32 @@ using Rodel.Timer.Core.Workspace;
 
 namespace Rodel.Timer.Core.Migration;
 
+/// <summary>
+/// Converts a <see cref="LegacyWorkTimerSnapshot"/> from the previous Work-Timer application into a new
+/// <see cref="TimerWorkspace"/>. Recoverable per-item issues (a missing name, an unknown icon codepoint, an
+/// out-of-range preference, an entry referring to a missing folder, and similar) are repaired in place and
+/// reported as warnings rather than aborting the import; only data that cannot be repaired into a valid
+/// workspace (invalid JSON, a null item, a duplicate/empty-folder-set invariant violation) throws
+/// <see cref="LegacyDataMigrationException"/>.
+/// </summary>
 public sealed class LegacyWorkTimerImporter
 {
     private readonly string _defaultFolderName;
     private readonly TimerPreferences _defaultPreferences;
     private readonly TimeZoneInfo _legacyTimeZone;
 
+    /// <summary>Creates an importer configured with the defaults and legacy time zone needed to repair recoverable issues.</summary>
+    /// <param name="defaultFolderName">
+    /// The base name used for a synthesized fallback folder (when the legacy data has no folders) and for
+    /// unnamed legacy folders (suffixed with their 1-based index).
+    /// </param>
+    /// <param name="defaultPreferences">The preferences substituted for any legacy preference that is missing or invalid.</param>
+    /// <param name="legacyTimeZone">
+    /// The time zone used to interpret a legacy timestamp whose <see cref="DateTimeKind"/> is
+    /// <see cref="DateTimeKind.Unspecified"/>, since the legacy application did not record an offset.
+    /// </param>
+    /// <exception cref="ArgumentNullException"><paramref name="defaultPreferences"/> or <paramref name="legacyTimeZone"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException"><paramref name="defaultFolderName"/> is null, empty, or whitespace-only.</exception>
     public LegacyWorkTimerImporter(
         string defaultFolderName,
         TimerPreferences defaultPreferences,
@@ -28,6 +48,27 @@ public sealed class LegacyWorkTimerImporter
         _legacyTimeZone = legacyTimeZone;
     }
 
+    /// <summary>
+    /// Converts <paramref name="snapshot"/> into a new <see cref="TimerWorkspace"/>, repairing recoverable
+    /// issues (missing names, unknown icons, out-of-range preferences, orphaned entries, an invalid selected
+    /// folder) and recording them as warnings.
+    /// </summary>
+    /// <param name="snapshot">The legacy data to convert.</param>
+    /// <param name="fallbackFolderId">
+    /// The identifier used for a synthesized folder when <paramref name="snapshot"/> has no folders at all.
+    /// Must not be <see cref="Guid.Empty"/>.
+    /// </param>
+    /// <param name="importedAt">
+    /// The timestamp used for any folder or entry whose legacy creation time is missing, and as the
+    /// reference point for interpreting legacy timestamps.
+    /// </param>
+    /// <returns>The migrated workspace together with any repair warnings.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="snapshot"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException"><paramref name="fallbackFolderId"/> is <see cref="Guid.Empty"/>.</exception>
+    /// <exception cref="LegacyDataMigrationException">
+    /// The legacy JSON is invalid, contains a null item, or converts to data that violates a
+    /// <see cref="TimerWorkspace"/> invariant.
+    /// </exception>
     public LegacyImportResult Import(
         LegacyWorkTimerSnapshot snapshot,
         Guid fallbackFolderId,

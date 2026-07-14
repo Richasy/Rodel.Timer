@@ -6,6 +6,12 @@ using Rodel.Timer.Core.Workspace;
 
 namespace Rodel.Timer.Core.Bootstrap;
 
+/// <summary>
+/// Resolves the workspace an application run should use, in priority order: (1) a workspace already
+/// persisted by <see cref="TimerDataRepository"/>, (2) a workspace recovered by migrating legacy
+/// Work-Timer data, or (3) a brand-new workspace seeded with a single default folder. Cases (2) and
+/// (3) are persisted immediately so subsequent runs take path (1).
+/// </summary>
 public sealed class TimerDataBootstrapper
 {
     private readonly TimerDataRepository _repository;
@@ -16,6 +22,24 @@ public sealed class TimerDataBootstrapper
     private readonly TimerPreferences _defaultPreferences;
     private readonly Func<Guid> _idFactory;
 
+    /// <summary>
+    /// Creates a bootstrapper wired to a specific repository, legacy data source, importer, and defaults.
+    /// </summary>
+    /// <param name="repository">The repository that stores and loads the current-format workspace.</param>
+    /// <param name="legacyDataSource">Supplies legacy Work-Timer data when no current workspace exists yet.</param>
+    /// <param name="importer">Converts legacy Work-Timer data into a new <see cref="TimerWorkspace"/>.</param>
+    /// <param name="timeProvider">The time source used to timestamp any folder or workspace created here.</param>
+    /// <param name="defaultFolderName">The name given to the single folder of a freshly created workspace.</param>
+    /// <param name="defaultPreferences">The preferences applied to a freshly created workspace.</param>
+    /// <param name="idFactory">
+    /// Optional identifier factory used for the initial folder and any migration fallback id; defaults to
+    /// <see cref="Guid.NewGuid"/>. Overriding this makes bootstrap deterministic for tests.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="repository"/>, <paramref name="legacyDataSource"/>, <paramref name="importer"/>,
+    /// <paramref name="timeProvider"/>, or <paramref name="defaultPreferences"/> is <see langword="null"/>.
+    /// </exception>
+    /// <exception cref="ArgumentException"><paramref name="defaultFolderName"/> is null, empty, or whitespace.</exception>
     public TimerDataBootstrapper(
         TimerDataRepository repository,
         ILegacyWorkTimerDataSource legacyDataSource,
@@ -41,6 +65,15 @@ public sealed class TimerDataBootstrapper
         _idFactory = idFactory ?? Guid.NewGuid;
     }
 
+    /// <summary>
+    /// Loads or produces the workspace to use for this run, persisting it when it was migrated or newly created
+    /// so subsequent calls (and future application runs) find it via <see cref="TimerDataRepository.LoadAsync"/>.
+    /// </summary>
+    /// <param name="cancellationToken">A token to cancel the load, migration import, or save.</param>
+    /// <returns>The resolved workspace, its <see cref="TimerBootstrapOrigin"/>, and any migration warnings.</returns>
+    /// <exception cref="Migration.LegacyDataMigrationException">The legacy data is present but structurally invalid.</exception>
+    /// <exception cref="Migration.LegacyDataAccessException">The legacy data source could not be read.</exception>
+    /// <exception cref="Persistence.TimerDataException">The repository could not load or save the workspace.</exception>
     public async Task<TimerBootstrapResult> LoadAsync(
         CancellationToken cancellationToken = default)
     {

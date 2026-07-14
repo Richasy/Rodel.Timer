@@ -10,6 +10,11 @@ using Sprout.Theming;
 
 namespace Rodel.Timer;
 
+/// <summary>
+/// The Rodel Timer application entry point. Opens the main window, wires the Ctrl+T theme toggle,
+/// bootstraps the timer workspace in the background, and reports the outcome to <see cref="MainView"/>
+/// once it settles (either the ready state or a data error, never leaving the placeholder view stuck).
+/// </summary>
 public sealed class App : Application
 {
     private Window _window = null!;
@@ -28,7 +33,7 @@ public sealed class App : Application
         _window.ActualThemeChanged += (_, _) => SyncBackground();
         SyncBackground();
 
-        var mainView = new MainView(_window);
+        var mainView = new MainView();
         _window.SetContent(mainView);
         _window.Show();
         InitializeDataAsync(mainView);
