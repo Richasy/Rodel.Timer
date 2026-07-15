@@ -71,8 +71,13 @@
   <data name="LanguageEnglish" xml:space="preserve"><value>English</value></data>
   <data name="LanguageChinese" xml:space="preserve"><value>Simplified Chinese</value></data>
   <data name="DailyTargetMinutes" xml:space="preserve"><value>Daily target in minutes</value></data>
-  <data name="OpenSource" xml:space="preserve"><value>Open source repository</value></data>
-  <data name="OpenSourceHelp" xml:space="preserve"><value>Open the Rodel Timer source code on GitHub</value></data>
+  <data name="OpenSource" xml:space="preserve"><value>Archived Work-Timer source</value></data>
+  <data name="OpenSourceHelp" xml:space="preserve"><value>Open the archived Work-Timer source code on GitHub</value></data>
+  <data name="ThemeDescription" xml:space="preserve"><value>Choose how the app looks</value></data>
+  <data name="LanguageDescription" xml:space="preserve"><value>Set the display language</value></data>
+  <data name="FontDescription" xml:space="preserve"><value>Pick the font used across the app</value></data>
+  <data name="DailyTargetDescription" xml:space="preserve"><value>Your daily focus goal in minutes</value></data>
+  <data name="OpenOnGitHub" xml:space="preserve"><value>Open on GitHub</value></data>
   <data name="WhatsNewTitle" xml:space="preserve"><value>What's new</value></data>
   <data name="WhatsNewBody" xml:space="preserve"><value>Rodel Timer is a complete Sprout-based rewrite with Fluent Design, live language and theme switching, accessible controls, and safe migration of your existing Work-Timer data.</value></data>
   <data name="Save" xml:space="preserve"><value>Save</value></data>
@@ -82,4 +87,47 @@
   <data name="Retry" xml:space="preserve"><value>Retry</value></data>
   <data name="SaveFailed" xml:space="preserve"><value>Your changes could not be saved.</value></data>
   <data name="MigrationWarnings" xml:space="preserve"><value>{0} migration warning(s) require review.</value></data>
+  <data name="MigrationWarningsTitle" xml:space="preserve"><value>Migration warnings</value></data>
+  <data name="HistoryItemAccessibleDescription" xml:space="preserve"><value>{0}, duration {1}, recorded {2}</value></data>
+  <data name="SelectedIconStatus" xml:space="preserve"><value>Selected icon</value></data>
+  <data name="FolderIconActivity" xml:space="preserve"><value>Activity</value></data>
+  <data name="FolderIconAirplay" xml:space="preserve"><value>AirPlay</value></data>
+  <data name="FolderIconAlertTriangle" xml:space="preserve"><value>Alert</value></data>
+  <data name="FolderIconAnchor" xml:space="preserve"><value>Anchor</value></data>
+  <data name="FolderIconAperture" xml:space="preserve"><value>Aperture</value></data>
+  <data name="FolderIconArchive" xml:space="preserve"><value>Archive</value></data>
+  <data name="FolderIconAward" xml:space="preserve"><value>Award</value></data>
+  <data name="FolderIconBarChart" xml:space="preserve"><value>Bar chart</value></data>
+  <data name="FolderIconBarChart2" xml:space="preserve"><value>Bar chart (horizontal)</value></data>
+  <data name="FolderIconBattery" xml:space="preserve"><value>Battery</value></data>
+  <data name="FolderIconBluetooth" xml:space="preserve"><value>Bluetooth</value></data>
+  <data name="FolderIconBook" xml:space="preserve"><value>Book</value></data>
+  <data name="FolderIconBookmark" xml:space="preserve"><value>Bookmark</value></data>
+  <data name="FolderIconBox" xml:space="preserve"><value>Box</value></data>
+  <data name="FolderIconBriefcase" xml:space="preserve"><value>Briefcase</value></data>
+  <data name="FolderIconCalendar" xml:space="preserve"><value>Calendar</value></data>
+  <data name="FolderIconCamera" xml:space="preserve"><value>Camera</value></data>
+  <data name="FolderIconCast" xml:space="preserve"><value>Cast</value></data>
+  <data name="FolderIconChrome" xml:space="preserve"><value>Browser</value></data>
+  <data name="FolderIconClipboard" xml:space="preserve"><value>Clipboard</value></data>
+  <data name="FolderIconClock" xml:space="preserve"><value>Clock</value></data>
+  <data name="FolderIconCloud" xml:space="preserve"><value>Cloud</value></data>
+  <data name="FolderIconCode" xml:space="preserve"><value>Code</value></data>
+  <data name="FolderIconCoffee" xml:space="preserve"><value>Coffee</value></data>
+  <data name="FolderIconCpu" xml:space="preserve"><value>Processor</value></data>
+  <data name="FolderIconCreditCard" xml:space="preserve"><value>Credit card</value></data>
+  <data name="FolderIconDisc" xml:space="preserve"><value>Disc</value></data>
+  <data name="FolderIconEdit" xml:space="preserve"><value>Edit</value></data>
+  <data name="FolderIconEye" xml:space="preserve"><value>Eye</value></data>
+  <data name="FolderIconFacebook" xml:space="preserve"><value>Community</value></data>
+  <data name="FolderIconFeather" xml:space="preserve"><value>Feather</value></data>
+  <data name="FolderIconFigma" xml:space="preserve"><value>Design</value></data>
+  <data name="FolderIconFile" xml:space="preserve"><value>File</value></data>
+  <data name="FolderIconFolder" xml:space="preserve"><value>Folder</value></data>
+  <data name="FolderIconFramer" xml:space="preserve"><value>Frame</value></data>
+  <data name="FolderIconGift" xml:space="preserve"><value>Gift</value></data>
+  <data name="FolderIconHome" xml:space="preserve"><value>Home</value></data>
+  <data name="FolderIconImage" xml:space="preserve"><value>Image</value></data>
+  <data name="FolderIconInbox" xml:space="preserve"><value>Inbox</value></data>
+  <data name="FolderIconInfo" xml:space="preserve"><value>Info</value></data>
 </root>

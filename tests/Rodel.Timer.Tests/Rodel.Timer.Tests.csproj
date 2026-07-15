@@ -16,4 +16,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Rodel.Timer.Presentation\Rodel.Timer.Presentation.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\src\Rodel.Timer\Strings\en-US\Resources.resw" Link="Strings\en-US\Resources.resw" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\Rodel.Timer\Strings\zh-CN\Resources.resw" Link="Strings\zh-CN\Resources.resw" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

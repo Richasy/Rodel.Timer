@@ -71,8 +71,13 @@
   <data name="LanguageEnglish" xml:space="preserve"><value>英语</value></data>
   <data name="LanguageChinese" xml:space="preserve"><value>简体中文</value></data>
   <data name="DailyTargetMinutes" xml:space="preserve"><value>每日目标分钟数</value></data>
-  <data name="OpenSource" xml:space="preserve"><value>开源仓库</value></data>
-  <data name="OpenSourceHelp" xml:space="preserve"><value>在 GitHub 上打开 Rodel 计时器源代码</value></data>
+  <data name="OpenSource" xml:space="preserve"><value>已归档的 Work-Timer 源代码</value></data>
+  <data name="OpenSourceHelp" xml:space="preserve"><value>在 GitHub 上打开已归档的 Work-Timer 源代码</value></data>
+  <data name="ThemeDescription" xml:space="preserve"><value>选择应用的外观</value></data>
+  <data name="LanguageDescription" xml:space="preserve"><value>设置显示语言</value></data>
+  <data name="FontDescription" xml:space="preserve"><value>选择应用使用的字体</value></data>
+  <data name="DailyTargetDescription" xml:space="preserve"><value>每天的专注目标（分钟）</value></data>
+  <data name="OpenOnGitHub" xml:space="preserve"><value>在 GitHub 上打开</value></data>
   <data name="WhatsNewTitle" xml:space="preserve"><value>新版内容</value></data>
   <data name="WhatsNewBody" xml:space="preserve"><value>Rodel 计时器现已基于 Sprout 完整重写，采用 Fluent Design，支持实时语言和主题切换、无障碍控件，并可安全迁移现有 Work-Timer 数据。</value></data>
   <data name="Save" xml:space="preserve"><value>保存</value></data>
@@ -82,4 +87,47 @@
   <data name="Retry" xml:space="preserve"><value>重试</value></data>
   <data name="SaveFailed" xml:space="preserve"><value>无法保存你的更改。</value></data>
   <data name="MigrationWarnings" xml:space="preserve"><value>有 {0} 条迁移警告需要检查。</value></data>
+  <data name="MigrationWarningsTitle" xml:space="preserve"><value>迁移警告</value></data>
+  <data name="HistoryItemAccessibleDescription" xml:space="preserve"><value>{0}，时长 {1}，记录于 {2}</value></data>
+  <data name="SelectedIconStatus" xml:space="preserve"><value>已选图标</value></data>
+  <data name="FolderIconActivity" xml:space="preserve"><value>活动</value></data>
+  <data name="FolderIconAirplay" xml:space="preserve"><value>隔空播放</value></data>
+  <data name="FolderIconAlertTriangle" xml:space="preserve"><value>警告</value></data>
+  <data name="FolderIconAnchor" xml:space="preserve"><value>锚点</value></data>
+  <data name="FolderIconAperture" xml:space="preserve"><value>光圈</value></data>
+  <data name="FolderIconArchive" xml:space="preserve"><value>归档</value></data>
+  <data name="FolderIconAward" xml:space="preserve"><value>奖杯</value></data>
+  <data name="FolderIconBarChart" xml:space="preserve"><value>柱状图</value></data>
+  <data name="FolderIconBarChart2" xml:space="preserve"><value>条形图</value></data>
+  <data name="FolderIconBattery" xml:space="preserve"><value>电池</value></data>
+  <data name="FolderIconBluetooth" xml:space="preserve"><value>蓝牙</value></data>
+  <data name="FolderIconBook" xml:space="preserve"><value>书籍</value></data>
+  <data name="FolderIconBookmark" xml:space="preserve"><value>书签</value></data>
+  <data name="FolderIconBox" xml:space="preserve"><value>盒子</value></data>
+  <data name="FolderIconBriefcase" xml:space="preserve"><value>公文包</value></data>
+  <data name="FolderIconCalendar" xml:space="preserve"><value>日历</value></data>
+  <data name="FolderIconCamera" xml:space="preserve"><value>相机</value></data>
+  <data name="FolderIconCast" xml:space="preserve"><value>投屏</value></data>
+  <data name="FolderIconChrome" xml:space="preserve"><value>浏览器</value></data>
+  <data name="FolderIconClipboard" xml:space="preserve"><value>剪贴板</value></data>
+  <data name="FolderIconClock" xml:space="preserve"><value>时钟</value></data>
+  <data name="FolderIconCloud" xml:space="preserve"><value>云朵</value></data>
+  <data name="FolderIconCode" xml:space="preserve"><value>代码</value></data>
+  <data name="FolderIconCoffee" xml:space="preserve"><value>咖啡</value></data>
+  <data name="FolderIconCpu" xml:space="preserve"><value>处理器</value></data>
+  <data name="FolderIconCreditCard" xml:space="preserve"><value>信用卡</value></data>
+  <data name="FolderIconDisc" xml:space="preserve"><value>光盘</value></data>
+  <data name="FolderIconEdit" xml:space="preserve"><value>编辑</value></data>
+  <data name="FolderIconEye" xml:space="preserve"><value>眼睛</value></data>
+  <data name="FolderIconFacebook" xml:space="preserve"><value>社区</value></data>
+  <data name="FolderIconFeather" xml:space="preserve"><value>羽毛</value></data>
+  <data name="FolderIconFigma" xml:space="preserve"><value>设计</value></data>
+  <data name="FolderIconFile" xml:space="preserve"><value>文件</value></data>
+  <data name="FolderIconFolder" xml:space="preserve"><value>文件夹</value></data>
+  <data name="FolderIconFramer" xml:space="preserve"><value>边框</value></data>
+  <data name="FolderIconGift" xml:space="preserve"><value>礼物</value></data>
+  <data name="FolderIconHome" xml:space="preserve"><value>主页</value></data>
+  <data name="FolderIconImage" xml:space="preserve"><value>图片</value></data>
+  <data name="FolderIconInbox" xml:space="preserve"><value>收件箱</value></data>
+  <data name="FolderIconInfo" xml:space="preserve"><value>信息</value></data>
 </root>

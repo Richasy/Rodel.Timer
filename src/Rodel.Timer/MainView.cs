@@ -1,90 +1,227 @@
-using Rodel.Timer.Core.Bootstrap;
+using Rodel.Timer.Core.Settings;
+using Rodel.Timer.Presentation;
 
 using Sprout;
-using Sprout.Graphics;
-using Sprout.Theming;
+using Sprout.Controls;
+using Sprout.Reconcile;
+using Sprout.Semantics;
 
 using static Sprout.Markup;
 
 namespace Rodel.Timer;
 
 /// <summary>
-/// The application's placeholder root view, shown while the timer workspace bootstraps and afterward to
-/// report its outcome. This is a foundation surface only: it renders <see cref="Heading"/>/<see cref="Status"/>
-/// as plain text and will be replaced by the real Fluent product UI once the data foundation is verified.
+/// The single stateful root control for the Rodel Timer product UI. It owns every piece of UI-only reactive state
+/// (viewport width, pane open flags, compact-presenter flag, the in-progress session title, and transient status),
+/// hosts the nested folder/history <see cref="Sprout.Controls.SplitView"/> shell around the central timer content, drives the
+/// one-second UI tick into the store, and orchestrates every dialog and menu. The reactive
+/// <see cref="TimerAppStore"/> is the data source it binds to; the store is owned and disposed by <see cref="App"/>.
 /// </summary>
-public sealed partial class MainView : Control
+public sealed partial class MainView : Control, ILanguageApplyTarget
 {
-    /// <summary>Creates the view in its initial "preparing data" state.</summary>
-    public MainView()
+    /// <summary>The open pane width (effective pixels) for both nested split views.</summary>
+    internal const float PaneLength = 320f;
+
+    private readonly Window _window;
+    private readonly TimerAppStore _store;
+    private readonly IReadOnlyList<FontChoice> _fonts;
+    private readonly TimerChrome _chrome;
+
+    /// <summary>Creates the product view over a window and its reactive store.</summary>
+    /// <param name="window">The hosting window (the source of theme, presenter, and dialog hosting).</param>
+    /// <param name="store">The reactive timer store this view renders and mutates.</param>
+    /// <param name="fonts">The selectable UI fonts offered in settings.</param>
+    /// <exception cref="ArgumentNullException">Any argument is <see langword="null"/>.</exception>
+    public MainView(Window window, TimerAppStore store, IReadOnlyList<FontChoice> fonts)
     {
-        Heading = Resources.AppName;
-        Status = Resources.PreparingData;
+        _window = window ?? throw new ArgumentNullException(nameof(window));
+        _store = store ?? throw new ArgumentNullException(nameof(store));
+        _fonts = fonts ?? throw new ArgumentNullException(nameof(fonts));
+        _chrome = new TimerChrome(window, this);
+        ViewportWidth = 1100d;
+        SessionTitle = string.Empty;
+        SaveErrorMessage = string.Empty;
     }
 
-    /// <summary>The view's current title text.</summary>
-    public partial string Heading { get; private set; }
+    /// <summary>The current viewport width in effective pixels; drives the responsive pane breakpoints.</summary>
+    public partial double ViewportWidth { get; private set; }
 
-    /// <summary>The view's current status/body text.</summary>
-    public partial string Status { get; private set; }
+    /// <summary>Whether the window is currently in the compact overlay presenter.</summary>
+    public partial bool IsCompactPresenter { get; private set; }
 
-    /// <summary>Updates the view to report a successful bootstrap outcome, summarizing its origin and contents.</summary>
-    /// <param name="result">The bootstrap result to summarize.</param>
-    /// <exception cref="ArgumentNullException"><paramref name="result"/> is <see langword="null"/>.</exception>
-    public void ShowReady(TimerBootstrapResult result)
+    /// <summary>Whether the folder pane is open (ignored while compact).</summary>
+    public partial bool FolderPaneOpen { get; private set; }
+
+    /// <summary>Whether the history pane is open (ignored while compact).</summary>
+    public partial bool HistoryPaneOpen { get; private set; }
+
+    /// <summary>The in-progress session title being edited; UI-only until a session is stopped.</summary>
+    public partial string SessionTitle { get; private set; }
+
+    /// <summary>A monotonic counter bumped on every theme change so descendant controls re-resolve their colors.</summary>
+    public partial int ThemeStamp { get; private set; }
+
+    /// <summary>A blocking save-failure message shown over the shell, or the empty string when there is none.</summary>
+    /// <remarks>
+    /// A non-null <see cref="string"/> (empty = "no message") rather than <c>string?</c> because the reactive store
+    /// generator emits its partial-property implementation with the fully qualified type, which drops the nullable
+    /// reference annotation — a <c>string?</c> author declaration would mismatch the generated <c>string</c> (CS9256).
+    /// </remarks>
+    public partial string SaveErrorMessage { get; private set; }
+
+    /// <summary>The store this view binds to (shared with the slot controls and rows).</summary>
+    internal TimerAppStore Store => _store;
+
+    /// <summary>The hosting window (shared with the slot controls for theme and dialog hosting).</summary>
+    internal Window Window => _window;
+
+    /// <summary>The selectable UI fonts offered in settings.</summary>
+    internal IReadOnlyList<FontChoice> Fonts => _fonts;
+
+    /// <summary>The persisted UI font family applied to primary text, or a safe default before the workspace loads.</summary>
+    internal string FontFamily =>
+        _store.Bootstrap.IsSuccess ? _store.Preferences.FontFamily : TimerPreferences.DefaultFontFamily;
+
+    /// <summary>The current folders, or an empty list before the workspace has loaded (never throws).</summary>
+    internal IReadOnlyList<Core.Folders.TimerFolder> Folders =>
+        _store.Bootstrap.IsSuccess ? _store.Folders : [];
+
+    /// <summary>The selected folder's history entries, or an empty list before the workspace has loaded (never throws).</summary>
+    internal IReadOnlyList<Core.History.TimerEntry> SelectedEntries =>
+        _store.Bootstrap.IsSuccess ? _store.SelectedEntries : [];
+
+    /// <summary>The selected folder's id, or <see cref="Guid.Empty"/> before the workspace has loaded (never throws).</summary>
+    internal Guid SelectedFolderId =>
+        _store.Bootstrap.IsSuccess ? _store.SelectedFolder.Id : Guid.Empty;
+
+    /// <summary>The selected folder's name, or the empty string before the workspace has loaded (never throws).</summary>
+    internal string SelectedFolderName =>
+        _store.Bootstrap.IsSuccess ? _store.SelectedFolder.Name : string.Empty;
+
+    /// <summary>The current preferences, or the defaults before the workspace has loaded (never throws).</summary>
+    internal TimerPreferences Preferences =>
+        _store.Bootstrap.IsSuccess ? _store.Preferences : TimerPreferences.Default;
+
+    /// <summary>The today's completed total, or zero before the workspace has loaded (never throws).</summary>
+    internal TimeSpan TodayTotal =>
+        _store.Bootstrap.IsSuccess ? _store.TodayTotal : TimeSpan.Zero;
+
+    /// <summary>Whether a timing session is currently running.</summary>
+    internal bool IsRunning => _store.IsRunning;
+
+    /// <summary>The running session's elapsed time (zero when idle); safe to read before the workspace loads.</summary>
+    internal TimeSpan Elapsed => _store.Elapsed;
+
+    /// <summary>The plain command-and-theme surface handed to the render-only composites.</summary>
+    internal TimerChrome Chrome => _chrome;
+
+    /// <summary>The footer "today's total / target" summary line (localized, culture-formatted).</summary>
+    internal string SummaryText => string.Format(
+        System.Globalization.CultureInfo.CurrentCulture,
+        "{0}: {1} / {2} {3}",
+        Resources.TodayTotal,
+        TimerFormat.WholeMinutes(TodayTotal),
+        Preferences.DailyTargetMinutes,
+        Resources.MinutesUnit);
+
+    /// <summary>The blocking-message title (save-failed when a save error is pending, else the load-error title).</summary>
+    internal string MessageTitle =>
+        SaveErrorMessage.Length > 0 ? Resources.SaveFailed : Resources.DataLoadErrorTitle;
+
+    /// <summary>The blocking-message detail (the save-error text, else the bootstrap failure message).</summary>
+    internal string MessageDetail =>
+        SaveErrorMessage.Length > 0 ? SaveErrorMessage : _store.Bootstrap.Error?.Message ?? string.Empty;
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// The nested folder / history split views take the <c>Control</c> pane and content overloads
+    /// (their slots are the interactive <see cref="FolderPaneControl"/> / <see cref="HistoryPaneControl"/> /
+    /// <see cref="TimerContentControl"/>) so all three trees are wired — the timer, folder, and history controls are
+    /// clickable, focusable, and screen-reader reachable. Each slot control is reconstructed each render with only the
+    /// stable <see cref="Chrome"/> surface (the changing state it reads live through its own reactive effect), so the
+    /// reconciler threads the throwaway into the retained split view without re-mounting. The loading and
+    /// blocking-message overlays use <c>When(...)</c> rather than
+    /// <c>.Visible(...)</c> so a hidden overlay is torn out of all three trees (a collapsed <c>.Visible(false)</c>
+    /// subtree keeps its semantics node, which would leak the retry button into the accessibility tree while the shell
+    /// is healthy).
+    /// </remarks>
+    public Ui Body => Overlay(
+        SplitView(
+            new FolderPaneControl(Chrome),
+            SplitView(
+                new HistoryPaneControl(Chrome),
+                new TimerContentControl(Chrome))
+                .PanePlacement(SplitViewPanePlacement.Right)
+                .DisplayMode(HistoryMode)
+                .OpenPaneLength(PaneLength)
+                .LightDismissOverlayMode(SplitViewLightDismissOverlayMode.On)
+                .PaneOpen(EffectiveHistoryOpen)
+                .OnPaneOpenChanged(SetHistoryPaneOpen)
+                .Automation(HistorySplitAutomation))
+            .PanePlacement(SplitViewPanePlacement.Left)
+            .DisplayMode(FolderMode)
+            .OpenPaneLength(PaneLength)
+            .LightDismissOverlayMode(SplitViewLightDismissOverlayMode.On)
+            .PaneOpen(EffectiveFolderOpen)
+            .OnPaneOpenChanged(SetFolderPaneOpen)
+            .Automation(FolderSplitAutomation),
+        When(IsBootstrapping, new TimerLoadingView(Chrome, FontFamily, ThemeStamp)),
+        When(HasBlockingMessage, new TimerMessageView(Chrome, MessageTitle, MessageDetail, FontFamily, ThemeStamp)));
+
+    /// <inheritdoc/>
+    protected override IDisposable? OnMounted()
     {
-        ArgumentNullException.ThrowIfNull(result);
+        DispatcherQueueTimer timer = DispatcherQueue.GetForCurrentThread().CreateTimer();
+        timer.Interval = TimeSpan.FromSeconds(1);
+        timer.IsRepeating = true;
+        timer.Tick += OnTick;
+        timer.Start();
+        return new TickSubscription(timer, OnTick);
+    }
 
-        string origin = result.Origin switch
+    private void OnTick(object? sender, EventArgs e) => _store.Tick();
+
+    private bool IsBootstrapping => !_store.Bootstrap.IsSuccess && !_store.Bootstrap.IsError;
+
+    private bool HasBlockingMessage => _store.Bootstrap.IsError || SaveErrorMessage.Length > 0;
+
+    private SplitViewDisplayMode FolderMode => Shell.FolderMode;
+
+    private SplitViewDisplayMode HistoryMode => Shell.HistoryMode;
+
+    private bool EffectiveFolderOpen => Shell.FolderPaneOpen;
+
+    private bool EffectiveHistoryOpen => Shell.HistoryPaneOpen;
+
+    private TimerShellLayout Shell =>
+        TimerShell.Resolve(ViewportWidth, IsCompactPresenter, FolderPaneOpen, HistoryPaneOpen);
+
+    internal static AutomationInfo FolderSplitAutomation => new()
+    {
+        Name = Resources.Folders,
+        AutomationId = TimerAutomationIds.FoldersSplit,
+    };
+
+    internal static AutomationInfo HistorySplitAutomation => new()
+    {
+        Name = Resources.History,
+        AutomationId = TimerAutomationIds.HistorySplit,
+    };
+
+    private sealed class TickSubscription(DispatcherQueueTimer timer, EventHandler handler) : IDisposable
+    {
+        private DispatcherQueueTimer? _timer = timer;
+
+        public void Dispose()
         {
-            TimerBootstrapOrigin.Migrated => "Legacy Work-Timer data migrated",
-            TimerBootstrapOrigin.Created => "New timer data created",
-            _ => "Timer data loaded",
-        };
-        string warning = result.Warnings.Count == 0
-            ? string.Empty
-            : $"\n{result.Warnings.Count} migration warning(s) require review.";
+            if (_timer is null)
+            {
+                return;
+            }
 
-        Status =
-            $"{origin}: {result.Workspace.Folders.Count} folder(s), "
-            + $"{result.Workspace.Entries.Count} history item(s).{warning}\n\n"
-            + "The Fluent product UI will be built on this verified foundation.";
+            _timer.Stop();
+            _timer.Tick -= handler;
+            _timer = null;
+        }
     }
-
-    /// <summary>
-    /// Updates the view to report that bootstrapping failed with a data error, leaving the original,
-    /// untouched data on disk (the caller is expected to have already avoided any destructive write).
-    /// </summary>
-    /// <param name="message">The message to display, describing the failure.</param>
-    /// <exception cref="ArgumentException"><paramref name="message"/> is null, empty, or whitespace-only.</exception>
-    public void ShowDataError(string message)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(message);
-        Heading = Resources.DataLoadErrorTitle;
-        Status = message;
-    }
-
-    /// <summary>The inline placeholder body, colored from the ambient window theme.</summary>
-    public Ui Body => Border(
-        Stack(
-            Text(
-                Heading,
-                new TextStyle(
-                    TextStyle.DefaultFontFamily,
-                    28f,
-                    TextStyle.NormalWeight,
-                    TextAlignment.Center,
-                    TextWrapping.Wrap),
-                Theme.Resolve().Colors.TextFillColorPrimary),
-            Text(
-                Status,
-                new TextStyle(
-                    TextStyle.DefaultFontFamily,
-                    15f,
-                    TextStyle.NormalWeight,
-                    TextAlignment.Center,
-                    TextWrapping.Wrap),
-                Theme.Resolve().Colors.TextFillColorSecondary))
-        .Spacing(16f))
-        .Padding(40f);
 }
