@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <IsTestProject>true</IsTestProject>
+    <RootNamespace>Rodel.Timer.Tests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MSTest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Rodel.Timer.Presentation\Rodel.Timer.Presentation.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\src\Rodel.Timer\Strings\en-US\Resources.resw" Link="Strings\en-US\Resources.resw" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\Rodel.Timer\Strings\zh-CN\Resources.resw" Link="Strings\zh-CN\Resources.resw" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

@@ -10,9 +10,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageVersion Include="Sprout" Version="0.1.0-local.g7bc57cdc62ee" />
-    <PackageVersion Include="Sprout.Backend.D2D" Version="0.1.0-local.g7bc57cdc62ee" />
-    <PackageVersion Include="Sprout.Packaging" Version="0.1.0-local.g7bc57cdc62ee" />
-    <PackageVersion Include="Sprout.WindowsAppSDK" Version="0.1.0-local.g7bc57cdc62ee" />
+    <PackageVersion Include="Sprout" Version="0.1.0-local.g143efe33.rodeltimer5" />
+    <PackageVersion Include="Sprout.Backend.D2D" Version="0.1.0-local.g143efe33.rodeltimer5" />
+    <PackageVersion Include="Sprout.FluentIcon" Version="0.1.0-local.g143efe33.rodeltimer5" />
+    <PackageVersion Include="Sprout.Packaging" Version="0.1.0-local.g143efe33.rodeltimer5" />
+    <PackageVersion Include="Sprout.WindowsAppSDK" Version="0.1.0-local.g143efe33.rodeltimer5" />
   </ItemGroup>
 </Project>
