@@ -19,10 +19,11 @@ namespace Rodel.Timer;
 [Composite]
 public readonly partial record struct NormalFooterStatusView(
     bool IsRunning,
+    bool ShowBackgroundStatus,
     string BackgroundStatus,
     ThemeColors Colors)
 {
-    /// <summary>The running state over the active/fallback material status.</summary>
+    /// <summary>The running state, with the material line appended only while the material is in fallback.</summary>
     public Ui Body => Stack(
         Stack(
             Rectangle(
@@ -40,8 +41,9 @@ public readonly partial record struct NormalFooterStatusView(
         Text(
             BackgroundStatus,
             new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.NormalWeight),
-            Colors.TextFillColorSecondary)
-            .HAlign(HorizontalAlignment.Center))
+            Colors.SystemFillColorCaution)
+            .HAlign(HorizontalAlignment.Center)
+            .Visible(ShowBackgroundStatus))
         .Spacing(2f);
 }
 
@@ -137,6 +139,7 @@ public readonly partial record struct NormalTimerFooterView(
     string FolderName,
     bool IsRunning,
     string FocusSummary,
+    bool IsBackgroundFallback,
     string BackgroundStatus)
 {
     /// <summary>The full-width bottom plane; the middle status is structurally absent in the narrow state.</summary>
@@ -156,7 +159,7 @@ public readonly partial record struct NormalTimerFooterView(
                 .Weight(1f),
             When(
                 Layout.ShowMiddleStatus,
-                new NormalFooterStatusView(IsRunning, BackgroundStatus, Colors)),
+                new NormalFooterStatusView(IsRunning, IsBackgroundFallback, BackgroundStatus, Colors)),
             Stack(
                 Text(
                     Resources.TodaysFocus,
@@ -193,6 +196,7 @@ public readonly partial record struct NormalTimerView(
     bool IsRunning,
     string SessionTitle,
     string FocusSummary,
+    bool IsBackgroundFallback,
     string BackgroundStatus)
 {
     /// <summary>The open timer stage and full-width footer, with no enclosing hero card.</summary>
@@ -205,6 +209,7 @@ public readonly partial record struct NormalTimerView(
             FolderName,
             IsRunning,
             FocusSummary,
+            IsBackgroundFallback,
             BackgroundStatus));
 }
 

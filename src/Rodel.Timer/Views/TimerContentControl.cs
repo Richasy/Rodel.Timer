@@ -51,6 +51,7 @@ public sealed partial class TimerContentControl : Control
                 _chrome.IsRunning,
                 _chrome.SessionTitle,
                 _chrome.FocusSummaryText,
+                _chrome.IsBackgroundFallback,
                 _chrome.BackgroundStatusText)));
 
     private Sprout.Theming.ThemeColors Colors

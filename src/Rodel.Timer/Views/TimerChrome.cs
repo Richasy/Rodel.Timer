@@ -76,6 +76,9 @@ public sealed class TimerChrome
     /// <summary>The requested window background and its active/fallback state (reactive).</summary>
     public string BackgroundStatusText => _main.BackgroundStatusText;
 
+    /// <summary>Whether the requested window material is currently in its opaque policy fallback (reactive).</summary>
+    public bool IsBackgroundFallback => _main.IsBackgroundFallback;
+
     /// <summary>The current folders (reactive; a fresh reference on every store revision).</summary>
     public IReadOnlyList<TimerFolder> Folders => _main.Folders;
 

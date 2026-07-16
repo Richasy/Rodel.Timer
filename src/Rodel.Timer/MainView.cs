@@ -149,6 +149,20 @@ public sealed partial class MainView : Control, ILanguageApplyTarget
         }
     }
 
+    /// <summary>
+    /// Whether the requested window material is currently showing its opaque policy fallback. The footer surfaces the
+    /// material line only in this degraded state — the active case is the silent default, so the middle column stays a
+    /// quiet running-state indicator rather than a persistent "material active" readout.
+    /// </summary>
+    internal bool IsBackgroundFallback
+    {
+        get
+        {
+            _ = MaterialPolicy.Current.System;
+            return _windowBackground.Resolve(Preferences.Background).IsFallback;
+        }
+    }
+
     /// <summary>The blocking-message title (save-failed when a save error is pending, else the load-error title).</summary>
     internal string MessageTitle =>
         SaveErrorMessage.Length > 0 ? Resources.SaveFailed : Resources.DataLoadErrorTitle;
