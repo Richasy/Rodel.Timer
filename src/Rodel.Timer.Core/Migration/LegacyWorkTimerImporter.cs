@@ -283,7 +283,7 @@ public sealed class LegacyWorkTimerImporter
 
         return new TimerPreferences(
             theme,
-            TimerBackgroundMode.SystemMaterial,
+            TimerBackgroundMode.Mica,
             language,
             string.IsNullOrWhiteSpace(fontFamily) ? _defaultPreferences.FontFamily : fontFamily,
             dailyTargetMinutes,

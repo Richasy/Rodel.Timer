@@ -56,8 +56,6 @@ internal static class TimerVisuals
         /// <summary>28 epx — a perfect circle for the 56 epx start / stop button (half its diameter).</summary>
         internal const float Circle = 28f;
 
-        /// <summary>25 epx — a perfect circle for the 50 epx compact start / stop button.</summary>
-        internal const float CompactCircle = 25f;
     }
 
     /// <summary>The standard control heights: 40 default, 36 icon / compact, 56 hero.</summary>
@@ -72,8 +70,6 @@ internal static class TimerVisuals
         /// <summary>56 epx — the hero start / stop circle diameter and the clock band.</summary>
         internal const float Hero = 56f;
 
-        /// <summary>50 epx — the compact-overlay start / stop circle diameter.</summary>
-        internal const float CompactStart = 50f;
     }
 
     /// <summary>The icon glyph sizes: 16 small, 20 medium, 24 large, plus the 40 epx square row tile.</summary>
@@ -120,8 +116,6 @@ internal static class TimerVisuals
         /// <summary>360 epx — a wrapping caption (empty-state, message detail).</summary>
         internal const float Caption = 360f;
 
-        /// <summary>320 epx — the open pane width for both nested split views.</summary>
-        internal const float Pane = 320f;
     }
 
     /// <summary>The row geometry: fixed row extents and the selected-folder accent indicator size.</summary>
@@ -172,7 +166,5 @@ internal static class TimerVisuals
         /// <summary>The circular hero start / stop action — zero padding + the 28 epx radius (a perfect 56 epx pill).</summary>
         internal static readonly ButtonStyle CircularAction = default(ButtonStyle).Padding(0f).CornerRadius(Radius.Circle);
 
-        /// <summary>The circular compact-overlay start / stop action — zero padding + the 25 epx radius (a perfect 50 epx pill).</summary>
-        internal static readonly ButtonStyle CompactCircularAction = default(ButtonStyle).Padding(0f).CornerRadius(Radius.CompactCircle);
     }
 }

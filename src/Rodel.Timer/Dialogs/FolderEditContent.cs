@@ -133,7 +133,7 @@ public sealed partial class FolderEditContent : Control
                 }),
             Text(
                 Resources.ChooseIcon,
-                new TextFormat(TimerPreferences.DefaultFontFamily, 13f, TextFormat.NormalWeight),
+                new TextFormat(TextFormat.DefaultFontFamily, 13f, TextFormat.NormalWeight),
                 Colors.TextFillColorSecondary),
             new IconPickerView(FolderIconCatalog.Choices(SelectedIcon, _main.ThemeStamp), BuildCell))
             .Spacing(TimerVisuals.Spacing.Medium)

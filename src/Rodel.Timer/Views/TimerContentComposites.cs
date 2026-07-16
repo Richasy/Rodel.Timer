@@ -7,6 +7,7 @@ using Sprout.Graphics;
 using Sprout.Layout;
 using Sprout.Reconcile;
 using Sprout.Semantics;
+using Sprout.Styling;
 using Sprout.Theming;
 using Sprout.Widgets;
 
@@ -14,137 +15,110 @@ using static Sprout.Markup;
 
 namespace Rodel.Timer;
 
-/// <summary>
-/// The full (non-compact) timer content — a central translucent hero card (folder label, rolling clock, session-title
-/// input, and the round start/stop button) and a centred footer command dock (folder toggle · today summary · history
-/// toggle). The brand, app name, settings, and compact command now live in the extended title bar
-/// (<see cref="TimerTitleBarControl"/>), not here. It is a render-only <c>[Composite]</c> value view whose every
-/// reactive input is supplied by the host <see cref="TimerContentControl"/> as a record field, so a tick, a theme
-/// switch, or a title edit reconciles it in place.
-/// </summary>
-/// <remarks>
-/// The view carries <b>four</b> interactive children (start/stop, the title box, the folder toggle, and the history
-/// toggle), so the Group projects a bound per child — each toggle's accessibility bounds are its own control rect, not
-/// the whole footer row. The outer surface paints <b>no</b> background so the window's Mica shows through; only the hero
-/// card and the footer dock carry the translucent card token + a hairline stroke.
-/// </remarks>
-/// <param name="Chrome">The command surface (start-stop / pane toggles / title setter).</param>
-/// <param name="Colors">The live theme palette resolved by the host.</param>
-/// <param name="FontFamily">The UI font family applied to every label.</param>
-/// <param name="FolderName">The selected folder's name shown above the clock.</param>
-/// <param name="Elapsed">The running session's elapsed time (zero when idle).</param>
-/// <param name="IsRunning">Whether a session is currently running (accent clock + stop affordance).</param>
-/// <param name="SessionTitle">The in-progress session title being edited.</param>
-/// <param name="SummaryText">The footer "today's total / target" summary line.</param>
+/// <summary>The middle footer column, mounted only when the normal layout has enough horizontal room.</summary>
 [Composite]
-public readonly partial record struct NormalTimerView(
+public readonly partial record struct NormalFooterStatusView(
+    bool IsRunning,
+    string BackgroundStatus,
+    ThemeColors Colors)
+{
+    /// <summary>The running state over the active/fallback material status.</summary>
+    public Ui Body => Stack(
+        Stack(
+            Rectangle(
+                Brush.CreateSolid(IsRunning ? Colors.AccentFillColorDefault : Colors.SystemFillColorNeutral),
+                new Size(6f, 6f))
+                .Rounded(3f)
+                .VAlign(VerticalAlignment.Center),
+            Text(
+                IsRunning ? Resources.TimerRunning : Resources.TimerReady,
+                new TextFormat(TextFormat.DefaultFontFamily, 12f, TextFormat.SemiBoldWeight),
+                Colors.TextFillColorSecondary))
+            .Orientation(Orientation.Horizontal)
+            .Spacing(6f)
+            .HAlign(HorizontalAlignment.Center),
+        Text(
+            BackgroundStatus,
+            new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.NormalWeight),
+            Colors.TextFillColorSecondary)
+            .HAlign(HorizontalAlignment.Center))
+        .Spacing(2f);
+}
+
+/// <summary>The open-canvas timer stage: status, broken axis and clock, title editor, then primary action.</summary>
+[Composite]
+public readonly partial record struct NormalTimerStageView(
     TimerChrome Chrome,
     ThemeColors Colors,
-    string FontFamily,
-    string FolderName,
+    TimerNormalLayout Layout,
     TimeSpan Elapsed,
     bool IsRunning,
-    string SessionTitle,
-    string SummaryText)
+    string SessionTitle)
 {
-    /// <summary>The centred hero card and the footer command dock over a transparent surface.</summary>
+    /// <summary>The centred stage with no enclosing card or opaque surface.</summary>
     public Ui Body => Stack(
-        Overlay(
-            Border(
-                Stack(
-                    Text(
-                        FolderName,
-                        new TextFormat(FontFamily, 13f, TextFormat.NormalWeight, TextAlignment.Center),
-                        Colors.TextFillColorSecondary)
-                        .HAlign(HorizontalAlignment.Center),
-                    AnimatedText(
-                        TimerFormat.Clock(Elapsed),
-                        new TextFormat(FontFamily, TimerVisuals.Clock.Hero, TextFormat.SemiBoldWeight, TextAlignment.Center),
-                        IsRunning ? Colors.AccentTextFillColorPrimary : Colors.TextFillColorPrimary)
-                        .HAlign(HorizontalAlignment.Center),
-                    TextBox()
-                        .Text(SessionTitle)
-                        .OnTextChanged(Chrome.SetSessionTitle)
-                        .Placeholder(Resources.SessionTitlePlaceholder)
-                        .Automation(TitleAutomation)
-                        .MaxWidth(TimerVisuals.MaxWidth.HeroColumn)
-                        .HAlign(HorizontalAlignment.Center),
-                    Button(
-                        Icon.Fluent(IsRunning ? FluentSymbol.Stop : FluentSymbol.Play, FluentIconVariant.Filled, TimerVisuals.IconSize.Large, Brush.CreateSolid(Colors.TextOnAccentFillColorPrimary)),
-                        Chrome.StartOrStop,
-                        ButtonPalette.FromTheme(Colors, ButtonColorScheme.Accent))
-                        .Style(TimerVisuals.Buttons.CircularAction)
-                        .Width(TimerVisuals.Height.Hero)
-                        .Height(TimerVisuals.Height.Hero)
-                        .HAlign(HorizontalAlignment.Center)
-                        .Automation(StartStopAutomation))
-                    .Spacing(TimerVisuals.Spacing.Large)
-                    .HAlign(HorizontalAlignment.Center))
-                .Background(Brush.Theme(ThemeColorToken.CardBackgroundFillColorDefault))
-                .BorderBrush(Brush.Theme(ThemeColorToken.CardStrokeColorDefault))
-                .BorderThickness(1f)
-                .CornerRadius(TimerVisuals.Radius.Hero)
-                .Padding(TimerVisuals.Spacing.XXLarge, TimerVisuals.Spacing.XLarge, TimerVisuals.Spacing.XXLarge, TimerVisuals.Spacing.XLarge)
-                .MaxWidth(TimerVisuals.MaxWidth.Hero)
-                .HAlign(HorizontalAlignment.Center)
+        Text(
+            IsRunning ? Resources.TimerRunning : Resources.TimerReady,
+            new TextFormat(TextFormat.DefaultFontFamily, 13f, TextFormat.SemiBoldWeight, TextAlignment.Center),
+            Colors.TextFillColorSecondary)
+            .HAlign(HorizontalAlignment.Center),
+        Stack(
+            Rectangle(
+                Brush.Theme(ThemeColorToken.DividerStrokeColorDefault),
+                new Size(Layout.AxisSegmentWidth, 1f))
+                .VAlign(VerticalAlignment.Center),
+            AnimatedText(
+                TimerFormat.Clock(Elapsed),
+                new TextFormat(
+                    TextFormat.DefaultFontFamily,
+                    Layout.ClockSize,
+                    TextFormat.SemiBoldWeight,
+                    TextAlignment.Center),
+                IsRunning ? Colors.AccentTextFillColorPrimary : Colors.TextFillColorPrimary)
+                .HAlign(HorizontalAlignment.Center),
+            Rectangle(
+                Brush.Theme(ThemeColorToken.DividerStrokeColorDefault),
+                new Size(Layout.AxisSegmentWidth, 1f))
                 .VAlign(VerticalAlignment.Center))
-            .Weight(1f),
-        Overlay(
-            Border(
-                Stack(
-                    Button(
-                        Icon.Fluent(FluentSymbol.FolderList, FluentIconVariant.Regular, TimerVisuals.IconSize.Medium, Brush.CreateSolid(Colors.TextFillColorPrimary)),
-                        Chrome.ToggleFolderPane,
-                        TimerVisuals.Ghost(Colors))
-                        .Style(TimerVisuals.Buttons.Icon)
-                        .Width(TimerVisuals.Height.Standard)
-                        .Height(TimerVisuals.Height.Standard)
-                        .Automation(FoldersAutomation),
-                    Text(
-                        SummaryText,
-                        new TextFormat(FontFamily, 13f, TextFormat.NormalWeight),
-                        Colors.TextFillColorSecondary)
-                        .VAlign(VerticalAlignment.Center),
-                    Button(
-                        Icon.Fluent(FluentSymbol.History, FluentIconVariant.Regular, TimerVisuals.IconSize.Medium, Brush.CreateSolid(Colors.TextFillColorPrimary)),
-                        Chrome.ToggleHistoryPane,
-                        TimerVisuals.Ghost(Colors))
-                        .Style(TimerVisuals.Buttons.Icon)
-                        .Width(TimerVisuals.Height.Standard)
-                        .Height(TimerVisuals.Height.Standard)
-                        .Automation(HistoryAutomation))
-                    .Orientation(Orientation.Horizontal)
-                    .Spacing(TimerVisuals.Spacing.Medium)
-                    .VAlign(VerticalAlignment.Center))
-                .Background(Brush.Theme(ThemeColorToken.CardBackgroundFillColorDefault))
-                .BorderBrush(Brush.Theme(ThemeColorToken.CardStrokeColorDefault))
-                .BorderThickness(1f)
-                .CornerRadius(TimerVisuals.Radius.Card)
-                .Padding(TimerVisuals.Spacing.XSmall + 2f)
+            .Orientation(Orientation.Horizontal)
+            .Spacing(TimerVisuals.Spacing.XLarge)
+            .HAlign(HorizontalAlignment.Center),
+        TextBox()
+            .Text(SessionTitle)
+            .OnTextChanged(Chrome.SetSessionTitle)
+            .Placeholder(Resources.SessionTitlePlaceholder)
+            .Automation(TitleAutomation)
+            .MaxWidth(TimerVisuals.MaxWidth.HeroColumn)
+            .HAlign(HorizontalAlignment.Center),
+        Stack(
+            Button(
+                Icon.Fluent(
+                    IsRunning ? FluentSymbol.Stop : FluentSymbol.Play,
+                    FluentIconVariant.Filled,
+                    TimerVisuals.IconSize.Large,
+                    Brush.CreateSolid(Colors.TextOnAccentFillColorPrimary)),
+                Chrome.StartOrStop,
+                ButtonPalette.FromTheme(Colors, ButtonColorScheme.Accent))
+                .Style(TimerVisuals.Buttons.CircularAction)
+                .Width(TimerVisuals.Height.Hero)
+                .Height(TimerVisuals.Height.Hero)
+                .HAlign(HorizontalAlignment.Center)
+                .Automation(StartStopAutomation),
+            Text(
+                IsRunning ? Resources.StopTimer : Resources.StartTimer,
+                new TextFormat(TextFormat.DefaultFontFamily, 12f, TextFormat.SemiBoldWeight),
+                Colors.TextFillColorSecondary)
                 .HAlign(HorizontalAlignment.Center))
+            .Spacing(TimerVisuals.Spacing.XSmall)
             .HAlign(HorizontalAlignment.Center))
-        .Spacing(TimerVisuals.Spacing.Small)
-        .Padding(TimerVisuals.Spacing.Large, TimerVisuals.Spacing.Medium, TimerVisuals.Spacing.Large, TimerVisuals.Spacing.Large);
+        .Spacing(TimerVisuals.Spacing.Large)
+        .Padding(TimerVisuals.Spacing.XLarge, Layout.StageVerticalPadding);
 
     internal static AutomationInfo TitleAutomation => new()
     {
         Name = Resources.SessionTitle,
         HelpText = Resources.SessionTitleHelp,
         AutomationId = TimerAutomationIds.Title,
-    };
-
-    internal static AutomationInfo FoldersAutomation => new()
-    {
-        Name = Resources.Folders,
-        HelpText = Resources.FoldersHelp,
-        AutomationId = TimerAutomationIds.FoldersToggle,
-    };
-
-    internal static AutomationInfo HistoryAutomation => new()
-    {
-        Name = Resources.History,
-        HelpText = Resources.HistoryHelp,
-        AutomationId = TimerAutomationIds.HistoryToggle,
     };
 
     internal AutomationInfo StartStopAutomation => new()
@@ -155,63 +129,172 @@ public readonly partial record struct NormalTimerView(
     };
 }
 
-/// <summary>
-/// The compact-overlay timer content — only the rolling clock, the round start/stop button, and an exit-compact chip,
-/// laid out for the small 360×203 overlay presenter (no header, title, or footer). It is a render-only
-/// <c>[Composite]</c> value view; toggling the compact overlay swaps the whole <see cref="NormalTimerView"/> for this
-/// one through the host's <c>When(...)</c>, so the header / title / footer nodes are torn out of all three trees while
-/// compact and return on exit.
-/// </summary>
-/// <param name="Chrome">The command surface (start-stop + exit-compact).</param>
-/// <param name="Colors">The live theme palette resolved by the host.</param>
-/// <param name="FontFamily">The UI font family applied to the clock.</param>
-/// <param name="Elapsed">The running session's elapsed time (zero when idle).</param>
-/// <param name="IsRunning">Whether a session is currently running (accent clock + stop affordance).</param>
+/// <summary>The full-width normal footer: current folder, optional live status, and today's focus.</summary>
 [Composite]
-public readonly partial record struct CompactTimerView(
+public readonly partial record struct NormalTimerFooterView(
+    ThemeColors Colors,
+    TimerNormalLayout Layout,
+    string FolderName,
+    bool IsRunning,
+    string FocusSummary,
+    string BackgroundStatus)
+{
+    /// <summary>The full-width bottom plane; the middle status is structurally absent in the narrow state.</summary>
+    public Ui Body => Border(
+        Stack(
+            Stack(
+                Text(
+                    Resources.CurrentFolder,
+                    new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.SemiBoldWeight),
+                    Colors.TextFillColorSecondary),
+                Text(
+                    FolderName,
+                    new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight),
+                    Colors.TextFillColorPrimary))
+                .Spacing(2f)
+                .VAlign(VerticalAlignment.Center)
+                .Weight(1f),
+            When(
+                Layout.ShowMiddleStatus,
+                new NormalFooterStatusView(IsRunning, BackgroundStatus, Colors)),
+            Stack(
+                Text(
+                    Resources.TodaysFocus,
+                    new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.SemiBoldWeight, TextAlignment.Trailing),
+                    Colors.TextFillColorSecondary)
+                    .HAlign(HorizontalAlignment.Right),
+                Text(
+                    FocusSummary,
+                    new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight, TextAlignment.Trailing),
+                    Colors.TextFillColorPrimary)
+                    .HAlign(HorizontalAlignment.Right))
+                .Spacing(2f)
+                .VAlign(VerticalAlignment.Center)
+                .Weight(1f))
+            .Orientation(Orientation.Horizontal)
+            .Spacing(18f))
+        .Background(Brush.Theme(ThemeColorToken.LayerFillColorDefault))
+        .BorderBrush(Brush.Theme(ThemeColorToken.DividerStrokeColorDefault))
+        .BorderThickness(1f)
+        .Padding(TimerVisuals.Spacing.XXLarge, Layout.FooterVerticalPadding);
+}
+
+/// <summary>
+/// The open normal workspace: a large rolling clock floats directly on the window canvas between two broken axis
+/// segments, with the title and primary action on the same centre line and one full-width status footer at the bottom.
+/// </summary>
+[Composite]
+public readonly partial record struct NormalTimerView(
     TimerChrome Chrome,
     ThemeColors Colors,
-    string FontFamily,
+    TimerNormalLayout Layout,
+    string FolderName,
+    TimeSpan Elapsed,
+    bool IsRunning,
+    string SessionTitle,
+    string FocusSummary,
+    string BackgroundStatus)
+{
+    /// <summary>The open timer stage and full-width footer, with no enclosing hero card.</summary>
+    public Ui Body => Stack(
+        new NormalTimerStageView(Chrome, Colors, Layout, Elapsed, IsRunning, SessionTitle)
+            .Weight(1f),
+        new NormalTimerFooterView(
+            Colors,
+            Layout,
+            FolderName,
+            IsRunning,
+            FocusSummary,
+            BackgroundStatus));
+}
+
+/// <summary>The folder and running-state context that Tight removes from all three trees.</summary>
+[Composite]
+public readonly partial record struct CompactContextView(
+    string FolderName,
+    bool IsRunning,
+    ThemeColors Colors,
+    float ClockSize)
+{
+    /// <summary>The folder name over the timer state, aligned with the clock's leading edge.</summary>
+    public Ui Body => Stack(
+        Text(
+            FolderName,
+            new TextFormat(TextFormat.DefaultFontFamily, 9f, TextFormat.SemiBoldWeight),
+            Colors.TextFillColorSecondary),
+        Text(
+            IsRunning ? Resources.TimerRunning : Resources.TimerReady,
+            new TextFormat(TextFormat.DefaultFontFamily, MathF.Max(11f, ClockSize * 0.3f), TextFormat.SemiBoldWeight),
+            Colors.TextFillColorPrimary))
+        .Spacing(2f);
+}
+
+/// <summary>
+/// One stable two-column compact grid. Track/cell metrics adapt between Tight, Balanced, and Wide while the primary
+/// Button keeps identity; only the optional context subtree is structurally removed in Tight.
+/// </summary>
+[Composite]
+public readonly partial record struct CompactAdaptiveView(
+    TimerChrome Chrome,
+    ThemeColors Colors,
+    TimerCompactLayout Layout,
+    string FolderName,
     TimeSpan Elapsed,
     bool IsRunning)
 {
-    /// <summary>The clock, the round start/stop button, and the exit-compact chip, centred for the overlay.</summary>
-    public Ui Body => Overlay(
-        Stack(
-            AnimatedText(
-                TimerFormat.Clock(Elapsed),
-                new TextFormat(FontFamily, TimerVisuals.Clock.Compact, TextFormat.SemiBoldWeight, TextAlignment.Center),
-                IsRunning ? Colors.AccentTextFillColorPrimary : Colors.TextFillColorPrimary)
-                .HAlign(HorizontalAlignment.Center),
-            Button(
-                Icon.Fluent(IsRunning ? FluentSymbol.Stop : FluentSymbol.Play, FluentIconVariant.Filled, TimerVisuals.IconSize.Large, Brush.CreateSolid(Colors.TextOnAccentFillColorPrimary)),
-                Chrome.StartOrStop,
-                ButtonPalette.FromTheme(Colors, ButtonColorScheme.Accent))
-                .Style(TimerVisuals.Buttons.CompactCircularAction)
-                .Width(TimerVisuals.Height.CompactStart)
-                .Height(TimerVisuals.Height.CompactStart)
-                .HAlign(HorizontalAlignment.Center)
-                .Automation(StartStopAutomation),
-            Button(
-                Icon.Fluent(FluentSymbol.PictureInPictureExit, FluentIconVariant.Regular, TimerVisuals.IconSize.Medium, Brush.CreateSolid(Colors.TextFillColorPrimary)),
-                Chrome.ToggleCompact,
-                TimerVisuals.Ghost(Colors))
-                .Style(TimerVisuals.Buttons.Icon)
-                .Width(TimerVisuals.Height.Icon)
-                .Height(TimerVisuals.Height.Icon)
-                .HAlign(HorizontalAlignment.Center)
-                .Automation(ExitCompactAutomation))
-            .Spacing(TimerVisuals.Spacing.Small)
-            .HAlign(HorizontalAlignment.Center)
-            .VAlign(VerticalAlignment.Center))
-        .Padding(TimerVisuals.Spacing.Medium);
+    internal static readonly GridLength[] Columns = [GridLength.Star(1f), GridLength.Auto];
+    internal static readonly GridLength[] TightRows = [GridLength.Auto];
+    internal static readonly GridLength[] DetailedRows = [GridLength.Auto, GridLength.Auto];
 
-    internal static AutomationInfo ExitCompactAutomation => new()
-    {
-        Name = Resources.ExitCompactOverlay,
-        HelpText = Resources.CompactOverlayHelp,
-        AutomationId = TimerAutomationIds.Compact,
-    };
+    /// <summary>The adaptive compact content grid.</summary>
+    public Ui Body => Grid(
+        Columns,
+        RowTracks,
+        When(
+            Layout.ShowContext,
+            new CompactContextView(FolderName, IsRunning, Colors, Layout.ClockSize))
+            .Cell(0, 0),
+        AnimatedText(
+            TimerFormat.Clock(Elapsed),
+            new TextFormat(
+                TextFormat.DefaultFontFamily,
+                Layout.ClockSize,
+                TextFormat.SemiBoldWeight,
+                TextAlignment.Leading),
+            IsRunning ? Colors.AccentTextFillColorPrimary : Colors.TextFillColorPrimary)
+            .HAlign(HorizontalAlignment.Left)
+            .VAlign(VerticalAlignment.Center)
+            .Cell(0, ClockRow),
+        Button(
+            Icon.Fluent(
+                IsRunning ? FluentSymbol.Stop : FluentSymbol.Play,
+                FluentIconVariant.Filled,
+                TimerVisuals.IconSize.Large,
+                Brush.CreateSolid(Colors.TextOnAccentFillColorPrimary)),
+            Chrome.StartOrStop,
+            ButtonPalette.FromTheme(Colors, ButtonColorScheme.Accent))
+            .Style(ActionStyle)
+            .Width(Layout.ActionSize)
+            .Height(Layout.ActionSize)
+            .HAlign(HorizontalAlignment.Right)
+            .VAlign(VerticalAlignment.Center)
+            .Cell(1, 0, rowSpan: ActionRowSpan)
+            .Automation(StartStopAutomation))
+        .ColumnSpacing(Layout.ColumnGap)
+        .RowSpacing(2f)
+        .Padding(Layout.HorizontalPadding, 0f);
+
+    internal GridLength[] RowTracks =>
+        Layout.ShowContext ? DetailedRows : TightRows;
+
+    internal int ClockRow => Layout.ShowContext ? 1 : 0;
+
+    internal int ActionRowSpan => Layout.ShowContext ? 2 : 1;
+
+    internal ButtonStyle ActionStyle =>
+        default(ButtonStyle)
+            .Padding(0f)
+            .CornerRadius(Layout.ActionSize / 2f);
 
     internal AutomationInfo StartStopAutomation => new()
     {
@@ -219,4 +302,21 @@ public readonly partial record struct CompactTimerView(
         HelpText = IsRunning ? Resources.StopTimerHelp : Resources.StartTimerHelp,
         AutomationId = TimerAutomationIds.StartStop,
     };
+}
+
+/// <summary>The compact-overlay content selected by the pure width+height resolver.</summary>
+[Composite]
+public readonly partial record struct CompactTimerView(
+    TimerChrome Chrome,
+    ThemeColors Colors,
+    TimerCompactLayout Layout,
+    string FolderName,
+    TimeSpan Elapsed,
+    bool IsRunning)
+{
+    /// <summary>The capped content band; the 32 epx title bar owns Exit and the native Close button.</summary>
+    public Ui Body => Overlay(
+        new CompactAdaptiveView(Chrome, Colors, Layout, FolderName, Elapsed, IsRunning)
+            .VAlign(VerticalAlignment.Center))
+        .Padding(Layout.OuterHorizontalPadding, 8f);
 }

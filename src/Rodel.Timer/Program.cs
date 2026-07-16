@@ -22,7 +22,7 @@ string language = CultureInfo.CurrentUICulture.Name.StartsWith("zh", StringCompa
 string defaultFolderName = language == TimerPreferences.ChineseLanguage ? "默认" : "Default";
 var defaultPreferences = new TimerPreferences(
     TimerThemeMode.System,
-    TimerBackgroundMode.SystemMaterial,
+    TimerBackgroundMode.Mica,
     language,
     TimerPreferences.DefaultFontFamily,
     TimerPreferences.DefaultDailyTargetMinutes);

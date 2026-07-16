@@ -4,11 +4,9 @@ namespace Rodel.Timer.Core.Settings;
 /// The deterministic effective background state after the platform reports whether a requested material is active.
 /// </summary>
 /// <param name="Requested">The persisted user preference.</param>
-/// <param name="Effective">The effective visible mode; material fallback resolves to <see cref="TimerBackgroundMode.Solid"/>.</param>
 /// <param name="IsFallback">Whether a requested material is currently showing its opaque policy fallback.</param>
 public readonly record struct TimerBackgroundResolution(
     TimerBackgroundMode Requested,
-    TimerBackgroundMode Effective,
     bool IsFallback)
 {
     /// <summary>Resolves a persisted choice against the platform's post-apply material state.</summary>
@@ -25,11 +23,6 @@ public readonly record struct TimerBackgroundResolution(
             throw new ArgumentOutOfRangeException(nameof(requested));
         }
 
-        bool requestsMaterial = requested != TimerBackgroundMode.Solid;
-        bool isFallback = requestsMaterial && !isMaterialActive;
-        return new(
-            requested,
-            isFallback ? TimerBackgroundMode.Solid : requested,
-            isFallback);
+        return new(requested, IsFallback: !isMaterialActive);
     }
 }

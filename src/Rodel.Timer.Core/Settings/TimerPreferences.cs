@@ -68,7 +68,7 @@ public sealed record TimerPreferences
     /// <summary>The default preferences: system theme, English language, the default font, and the default daily target.</summary>
     public static TimerPreferences Default { get; } = new(
         TimerThemeMode.System,
-        TimerBackgroundMode.SystemMaterial,
+        TimerBackgroundMode.Mica,
         EnglishLanguage,
         DefaultFontFamily,
         DefaultDailyTargetMinutes);

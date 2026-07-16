@@ -14,7 +14,7 @@ namespace Rodel.Timer;
 internal sealed class TimerWindowBackground
 {
     private readonly Window _window;
-    private readonly WindowBackdropMaterial _acrylic;
+    private readonly WindowBackdropMaterial _acrylicThin;
     private readonly WindowBackdropMaterial _wallpaperGlass;
 
     /// <summary>Creates the background owner for <paramref name="window"/>.</summary>
@@ -22,7 +22,7 @@ internal sealed class TimerWindowBackground
     internal TimerWindowBackground(Window window)
     {
         _window = window ?? throw new ArgumentNullException(nameof(window));
-        _acrylic = WindowBackdropMaterial.Custom(ResolveAcrylic);
+        _acrylicThin = WindowBackdropMaterial.Custom(ResolveAcrylicThin);
         _wallpaperGlass = WindowBackdropMaterial.WallpaperGlass(ResolveWallpaperGlass);
     }
 
@@ -35,14 +35,17 @@ internal sealed class TimerWindowBackground
 
         switch (mode)
         {
-            case TimerBackgroundMode.SystemMaterial:
+            case TimerBackgroundMode.Mica:
                 ApplySystemBackdrop(SystemBackdrop.Mica);
                 break;
-            case TimerBackgroundMode.Solid:
-                ApplySystemBackdrop(SystemBackdrop.None);
+            case TimerBackgroundMode.MicaAlt:
+                ApplySystemBackdrop(SystemBackdrop.MicaAlt);
                 break;
             case TimerBackgroundMode.Acrylic:
-                ApplyMaterial(_acrylic);
+                ApplySystemBackdrop(SystemBackdrop.Acrylic);
+                break;
+            case TimerBackgroundMode.AcrylicThin:
+                ApplyMaterial(_acrylicThin);
                 break;
             case TimerBackgroundMode.LiquidGlassWallpaper:
                 ApplyMaterial(_wallpaperGlass);
@@ -61,7 +64,7 @@ internal sealed class TimerWindowBackground
     private Color FallbackColor =>
         _window.Theme.Colors.SolidBackgroundFillColorBase with { A = byte.MaxValue };
 
-    private AcrylicMaterial ResolveAcrylic(ThemeMode mode) =>
+    private AcrylicMaterial ResolveAcrylicThin(ThemeMode mode) =>
         AcrylicMaterial.Thin(mode == ThemeMode.Dark) with { FallbackColor = FallbackColor };
 
     private LiquidGlassMaterial ResolveWallpaperGlass(ThemeMode mode) =>

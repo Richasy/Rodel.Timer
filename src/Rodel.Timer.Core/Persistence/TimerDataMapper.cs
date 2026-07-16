@@ -7,7 +7,7 @@ namespace Rodel.Timer.Core.Persistence;
 
 internal static class TimerDataMapper
 {
-    public const int CurrentSchemaVersion = 2;
+    public const int CurrentSchemaVersion = 3;
     private const int OldestSupportedSchemaVersion = 1;
 
     public static TimerDataDocument ToDocument(TimerWorkspace workspace)
@@ -21,7 +21,7 @@ internal static class TimerDataMapper
             Preferences = new TimerPreferencesData
             {
                 Theme = workspace.Preferences.Theme,
-                Background = workspace.Preferences.Background,
+                Background = workspace.Preferences.Background.ToString(),
                 Language = workspace.Preferences.Language,
                 FontFamily = workspace.Preferences.FontFamily,
                 DailyTargetMinutes = workspace.Preferences.DailyTargetMinutes,
@@ -73,12 +73,7 @@ internal static class TimerDataMapper
             throw new InvalidDataException("The timer data document contains a null item.");
         }
 
-        TimerBackgroundMode background = document.SchemaVersion switch
-        {
-            1 => TimerBackgroundMode.SystemMaterial,
-            _ => document.Preferences.Background
-                ?? throw new InvalidDataException("Schema version 2 preferences are missing the background mode."),
-        };
+        TimerBackgroundMode background = MapBackground(document.SchemaVersion, document.Preferences.Background);
         TimerPreferences preferences = new(
             document.Preferences.Theme,
             background,
@@ -101,5 +96,49 @@ internal static class TimerDataMapper
             entry.CreatedAt));
 
         return TimerWorkspace.Restore(folders, entries, document.SelectedFolderId, preferences);
+    }
+
+    private static TimerBackgroundMode MapBackground(int schemaVersion, string? persisted)
+    {
+        if (schemaVersion == 1)
+        {
+            return TimerBackgroundMode.Mica;
+        }
+
+        if (string.IsNullOrWhiteSpace(persisted))
+        {
+            throw new InvalidDataException($"Schema version {schemaVersion} preferences are missing the background mode.");
+        }
+
+        string value = persisted.Trim();
+        if (schemaVersion == 2)
+        {
+            if (string.Equals(value, "SystemMaterial", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(value, "Solid", StringComparison.OrdinalIgnoreCase))
+            {
+                return TimerBackgroundMode.Mica;
+            }
+
+            if (string.Equals(value, "Acrylic", StringComparison.OrdinalIgnoreCase))
+            {
+                return TimerBackgroundMode.AcrylicThin;
+            }
+
+            if (string.Equals(value, "LiquidGlassWallpaper", StringComparison.OrdinalIgnoreCase))
+            {
+                return TimerBackgroundMode.LiquidGlassWallpaper;
+            }
+
+            throw new InvalidDataException($"Schema version 2 preferences contain unsupported background mode '{value}'.");
+        }
+
+        if (Enum.TryParse(value, ignoreCase: true, out TimerBackgroundMode background)
+            && Enum.IsDefined(background)
+            && string.Equals(value, background.ToString(), StringComparison.OrdinalIgnoreCase))
+        {
+            return background;
+        }
+
+        throw new InvalidDataException($"Schema version {schemaVersion} preferences contain unsupported background mode '{value}'.");
     }
 }

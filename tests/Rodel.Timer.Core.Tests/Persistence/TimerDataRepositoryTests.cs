@@ -34,14 +34,36 @@ public sealed class TimerDataRepositoryTests
         Assert.AreEqual(TimerBackgroundMode.Acrylic, loaded.Preferences.Background);
 
         string json = await File.ReadAllTextAsync(path);
-        StringAssert.Contains(json, "\"schemaVersion\": 2");
+        StringAssert.Contains(json, "\"schemaVersion\": 3");
         StringAssert.Contains(json, "\"background\": \"Acrylic\"");
         StringAssert.Contains(json, "\"icon\": \"Book\"");
         Assert.IsEmpty(Directory.GetFiles(directory.Path, "*.tmp"));
     }
 
     [TestMethod]
-    public async Task Load_SchemaVersion1_ExplicitlyMigratesBackgroundToSystemMaterial()
+    public async Task SaveAndLoad_RoundTripsEveryCurrentBackgroundMode()
+    {
+        using var directory = new TemporaryDirectory();
+
+        foreach (TimerBackgroundMode background in Enum.GetValues<TimerBackgroundMode>())
+        {
+            string path = directory.File($"{background}.json");
+            using var repository = new TimerDataRepository(path);
+            TimerWorkspace workspace = CreateWorkspace(background);
+
+            await repository.SaveAsync(workspace);
+            TimerWorkspace? loaded = await repository.LoadAsync();
+
+            Assert.IsNotNull(loaded);
+            Assert.AreEqual(background, loaded.Preferences.Background);
+            StringAssert.Contains(
+                await File.ReadAllTextAsync(path),
+                $"\"background\": \"{background}\"");
+        }
+    }
+
+    [TestMethod]
+    public async Task Load_SchemaVersion1_ExplicitlyMigratesBackgroundToMica()
     {
         using var directory = new TemporaryDirectory();
         string path = directory.File("timer-data.json");
@@ -74,14 +96,39 @@ public sealed class TimerDataRepositoryTests
 
         Assert.IsNotNull(loaded);
         Assert.AreEqual(
-            TimerBackgroundMode.SystemMaterial,
+            TimerBackgroundMode.Mica,
             loaded.Preferences.Background,
-            "schema v1 explicitly migrates to System Material rather than relying on an enum default.");
+            "Schema v1 explicitly migrates to Mica rather than relying on an enum default.");
 
         await repository.SaveAsync(loaded);
         string upgraded = await File.ReadAllTextAsync(path);
-        StringAssert.Contains(upgraded, "\"schemaVersion\": 2");
-        StringAssert.Contains(upgraded, "\"background\": \"SystemMaterial\"");
+        StringAssert.Contains(upgraded, "\"schemaVersion\": 3");
+        StringAssert.Contains(upgraded, "\"background\": \"Mica\"");
+    }
+
+    [TestMethod]
+    public async Task Load_SchemaVersion2_ExplicitlyMigratesEveryLegacyBackgroundMode()
+    {
+        using var directory = new TemporaryDirectory();
+        (string Persisted, TimerBackgroundMode Expected)[] cases =
+        [
+            ("SystemMaterial", TimerBackgroundMode.Mica),
+            ("Solid", TimerBackgroundMode.Mica),
+            ("Acrylic", TimerBackgroundMode.AcrylicThin),
+            ("LiquidGlassWallpaper", TimerBackgroundMode.LiquidGlassWallpaper),
+        ];
+
+        foreach ((string persisted, TimerBackgroundMode expected) in cases)
+        {
+            string path = directory.File($"{persisted}.json");
+            await File.WriteAllTextAsync(path, SchemaVersion2Document(persisted));
+            using var repository = new TimerDataRepository(path);
+
+            TimerWorkspace? loaded = await repository.LoadAsync();
+
+            Assert.IsNotNull(loaded);
+            Assert.AreEqual(expected, loaded.Preferences.Background, persisted);
+        }
     }
 
     [TestMethod]
@@ -108,6 +155,21 @@ public sealed class TimerDataRepositoryTests
         using var repository = new TimerDataRepository(path);
 
         await Assert.ThrowsAsync<TimerDataCorruptedException>(() => repository.LoadAsync());
+    }
+
+    [TestMethod]
+    public async Task Load_SchemaVersion3_RejectsLegacyAndNumericBackgroundTokens()
+    {
+        using var directory = new TemporaryDirectory();
+
+        foreach (string persisted in new[] { "SystemMaterial", "Solid", "2", "Unknown" })
+        {
+            string path = directory.File($"{persisted}.json");
+            await File.WriteAllTextAsync(path, SchemaVersion3Document(persisted));
+            using var repository = new TimerDataRepository(path);
+
+            await Assert.ThrowsAsync<TimerDataCorruptedException>(() => repository.LoadAsync());
+        }
     }
 
     [TestMethod]
@@ -175,7 +237,7 @@ public sealed class TimerDataRepositoryTests
         Assert.IsEmpty(Directory.GetFiles(directory.Path, "*.tmp"));
     }
 
-    private static TimerWorkspace CreateWorkspace()
+    private static TimerWorkspace CreateWorkspace(TimerBackgroundMode background = TimerBackgroundMode.Acrylic)
     {
         var first = new TimerFolder(
             Guid.ParseExact("11111111111111111111111111111111", "N"),
@@ -189,7 +251,7 @@ public sealed class TimerDataRepositoryTests
             TimerFolderIcon.Book);
         var preferences = new TimerPreferences(
             TimerThemeMode.Dark,
-            TimerBackgroundMode.Acrylic,
+            background,
             TimerPreferences.EnglishLanguage,
             "Segoe UI",
             480,
@@ -205,4 +267,34 @@ public sealed class TimerDataRepositoryTests
             new DateTimeOffset(2026, 7, 14, 1, 0, 0, TimeSpan.Zero)));
         return workspace;
     }
+
+    private static string SchemaVersion2Document(string background) =>
+        $$"""
+        {
+          "schemaVersion": 2,
+          "selectedFolderId": "11111111-1111-1111-1111-111111111111",
+          "preferences": {
+            "theme": "Dark",
+            "background": "{{background}}",
+            "language": "en-US",
+            "fontFamily": "Segoe UI",
+            "dailyTargetMinutes": 360
+          },
+          "folders": [
+            {
+              "id": "11111111-1111-1111-1111-111111111111",
+              "name": "Work",
+              "createdAt": "2026-07-14T00:00:00+00:00",
+              "icon": "Briefcase"
+            }
+          ],
+          "entries": []
+        }
+        """;
+
+    private static string SchemaVersion3Document(string background) =>
+        SchemaVersion2Document(background).Replace(
+            "\"schemaVersion\": 2",
+            "\"schemaVersion\": 3",
+            StringComparison.Ordinal);
 }

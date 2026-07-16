@@ -6,16 +6,8 @@ using Sprout.Semantics;
 namespace Rodel.Timer.Tests.Accessibility;
 
 /// <summary>
-/// Headless accessibility-audit gate for the ready (loaded) and compact shells. It assembles hand-authored
-/// <b>contract mirrors</b> — <see cref="SemanticsNode"/> trees in the shape the mounted UI is expected to project, built
-/// from the real <see cref="TimerAutomationIds"/> builders — <em>not</em> the live mounted tree (that is verified
-/// end-to-end by the Sprout.DevTools drive over the published exe). The ready mirror carries the two split-view groups,
-/// the header/centre/footer command controls (each named + carrying its stable <c>RodelTimer.*</c> automation id), the
-/// pane toggles whose <c>ControlledPeers</c> point at the split groups, and per-folder / per-entry rows keyed by
-/// <see cref="Guid"/>. The compact mirror models the compact overlay presenter, which tears the header (Settings), the
-/// session-title editor (Title), and both footer toggles out of the tree. A clean audit on each proves no unnamed
-/// control, no duplicate element, and no dangling relation; the id-presence assertions pin exactly which controls each
-/// state exposes so a screen reader / UI-test driver addresses them unambiguously.
+/// Headless contract mirrors for the closed normal shell, each anchored surface, a nested row context menu, and compact
+/// mode. Real mounted UIA evidence remains a DevTools gate; these mirrors cheaply pin identity and absence invariants.
 /// </summary>
 [TestClass]
 public sealed class ReadyTreeAccessibilityAuditTests
@@ -55,77 +47,83 @@ public sealed class ReadyTreeAccessibilityAuditTests
         }
     }
 
-    private static SemanticsNode BuildReadyTree(out List<string> rowAutomationIds)
+    private static SemanticsNode BuildClosedNormalTree(TreeBuilder? builder = null)
     {
-        var builder = new TreeBuilder();
-        rowAutomationIds = [];
-
+        builder ??= new TreeBuilder();
         SemanticsNode root = builder.Node(SemanticsRole.Window, "Rodel Timer", automationId: null, interactive: false);
-
-        SemanticsNode foldersSplit = builder.Node(SemanticsRole.Group, "Folders", TimerAutomationIds.FoldersSplit, interactive: false);
-        SemanticsNode historySplit = builder.Node(SemanticsRole.Group, "History", TimerAutomationIds.HistorySplit, interactive: false);
-        _ = root.Add(foldersSplit);
-        _ = root.Add(historySplit);
-
+        _ = root.Add(builder.Node(SemanticsRole.Button, "Folders", TimerAutomationIds.FoldersToggle, interactive: true));
+        _ = root.Add(builder.Node(SemanticsRole.Button, "History", TimerAutomationIds.HistoryToggle, interactive: true));
         _ = root.Add(builder.Node(SemanticsRole.Button, "Settings", TimerAutomationIds.Settings, interactive: true));
+        _ = root.Add(builder.Node(SemanticsRole.Button, "Compact overlay", TimerAutomationIds.Compact, interactive: true));
         _ = root.Add(builder.Node(SemanticsRole.Button, "Start timer", TimerAutomationIds.StartStop, interactive: true));
         _ = root.Add(builder.Node(SemanticsRole.Edit, "Session title", TimerAutomationIds.Title, interactive: true));
-        _ = root.Add(builder.Node(SemanticsRole.Button, "Compact overlay", TimerAutomationIds.Compact, interactive: true));
+        return root;
+    }
 
-        SemanticsNode foldersToggle = builder.Node(SemanticsRole.Button, "Folders", TimerAutomationIds.FoldersToggle, interactive: true);
-        foldersToggle.ControlledPeers = [TimerAutomationIds.FoldersSplit];
-        _ = root.Add(foldersToggle);
+    private static SemanticsNode BuildFoldersOpenTree(out List<string> rowIds)
+    {
+        var builder = new TreeBuilder();
+        SemanticsNode root = BuildClosedNormalTree(builder);
+        SemanticsNode flyout = builder.Node(SemanticsRole.Pane, "Folders", TimerAutomationIds.FoldersFlyout, interactive: false);
+        SemanticsNode content = builder.Node(SemanticsRole.Group, "Folders", TimerAutomationIds.FoldersFlyoutContent, interactive: false);
+        SemanticsNode list = builder.Node(SemanticsRole.List, "Folders", automationId: null, interactive: false);
+        _ = root.Add(flyout);
+        _ = flyout.Add(content);
+        _ = content.Add(builder.Node(SemanticsRole.Button, "Add folder", TimerAutomationIds.AddFolder, interactive: true));
+        _ = content.Add(list);
 
-        SemanticsNode historyToggle = builder.Node(SemanticsRole.Button, "History", TimerAutomationIds.HistoryToggle, interactive: true);
-        historyToggle.ControlledPeers = [TimerAutomationIds.HistorySplit];
-        _ = root.Add(historyToggle);
-
-        _ = foldersSplit.Add(builder.Node(SemanticsRole.Button, "Add folder", TimerAutomationIds.AddFolder, interactive: true));
-
+        rowIds = [];
         for (int i = 0; i < Folders.Length; i++)
         {
-            string select = TimerAutomationIds.FolderSelect(Folders[i]);
-            string more = TimerAutomationIds.FolderMore(Folders[i]);
-            rowAutomationIds.Add(select);
-            rowAutomationIds.Add(more);
-            _ = foldersSplit.Add(builder.Node(SemanticsRole.Button, $"Folder {i}", select, interactive: true));
-            _ = foldersSplit.Add(builder.Node(SemanticsRole.Button, $"More actions for folder {i}", more, interactive: true));
-        }
-
-        for (int i = 0; i < Entries.Length; i++)
-        {
-            string more = TimerAutomationIds.HistoryMore(Entries[i]);
-            rowAutomationIds.Add(more);
-            _ = historySplit.Add(builder.Node(SemanticsRole.Button, $"More actions for session {i}", more, interactive: true));
+            string id = TimerAutomationIds.FolderSelect(Folders[i]);
+            rowIds.Add(id);
+            _ = list.Add(builder.Node(SemanticsRole.ListItem, $"Folder {i}", id, interactive: true));
         }
 
         return root;
     }
 
-    [TestMethod]
-    public void ReadyTree_HasNoAccessibilityViolations()
+    private static SemanticsNode BuildHistoryContextTree(out List<string> rowAndMenuIds)
     {
-        SemanticsNode root = BuildReadyTree(out _);
+        var builder = new TreeBuilder();
+        SemanticsNode root = BuildClosedNormalTree(builder);
+        SemanticsNode flyout = builder.Node(SemanticsRole.Pane, "History", TimerAutomationIds.HistoryFlyout, interactive: false);
+        SemanticsNode content = builder.Node(SemanticsRole.Group, "History", TimerAutomationIds.HistoryFlyoutContent, interactive: false);
+        SemanticsNode list = builder.Node(SemanticsRole.List, "History", automationId: null, interactive: false);
+        _ = root.Add(flyout);
+        _ = flyout.Add(content);
+        _ = content.Add(list);
 
-        IReadOnlyList<AccessibilityViolation> violations = AccessibilityAudit.Audit(root);
+        rowAndMenuIds = [];
+        for (int i = 0; i < Entries.Length; i++)
+        {
+            string id = TimerAutomationIds.HistoryItem(Entries[i]);
+            rowAndMenuIds.Add(id);
+            _ = list.Add(builder.Node(SemanticsRole.ListItem, $"Session {i}", id, interactive: true));
+        }
 
-        Assert.IsEmpty(
-            violations,
-            $"the ready tree must be clean; found: {string.Join(", ", violations.Select(static v => $"{v.Rule} @ {v.Element}"))}");
+        Guid entry = Entries[0];
+        SemanticsNode menu = builder.Node(SemanticsRole.Menu, "Session 0 actions", TimerAutomationIds.HistoryMenu(entry), interactive: false);
+        _ = root.Add(menu);
+        string move = TimerAutomationIds.HistoryMove(entry);
+        string delete = TimerAutomationIds.HistoryDelete(entry);
+        rowAndMenuIds.Add(TimerAutomationIds.HistoryMenu(entry));
+        rowAndMenuIds.Add(move);
+        rowAndMenuIds.Add(delete);
+        _ = menu.Add(builder.Node(SemanticsRole.MenuItem, "Move session", move, interactive: true));
+        _ = menu.Add(builder.Node(SemanticsRole.MenuItem, "Delete session", delete, interactive: true));
+        return root;
     }
 
-    [TestMethod]
-    public void ReadyTree_EveryRowAutomationIdIsUnique()
+    private static SemanticsNode BuildCompactTree()
     {
-        _ = BuildReadyTree(out List<string> rowAutomationIds);
-
-        Assert.AreEqual(
-            rowAutomationIds.Count,
-            rowAutomationIds.Distinct(StringComparer.Ordinal).Count(),
-            "every folder/history row id must be unique.");
+        var builder = new TreeBuilder();
+        SemanticsNode root = builder.Node(SemanticsRole.Window, "Rodel Timer", automationId: null, interactive: false);
+        _ = root.Add(builder.Node(SemanticsRole.Button, "Stop timer", TimerAutomationIds.StartStop, interactive: true));
+        _ = root.Add(builder.Node(SemanticsRole.Button, "Exit compact overlay", TimerAutomationIds.Compact, interactive: true));
+        return root;
     }
 
-    /// <summary>The automation ids the compact overlay presenter tears down (header settings, title, both toggles).</summary>
     private static readonly string[] CompactOmittedIds =
     [
         TimerAutomationIds.Settings,
@@ -134,15 +132,61 @@ public sealed class ReadyTreeAccessibilityAuditTests
         TimerAutomationIds.HistoryToggle,
     ];
 
-    // The compact CONTRACT MIRROR: only the clock (non-interactive, no id), the start/stop button, and the compact-exit
-    // button survive; the header, title editor, and both footer toggles are torn out of the tree.
-    private static SemanticsNode BuildCompactTree()
+    [TestMethod]
+    public void ClosedNormalTree_IsCleanAndContainsNoFlyoutDescendants()
     {
-        var builder = new TreeBuilder();
-        SemanticsNode root = builder.Node(SemanticsRole.Window, "Rodel Timer", automationId: null, interactive: false);
-        _ = root.Add(builder.Node(SemanticsRole.Button, "Stop timer", TimerAutomationIds.StartStop, interactive: true));
-        _ = root.Add(builder.Node(SemanticsRole.Button, "Exit compact overlay", TimerAutomationIds.Compact, interactive: true));
-        return root;
+        SemanticsNode root = BuildClosedNormalTree();
+
+        AssertAuditClean(root);
+        Assert.IsFalse(ContainsAutomationId(root, TimerAutomationIds.FoldersFlyout));
+        Assert.IsFalse(ContainsAutomationId(root, TimerAutomationIds.HistoryFlyout));
+        Assert.IsFalse(ContainsAutomationId(root, TimerAutomationIds.FolderSelect(Folders[0])));
+        Assert.IsFalse(ContainsAutomationId(root, TimerAutomationIds.HistoryItem(Entries[0])));
+    }
+
+    [TestMethod]
+    public void FoldersOpenTree_IsCleanAndRowsAreUnique()
+    {
+        SemanticsNode root = BuildFoldersOpenTree(out List<string> rowIds);
+
+        AssertAuditClean(root);
+        Assert.AreEqual(rowIds.Count, rowIds.Distinct(StringComparer.Ordinal).Count());
+        Assert.IsTrue(ContainsAutomationId(root, TimerAutomationIds.FoldersFlyoutContent));
+        Assert.IsFalse(ContainsAutomationId(root, TimerAutomationIds.HistoryFlyout));
+    }
+
+    [TestMethod]
+    public void HistoryContextTree_PreservesParentAndIsClean()
+    {
+        SemanticsNode root = BuildHistoryContextTree(out List<string> ids);
+
+        AssertAuditClean(root);
+        Assert.AreEqual(ids.Count, ids.Distinct(StringComparer.Ordinal).Count());
+        Assert.IsTrue(ContainsAutomationId(root, TimerAutomationIds.HistoryFlyout));
+        Assert.IsTrue(ContainsAutomationId(root, TimerAutomationIds.HistoryMenu(Entries[0])));
+    }
+
+    [TestMethod]
+    public void CompactTree_IsCleanAndOmitsNormalOnlyControls()
+    {
+        SemanticsNode root = BuildCompactTree();
+
+        AssertAuditClean(root);
+        foreach (string id in CompactOmittedIds)
+        {
+            Assert.IsFalse(ContainsAutomationId(root, id));
+        }
+
+        Assert.IsTrue(ContainsAutomationId(root, TimerAutomationIds.StartStop));
+        Assert.IsTrue(ContainsAutomationId(root, TimerAutomationIds.Compact));
+    }
+
+    private static void AssertAuditClean(SemanticsNode root)
+    {
+        IReadOnlyList<AccessibilityViolation> violations = AccessibilityAudit.Audit(root);
+        Assert.IsEmpty(
+            violations,
+            $"the semantics contract must be clean; found: {string.Join(", ", violations.Select(static violation => $"{violation.Rule} @ {violation.Element}"))}");
     }
 
     private static bool ContainsAutomationId(SemanticsNode node, string automationId)
@@ -161,68 +205,5 @@ public sealed class ReadyTreeAccessibilityAuditTests
         }
 
         return false;
-    }
-
-    [TestMethod]
-    public void ReadyTree_ExposesEveryControlTheCompactPresenterTearsDown()
-    {
-        SemanticsNode root = BuildReadyTree(out _);
-
-        foreach (string id in CompactOmittedIds)
-        {
-            Assert.IsTrue(ContainsAutomationId(root, id), $"the ready tree must expose '{id}'.");
-        }
-    }
-
-    [TestMethod]
-    public void CompactTree_HasNoAccessibilityViolations()
-    {
-        SemanticsNode root = BuildCompactTree();
-
-        IReadOnlyList<AccessibilityViolation> violations = AccessibilityAudit.Audit(root);
-
-        Assert.IsEmpty(
-            violations,
-            $"the compact tree must be clean; found: {string.Join(", ", violations.Select(static v => $"{v.Rule} @ {v.Element}"))}");
-    }
-
-    [TestMethod]
-    public void CompactTree_OmitsSettingsTitleAndBothToggles()
-    {
-        SemanticsNode root = BuildCompactTree();
-
-        foreach (string id in CompactOmittedIds)
-        {
-            Assert.IsFalse(
-                ContainsAutomationId(root, id),
-                $"the compact tree must not expose '{id}' (it is torn down in the compact presenter).");
-        }
-    }
-
-    [TestMethod]
-    public void CompactTree_KeepsTheCoreTimerEssentials()
-    {
-        SemanticsNode root = BuildCompactTree();
-
-        Assert.IsTrue(ContainsAutomationId(root, TimerAutomationIds.StartStop), "compact must keep the start/stop button.");
-        Assert.IsTrue(ContainsAutomationId(root, TimerAutomationIds.Compact), "compact must keep the compact-exit button.");
-    }
-
-    [TestMethod]
-    public void RemovingATogglesControlledSplit_IsReportedAsADanglingRelation()
-    {
-        // Sanity-check that the audit actually exercises the ControlledPeers relation we rely on: if a toggle points
-        // at a split id that is not present in the tree, the audit must flag it as a dangling relation.
-        var builder = new TreeBuilder();
-        SemanticsNode root = builder.Node(SemanticsRole.Window, "Rodel Timer", automationId: null, interactive: false);
-        SemanticsNode toggle = builder.Node(SemanticsRole.Button, "Folders", TimerAutomationIds.FoldersToggle, interactive: true);
-        toggle.ControlledPeers = [TimerAutomationIds.FoldersSplit];
-        _ = root.Add(toggle);
-
-        IReadOnlyList<AccessibilityViolation> violations = AccessibilityAudit.Audit(root);
-
-        Assert.IsTrue(
-            violations.Any(static v => v.Rule == AccessibilityRule.DanglingRelation),
-            "a toggle controlling a missing split must be a dangling relation.");
     }
 }

@@ -29,7 +29,7 @@ public sealed class TimerAppStoreDisposeTests
         Assert.Throws<ObjectDisposedException>(() => harness.Store.LoadAsync());
         Assert.Throws<ObjectDisposedException>(harness.Store.Tick);
         Assert.Throws<ObjectDisposedException>(() => harness.Store.SelectFolder(TimerStoreHarness.FolderAId));
-        Assert.Throws<ObjectDisposedException>(() => harness.Store.UpdateBackground(TimerBackgroundMode.Solid));
+        Assert.Throws<ObjectDisposedException>(() => harness.Store.UpdateBackground(TimerBackgroundMode.MicaAlt));
         Assert.Throws<ObjectDisposedException>(() => harness.Store.UpdateDailyTarget(90));
         Assert.Throws<ObjectDisposedException>(harness.Store.StartTimer);
         Assert.Throws<ObjectDisposedException>(() => harness.Store.CloseAsync());

@@ -22,14 +22,12 @@ namespace Rodel.Timer;
 /// <param name="Chrome">The plain command-and-theme surface (retry callback + live colours).</param>
 /// <param name="Title">The message title (save-failed vs load-error).</param>
 /// <param name="Detail">The failure detail line.</param>
-/// <param name="FontFamily">The UI font family applied to the message.</param>
 /// <param name="ThemeStamp">A monotonic stamp bumped on theme or language change to force a re-resolve.</param>
 [Composite]
 public readonly partial record struct TimerMessageView(
     TimerChrome Chrome,
     string Title,
     string Detail,
-    string FontFamily,
     int ThemeStamp)
 {
     /// <summary>The centred title, detail, and accent Retry button on an opaque background.</summary>
@@ -37,13 +35,23 @@ public readonly partial record struct TimerMessageView(
         Stack(
             Text(
                 Title,
-                new TextFormat(FontFamily, 20f, TextFormat.SemiBoldWeight, TextAlignment.Center, TextWrapping.Wrap),
+                new TextFormat(
+                    TextFormat.DefaultFontFamily,
+                    20f,
+                    TextFormat.SemiBoldWeight,
+                    TextAlignment.Center,
+                    TextWrapping.Wrap),
                 Colors.TextFillColorPrimary)
                 .MaxWidth(460f)
                 .HAlign(HorizontalAlignment.Center),
             Text(
                 Detail,
-                new TextFormat(FontFamily, 14f, TextFormat.NormalWeight, TextAlignment.Center, TextWrapping.Wrap),
+                new TextFormat(
+                    TextFormat.DefaultFontFamily,
+                    14f,
+                    TextFormat.NormalWeight,
+                    TextAlignment.Center,
+                    TextWrapping.Wrap),
                 Colors.TextFillColorSecondary)
                 .MaxWidth(460f)
                 .HAlign(HorizontalAlignment.Center),

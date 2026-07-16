@@ -10,8 +10,10 @@ public sealed class TimerBackgroundResolutionTests
     {
         TimerBackgroundMode[] materials =
         [
-            TimerBackgroundMode.SystemMaterial,
+            TimerBackgroundMode.Mica,
+            TimerBackgroundMode.MicaAlt,
             TimerBackgroundMode.Acrylic,
+            TimerBackgroundMode.AcrylicThin,
             TimerBackgroundMode.LiquidGlassWallpaper,
         ];
 
@@ -22,7 +24,6 @@ public sealed class TimerBackgroundResolutionTests
                 isMaterialActive: true);
 
             Assert.AreEqual(material, resolution.Requested);
-            Assert.AreEqual(material, resolution.Effective);
             Assert.IsFalse(resolution.IsFallback);
         }
     }
@@ -32,8 +33,10 @@ public sealed class TimerBackgroundResolutionTests
     {
         TimerBackgroundMode[] materials =
         [
-            TimerBackgroundMode.SystemMaterial,
+            TimerBackgroundMode.Mica,
+            TimerBackgroundMode.MicaAlt,
             TimerBackgroundMode.Acrylic,
+            TimerBackgroundMode.AcrylicThin,
             TimerBackgroundMode.LiquidGlassWallpaper,
         ];
 
@@ -44,22 +47,8 @@ public sealed class TimerBackgroundResolutionTests
                 isMaterialActive: false);
 
             Assert.AreEqual(material, resolution.Requested);
-            Assert.AreEqual(TimerBackgroundMode.Solid, resolution.Effective);
             Assert.IsTrue(resolution.IsFallback);
         }
-    }
-
-    [TestMethod]
-    [DataRow(false)]
-    [DataRow(true)]
-    public void Resolve_Solid_IgnoresMaterialActivity(bool isMaterialActive)
-    {
-        TimerBackgroundResolution resolution = TimerBackgroundResolution.Resolve(
-            TimerBackgroundMode.Solid,
-            isMaterialActive);
-
-        Assert.AreEqual(TimerBackgroundMode.Solid, resolution.Effective);
-        Assert.IsFalse(resolution.IsFallback);
     }
 
     [TestMethod]

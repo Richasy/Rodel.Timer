@@ -3,15 +3,18 @@ namespace Rodel.Timer.Core.Settings;
 /// <summary>The persisted window-background preference, independent of the light/dark theme preference.</summary>
 public enum TimerBackgroundMode
 {
-    /// <summary>Use the platform's long-lived main-window material (Mica) with an opaque themed fallback.</summary>
-    SystemMaterial,
+    /// <summary>Use the platform's long-lived main-window Mica material.</summary>
+    Mica = 0,
 
-    /// <summary>Use only the opaque themed solid background.</summary>
-    Solid,
+    /// <summary>Use the higher-tint tabbed-window Mica variant.</summary>
+    MicaAlt = 1,
 
-    /// <summary>Use a theme-aware window Acrylic material with an opaque themed fallback.</summary>
-    Acrylic,
+    /// <summary>Use the platform's transient-window Acrylic material.</summary>
+    Acrylic = 2,
 
-    /// <summary>Use the screen-recordable wallpaper-backed Liquid Glass material with an opaque themed fallback.</summary>
-    LiquidGlassWallpaper,
+    /// <summary>Use the theme-aware, more translucent Composition Acrylic variant.</summary>
+    AcrylicThin = 3,
+
+    /// <summary>Use the screen-recordable wallpaper-backed Liquid Glass material.</summary>
+    LiquidGlassWallpaper = 4,
 }

@@ -11,9 +11,11 @@
   <data name="PreparingData" xml:space="preserve"><value>正在准备计时数据…</value></data>
   <data name="DataLoadErrorTitle" xml:space="preserve"><value>Rodel 计时器无法加载数据</value></data>
   <data name="Folders" xml:space="preserve"><value>分组</value></data>
-  <data name="FoldersHelp" xml:space="preserve"><value>显示或隐藏计时器分组</value></data>
+  <data name="FoldersHelp" xml:space="preserve"><value>打开计时器分组</value></data>
+  <data name="FoldersFlyoutSubtitle" xml:space="preserve"><value>选择本次计时所属的分组</value></data>
   <data name="History" xml:space="preserve"><value>历史记录</value></data>
-  <data name="HistoryHelp" xml:space="preserve"><value>显示或隐藏当前分组的计时历史</value></data>
+  <data name="HistoryHelp" xml:space="preserve"><value>打开当前分组的计时历史</value></data>
+  <data name="HistoryFlyoutSubtitle" xml:space="preserve"><value>{0} · 今天</value></data>
   <data name="Settings" xml:space="preserve"><value>设置</value></data>
   <data name="SettingsHelp" xml:space="preserve"><value>主题、窗口背景、字体、语言和每日目标</value></data>
   <data name="SessionTitle" xml:space="preserve"><value>计时标题</value></data>
@@ -33,6 +35,7 @@
   <data name="Today" xml:space="preserve"><value>今天</value></data>
   <data name="DailyTarget" xml:space="preserve"><value>每日目标</value></data>
   <data name="TodayTotal" xml:space="preserve"><value>今日累计</value></data>
+  <data name="TodaysFocus" xml:space="preserve"><value>今日专注</value></data>
   <data name="MinutesUnit" xml:space="preserve"><value>分钟</value></data>
   <data name="CompactOverlay" xml:space="preserve"><value>紧凑悬浮窗</value></data>
   <data name="ExitCompactOverlay" xml:space="preserve"><value>退出紧凑悬浮窗</value></data>
@@ -62,6 +65,8 @@
   <data name="Duration" xml:space="preserve"><value>用时</value></data>
   <data name="Created" xml:space="preserve"><value>创建时间</value></data>
   <data name="MoreActions" xml:space="preserve"><value>{0} 的更多操作</value></data>
+  <data name="FolderRowHelp" xml:space="preserve"><value>选择此分组；通过上下文菜单编辑或删除</value></data>
+  <data name="HistoryRowHelp" xml:space="preserve"><value>通过上下文菜单移动或删除</value></data>
   <data name="Theme" xml:space="preserve"><value>主题</value></data>
   <data name="ThemeSystem" xml:space="preserve"><value>跟随系统</value></data>
   <data name="ThemeLight" xml:space="preserve"><value>浅色</value></data>
@@ -72,10 +77,18 @@
   <data name="About" xml:space="preserve"><value>关于</value></data>
   <data name="WindowBackground" xml:space="preserve"><value>窗口背景</value></data>
   <data name="WindowBackgroundDescription" xml:space="preserve"><value>选择窗口画布材质；效果不可用时显示不透明的主题背景</value></data>
-  <data name="BackgroundSystemMaterial" xml:space="preserve"><value>系统材质（云母）</value></data>
-  <data name="BackgroundSolid" xml:space="preserve"><value>纯色</value></data>
+  <data name="BackgroundMica" xml:space="preserve"><value>云母</value></data>
+  <data name="BackgroundMicaAlt" xml:space="preserve"><value>云母 Alt</value></data>
   <data name="BackgroundAcrylic" xml:space="preserve"><value>亚克力</value></data>
-  <data name="BackgroundLiquidGlassWallpaper" xml:space="preserve"><value>液态玻璃（壁纸）</value></data>
+  <data name="BackgroundAcrylicThin" xml:space="preserve"><value>亚克力（Thin）</value></data>
+  <data name="BackgroundLiquidGlassWallpaper" xml:space="preserve"><value>流体玻璃（壁纸）</value></data>
+  <data name="BackgroundStatusMica" xml:space="preserve"><value>云母</value></data>
+  <data name="BackgroundStatusMicaAlt" xml:space="preserve"><value>云母 Alt</value></data>
+  <data name="BackgroundStatusAcrylic" xml:space="preserve"><value>亚克力</value></data>
+  <data name="BackgroundStatusAcrylicThin" xml:space="preserve"><value>亚克力（Thin）</value></data>
+  <data name="BackgroundStatusLiquidGlass" xml:space="preserve"><value>流体玻璃 · 壁纸</value></data>
+  <data name="BackgroundStatusActive" xml:space="preserve"><value>已启用</value></data>
+  <data name="BackgroundStatusFallback" xml:space="preserve"><value>回退</value></data>
   <data name="Font" xml:space="preserve"><value>字体</value></data>
   <data name="Language" xml:space="preserve"><value>语言</value></data>
   <data name="LanguageEnglish" xml:space="preserve"><value>英语</value></data>

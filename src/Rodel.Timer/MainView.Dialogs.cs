@@ -8,6 +8,7 @@ using Rodel.Timer.Presentation;
 
 using Sprout.Controls;
 using Sprout.Graphics;
+using Sprout.Popups;
 using Sprout.Semantics;
 using Sprout.Widgets;
 
@@ -21,24 +22,58 @@ public sealed partial class MainView
     /// <summary>The current product version, compared against the persisted last-seen version for the what's-new dialog.</summary>
     private const string CurrentVersion = "2.0.0";
 
-    /// <summary>Opens the per-folder command menu (edit / delete) anchored at the invoking control.</summary>
+    /// <summary>Builds a fresh per-folder context menu from the latest store state.</summary>
     /// <param name="folderId">The folder the menu acts on.</param>
-    public void ShowFolderMenu(Guid folderId)
+    /// <returns>The owned child menu for the row context gesture.</returns>
+    public MenuFlyout BuildFolderContextMenu(Guid folderId)
     {
-        var menu = new MenuFlyout(
-            new MenuFlyoutItem(Resources.EditFolder, () => ShowEditFolderDialog(folderId)),
-            new MenuFlyoutItem(Resources.DeleteFolder, () => ConfirmDeleteFolder(folderId)));
-        menu.ShowAt(_window);
+        TimerFolder folder = _store.Folders.FirstOrDefault(candidate => candidate.Id == folderId)
+            ?? throw new KeyNotFoundException($"Folder '{folderId}' does not exist.");
+        var edit = new MenuFlyoutItem(Resources.EditFolder, () => ShowEditFolderDialog(folderId))
+        {
+            Automation = new AutomationInfo { AutomationId = TimerAutomationIds.FolderEdit(folderId) },
+        };
+        var delete = new MenuFlyoutItem(Resources.DeleteFolder, () => ConfirmDeleteFolder(folderId))
+        {
+            IsEnabled = _store.Folders.Count > 1,
+            Automation = new AutomationInfo { AutomationId = TimerAutomationIds.FolderDelete(folderId) },
+        };
+        return new MenuFlyout(edit, delete)
+        {
+            Placement = PopupPlacement.RightEdgeAlignedTop,
+        }
+            .Automation(new AutomationInfo
+            {
+                Name = FormatOne(Resources.MoreActions, folder.Name),
+                AutomationId = TimerAutomationIds.FolderMenu(folderId),
+            });
     }
 
-    /// <summary>Opens the per-session command menu (move / delete) anchored at the invoking control.</summary>
+    /// <summary>Builds a fresh per-session context menu from the latest store state.</summary>
     /// <param name="entryId">The history entry the menu acts on.</param>
-    public void ShowHistoryMenu(Guid entryId)
+    /// <returns>The owned child menu for the row context gesture.</returns>
+    public MenuFlyout BuildHistoryContextMenu(Guid entryId)
     {
-        var menu = new MenuFlyout(
-            new MenuFlyoutItem(Resources.MoveHistory, () => ShowMoveHistoryDialog(entryId)),
-            new MenuFlyoutItem(Resources.DeleteHistory, () => ConfirmDeleteHistory(entryId)));
-        menu.ShowAt(_window);
+        TimerEntry entry = _store.Entries.FirstOrDefault(candidate => candidate.Id == entryId)
+            ?? throw new KeyNotFoundException($"History entry '{entryId}' does not exist.");
+        var move = new MenuFlyoutItem(Resources.MoveHistory, () => ShowMoveHistoryDialog(entryId))
+        {
+            IsEnabled = _store.Folders.Count > 1,
+            Automation = new AutomationInfo { AutomationId = TimerAutomationIds.HistoryMove(entryId) },
+        };
+        var delete = new MenuFlyoutItem(Resources.DeleteHistory, () => ConfirmDeleteHistory(entryId))
+        {
+            Automation = new AutomationInfo { AutomationId = TimerAutomationIds.HistoryDelete(entryId) },
+        };
+        return new MenuFlyout(move, delete)
+        {
+            Placement = PopupPlacement.RightEdgeAlignedTop,
+        }
+            .Automation(new AutomationInfo
+            {
+                Name = FormatOne(Resources.MoreActions, entry.Title),
+                AutomationId = TimerAutomationIds.HistoryMenu(entryId),
+            });
     }
 
     /// <summary>Opens the add-folder dialog and adds the folder on commit.</summary>
@@ -352,8 +387,8 @@ public sealed partial class MainView
     private static bool IsDataException(Exception exception) =>
         exception is TimerDataException or IOException or UnauthorizedAccessException;
 
-    private TextFormat BodyStyle =>
-        new(FontFamily, 14f, TextFormat.NormalWeight, TextAlignment.Leading, TextWrapping.Wrap);
+    private static TextFormat BodyStyle =>
+        new(TextFormat.DefaultFontFamily, 14f, TextFormat.NormalWeight, TextAlignment.Leading, TextWrapping.Wrap);
 
     private bool TryGetFolder(Guid folderId, out TimerFolder folder)
     {

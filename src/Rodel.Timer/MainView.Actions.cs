@@ -14,11 +14,16 @@ namespace Rodel.Timer;
 /// <summary>Command and state-mutation surface of <see cref="MainView"/> (invoked by the shell, slots, rows, and dialogs).</summary>
 public sealed partial class MainView
 {
-    /// <summary>Updates the viewport width used for the responsive pane breakpoints.</summary>
-    /// <param name="width">The new viewport width in effective pixels.</param>
-    public void SetViewportWidth(double width) => ViewportWidth = width;
+    /// <summary>Updates the effective-pixel viewport used by the normal and compact layout resolvers.</summary>
+    /// <param name="width">The client width.</param>
+    /// <param name="height">The client height.</param>
+    public void SetViewportSize(double width, double height)
+    {
+        ViewportWidth = width;
+        ViewportHeight = height;
+    }
 
-    /// <summary>Records the current compact-overlay presenter state (closes both panes when entering compact).</summary>
+    /// <summary>Records the current compact-overlay presenter state.</summary>
     /// <param name="isCompact">Whether the window is now in the compact overlay presenter.</param>
     public void SetCompactPresenter(bool isCompact)
     {
@@ -29,11 +34,6 @@ public sealed partial class MainView
         // exit so the brand + settings + compact commands return.
         _window.TitleBarHeight = isCompact ? TitleBarHeight.Standard : TitleBarHeight.Tall;
 
-        if (isCompact)
-        {
-            FolderPaneOpen = false;
-            HistoryPaneOpen = false;
-        }
     }
 
     /// <summary>Bumps <see cref="MainView.ThemeStamp"/> so descendant controls re-resolve their theme colors.</summary>
@@ -129,38 +129,6 @@ public sealed partial class MainView
     /// <summary>Shows a blocking save-failure message over the shell with a retry affordance.</summary>
     /// <param name="message">The failure message to display.</param>
     public void ShowSaveError(string message) => SaveErrorMessage = message;
-
-    /// <summary>Opens or closes the folder pane (controlled by the split view); closes the history pane if they are mutually exclusive.</summary>
-    /// <param name="open">Whether the pane should be open.</param>
-    public void SetFolderPaneOpen(bool open)
-    {
-        FolderPaneOpen = open;
-        if (open && PanesAreMutuallyExclusive)
-        {
-            HistoryPaneOpen = false;
-        }
-    }
-
-    /// <summary>Opens or closes the history pane (controlled by the split view); closes the folder pane if they are mutually exclusive.</summary>
-    /// <param name="open">Whether the pane should be open.</param>
-    public void SetHistoryPaneOpen(bool open)
-    {
-        HistoryPaneOpen = open;
-        if (open && PanesAreMutuallyExclusive)
-        {
-            FolderPaneOpen = false;
-        }
-    }
-
-    /// <summary>Toggles the folder pane open state (closing the history pane when the two are mutually exclusive).</summary>
-    public void ToggleFolderPane() => SetFolderPaneOpen(!FolderPaneOpen);
-
-    /// <summary>Toggles the history pane open state (closing the folder pane when the two are mutually exclusive).</summary>
-    public void ToggleHistoryPane() => SetHistoryPaneOpen(!HistoryPaneOpen);
-
-    /// <summary>Whether the two panes cannot be open at once at the current viewport (both overlay), so opening one closes the other.</summary>
-    private bool PanesAreMutuallyExclusive =>
-        TimerShell.PanesAreMutuallyExclusive(ViewportWidth, IsCompactPresenter);
 
     /// <summary>Updates the in-progress session title being edited.</summary>
     /// <param name="title">The new title text.</param>

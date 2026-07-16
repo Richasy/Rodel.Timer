@@ -21,7 +21,7 @@ public sealed class TimerAppStoreMutationTests
         AssertBumpsRevisionByOne(harness, store => store.AddFolder("Reading", TimerFolderIcon.Book));
         AssertBumpsRevisionByOne(harness, store => store.UpdateFolder(TimerStoreHarness.FolderAId, "Work!", TimerFolderIcon.Briefcase));
         AssertBumpsRevisionByOne(harness, store => store.UpdateTheme(TimerThemeMode.Dark));
-        AssertBumpsRevisionByOne(harness, store => store.UpdateBackground(TimerBackgroundMode.Acrylic));
+        AssertBumpsRevisionByOne(harness, store => store.UpdateBackground(TimerBackgroundMode.AcrylicThin));
         AssertBumpsRevisionByOne(harness, store => store.UpdateLanguage("zh-CN"));
         AssertBumpsRevisionByOne(harness, store => store.UpdateFontFamily("Consolas"));
         AssertBumpsRevisionByOne(harness, store => store.UpdateDailyTarget(120));

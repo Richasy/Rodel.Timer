@@ -17,10 +17,9 @@ namespace Rodel.Timer;
 /// so it never churns the shell tree.
 /// </summary>
 /// <param name="Chrome">The plain command-and-theme surface (live colours).</param>
-/// <param name="FontFamily">The UI font family applied to the caption.</param>
 /// <param name="ThemeStamp">A monotonic stamp bumped on theme or language change to force a re-resolve.</param>
 [Composite]
-public readonly partial record struct TimerLoadingView(TimerChrome Chrome, string FontFamily, int ThemeStamp)
+public readonly partial record struct TimerLoadingView(TimerChrome Chrome, int ThemeStamp)
 {
     /// <summary>A centred progress ring over the "preparing data" caption on an opaque background.</summary>
     public Ui Body => Overlay(
@@ -31,7 +30,7 @@ public readonly partial record struct TimerLoadingView(TimerChrome Chrome, strin
                 .Foreground(Brush.Theme(ThemeColorToken.AccentFillColorDefault)),
             Text(
                 Resources.PreparingData,
-                new TextFormat(FontFamily, 14f, TextFormat.NormalWeight),
+                new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.NormalWeight),
                 Colors.TextFillColorSecondary))
             .Spacing(16f)
             .HAlign(HorizontalAlignment.Center)
