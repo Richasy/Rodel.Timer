@@ -34,6 +34,8 @@ public sealed partial class MainView
         // exit so the brand + settings + compact commands return.
         _window.TitleBarHeight = isCompact ? TitleBarHeight.Standard : TitleBarHeight.Tall;
 
+        // The compact overlay uses the opaque themed surface; the persisted material is restored on return to normal.
+        _windowBackground.SetCompact(isCompact);
     }
 
     /// <summary>Bumps <see cref="MainView.ThemeStamp"/> so descendant controls re-resolve their theme colors.</summary>
