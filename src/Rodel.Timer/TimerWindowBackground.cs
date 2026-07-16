@@ -10,9 +10,9 @@ namespace Rodel.Timer;
 /// <summary>
 /// Owns the window's background plane and applies one persisted mode without exposing compositor details to settings.
 /// Theme-aware material recipes always use the window palette's opaque base surface as their policy fallback. The
-/// always-on-top compact overlay uses that opaque surface directly: a desktop-sampling material there would leave the
-/// exposed band uncovered while the small picture-in-picture window is user-resized, so the material is a normal-window
-/// affordance only and is restored automatically when the window returns to the overlapped presenter.
+/// compact overlay's opaque surface is handled by the framework: a topmost (compact-overlay / always-on-top) window
+/// suppresses its window material to the opaque themed fallback automatically and restores it on return to the
+/// overlapped form, so this owner just applies the persisted material for every presenter.
 /// </summary>
 internal sealed class TimerWindowBackground
 {
@@ -20,7 +20,6 @@ internal sealed class TimerWindowBackground
     private readonly WindowBackdropMaterial _acrylicThin;
     private readonly WindowBackdropMaterial _wallpaperGlass;
     private TimerBackgroundMode _requestedMode = TimerBackgroundMode.Mica;
-    private bool _isCompact;
 
     /// <summary>Creates the background owner for <paramref name="window"/>.</summary>
     /// <param name="window">The product window.</param>
@@ -45,14 +44,6 @@ internal sealed class TimerWindowBackground
         Refresh();
     }
 
-    /// <summary>Records the compact-overlay presenter state and re-applies the appropriate background.</summary>
-    /// <param name="isCompact">Whether the window is now in the compact overlay presenter.</param>
-    internal void SetCompact(bool isCompact)
-    {
-        _isCompact = isCompact;
-        Refresh();
-    }
-
     /// <summary>Resolves the post-apply active/fallback state for status presentation (normal presenter only).</summary>
     /// <param name="mode">The persisted background choice.</param>
     /// <returns>The effective background resolution.</returns>
@@ -62,12 +53,6 @@ internal sealed class TimerWindowBackground
     private void Refresh()
     {
         _window.Background = FallbackColor;
-
-        if (_isCompact)
-        {
-            ApplyOpaque();
-            return;
-        }
 
         switch (_requestedMode)
         {
@@ -110,11 +95,5 @@ internal sealed class TimerWindowBackground
     {
         _window.SystemBackdrop = backdrop;
         _window.BackdropMaterial = null;
-    }
-
-    private void ApplyOpaque()
-    {
-        _window.BackdropMaterial = null;
-        _window.SystemBackdrop = SystemBackdrop.None;
     }
 }

@@ -31,11 +31,9 @@ public sealed partial class MainView
 
         // Collapse the extended title bar to the standard 32 epx band while compact (its brand + command band is also
         // torn out of all three trees by the title bar's When(!IsCompact) switch), and restore the 48 epx tall band on
-        // exit so the brand + settings + compact commands return.
+        // exit so the brand + settings + compact commands return. The window material is degraded to the opaque themed
+        // fallback automatically by the framework while the window is a topmost compact overlay, and restored on exit.
         _window.TitleBarHeight = isCompact ? TitleBarHeight.Standard : TitleBarHeight.Tall;
-
-        // The compact overlay uses the opaque themed surface; the persisted material is restored on return to normal.
-        _windowBackground.SetCompact(isCompact);
     }
 
     /// <summary>Bumps <see cref="MainView.ThemeStamp"/> so descendant controls re-resolve their theme colors.</summary>
