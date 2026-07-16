@@ -42,7 +42,7 @@ public readonly partial record struct HistoryRowView(
                     .HAlign(HorizontalAlignment.Center)
                     .VAlign(VerticalAlignment.Center))
                 .Background(TileBrush)
-                .CornerRadius(TimerVisuals.Radius.App)
+                .CornerRadius(TimerVisuals.Radius.Control)
                 .Width(TimerVisuals.IconSize.Tile)
                 .Height(TimerVisuals.IconSize.Tile),
             Stack(
@@ -52,9 +52,9 @@ public readonly partial record struct HistoryRowView(
                 .VAlign(VerticalAlignment.Center)
                 .Weight(1f))
             .Orientation(Orientation.Horizontal)
-            .Spacing(TimerVisuals.Spacing.Medium)
+            .Spacing(10f)
             .VAlign(VerticalAlignment.Center))
-        .Padding(TimerVisuals.Spacing.Medium, TimerVisuals.Spacing.Small);
+        .Padding(9f, 7f);
 }
 
 /// <summary>

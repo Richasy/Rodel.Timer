@@ -11,20 +11,21 @@ public sealed class TimerNormalLayoutTests
         TimerNormalLayout layout = TimerNormalLayoutResolver.Resolve(1100d, 720d);
 
         Assert.IsTrue(layout.ShowMiddleStatus);
-        Assert.AreEqual(96f, layout.ClockSize);
-        Assert.AreEqual(280f, layout.AxisSegmentWidth);
+        Assert.IsTrue(layout.ShowAxisDecoration);
+        Assert.AreEqual(110f, layout.ClockSize, "10vw of 1100 is 110, inside the [84, 116] clamp.");
+        Assert.AreEqual(880f, layout.AxisTotalWidth, "the axis line caps at 880 (86% of 1100 = 946 > 880).");
         Assert.AreEqual(36f, layout.StageVerticalPadding);
         Assert.AreEqual(14f, layout.FooterVerticalPadding);
     }
 
     [TestMethod]
-    public void NarrowShort_RemovesMiddleStatusAndCompressesVerticalMetrics()
+    public void NarrowShort_RemovesTheMiddleStatusAndAxis_AndCompressesVerticalMetrics()
     {
         TimerNormalLayout layout = TimerNormalLayoutResolver.Resolve(640d, 480d);
 
         Assert.IsFalse(layout.ShowMiddleStatus);
-        Assert.AreEqual(58f, layout.ClockSize);
-        Assert.AreEqual(120f, layout.AxisSegmentWidth);
+        Assert.IsFalse(layout.ShowAxisDecoration, "a narrow window hides the axis decoration so the clock stays centred.");
+        Assert.AreEqual(58f, layout.ClockSize, "a short window uses the compact clock size.");
         Assert.AreEqual(18f, layout.StageVerticalPadding);
         Assert.AreEqual(10f, layout.FooterVerticalPadding);
     }
@@ -37,13 +38,26 @@ public sealed class TimerNormalLayoutTests
             TimerNormalLayoutResolver.ShortThreshold);
 
         Assert.IsTrue(layout.ShowMiddleStatus);
-        Assert.AreEqual(96f, layout.ClockSize);
+        Assert.IsTrue(layout.ShowAxisDecoration);
+        Assert.AreEqual(84f, layout.ClockSize, "at 720 width the 10vw (72) clamps up to the 84 floor.");
     }
 
     [TestMethod]
-    public void AxisSegments_ClampAtBothEnds()
+    public void ClockSize_ScalesContinuouslyAndClampsAtBothEnds()
     {
-        Assert.AreEqual(48f, TimerNormalLayoutResolver.Resolve(300d, 720d).AxisSegmentWidth);
-        Assert.AreEqual(280f, TimerNormalLayoutResolver.Resolve(2000d, 720d).AxisSegmentWidth);
+        Assert.AreEqual(84f, TimerNormalLayoutResolver.Resolve(300d, 720d).ClockSize, "10vw below the floor clamps to 84.");
+        Assert.AreEqual(90f, TimerNormalLayoutResolver.Resolve(900d, 720d).ClockSize, "10vw of 900 is 90.");
+        Assert.AreEqual(116f, TimerNormalLayoutResolver.Resolve(2000d, 720d).ClockSize, "10vw above the cap clamps to 116.");
+    }
+
+    [TestMethod]
+    public void AxisGeometry_TracksTheClientWidthAndTheClock()
+    {
+        TimerNormalLayout wide = TimerNormalLayoutResolver.Resolve(1100d, 720d);
+        Assert.AreEqual(880f, wide.AxisTotalWidth);
+        Assert.AreEqual(MathF.Min(880f, 110f * 4.3f), wide.AxisGapWidth, "the centre gap is a little wider than the clock.");
+
+        TimerNormalLayout mid = TimerNormalLayoutResolver.Resolve(760d, 720d);
+        Assert.AreEqual((float)(760d * 0.86d), mid.AxisTotalWidth, 0.01f, "below 1023 wide the axis line is 86% of the client.");
     }
 }

@@ -15,36 +15,19 @@ using static Sprout.Markup;
 
 namespace Rodel.Timer;
 
-/// <summary>The middle footer column, mounted only when the normal layout has enough horizontal room.</summary>
+/// <summary>The middle footer column, mounted only when the normal layout is wide enough AND the window material is in fallback.</summary>
 [Composite]
 public readonly partial record struct NormalFooterStatusView(
-    bool IsRunning,
-    bool ShowBackgroundStatus,
     string BackgroundStatus,
     ThemeColors Colors)
 {
-    /// <summary>The running state, with the material line appended only while the material is in fallback.</summary>
+    /// <summary>The material-fallback caution line — the running / ready state now lives under the clock, so the footer only carries the (rare) material warning.</summary>
     public Ui Body => Stack(
-        Stack(
-            Rectangle(
-                Brush.CreateSolid(IsRunning ? Colors.AccentFillColorDefault : Colors.SystemFillColorNeutral),
-                new Size(6f, 6f))
-                .Rounded(3f)
-                .VAlign(VerticalAlignment.Center),
-            Text(
-                IsRunning ? Resources.TimerRunning : Resources.TimerReady,
-                new TextFormat(TextFormat.DefaultFontFamily, 12f, TextFormat.SemiBoldWeight),
-                Colors.TextFillColorSecondary))
-            .Orientation(Orientation.Horizontal)
-            .Spacing(6f)
-            .HAlign(HorizontalAlignment.Center),
         Text(
             BackgroundStatus,
-            new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.NormalWeight),
+            new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.NormalWeight, TextAlignment.Center),
             Colors.SystemFillColorCaution)
-            .HAlign(HorizontalAlignment.Center)
-            .Visible(ShowBackgroundStatus))
-        .Spacing(2f);
+            .HAlign(HorizontalAlignment.Center));
 }
 
 /// <summary>The open-canvas timer stage: status, broken axis and clock, title editor, then primary action.</summary>
@@ -57,64 +40,79 @@ public readonly partial record struct NormalTimerStageView(
     bool IsRunning,
     string SessionTitle)
 {
-    /// <summary>The centred stage with no enclosing card or opaque surface.</summary>
-    public Ui Body => Stack(
-        Text(
-            IsRunning ? Resources.TimerRunning : Resources.TimerReady,
-            new TextFormat(TextFormat.DefaultFontFamily, 13f, TextFormat.SemiBoldWeight, TextAlignment.Center),
-            Colors.TextFillColorSecondary)
-            .HAlign(HorizontalAlignment.Center),
+    /// <summary>The centred stage with no enclosing card or opaque surface: a heavy clock over a fading axis, the caption below it, then the centred title editor and the primary action, the whole block vertically centred.</summary>
+    public Ui Body => Overlay(
         Stack(
-            Rectangle(
-                Brush.Theme(ThemeColorToken.DividerStrokeColorDefault),
-                new Size(Layout.AxisSegmentWidth, 1f))
-                .VAlign(VerticalAlignment.Center),
-            AnimatedText(
-                TimerFormat.Clock(Elapsed),
-                new TextFormat(
-                    TextFormat.DefaultFontFamily,
-                    Layout.ClockSize,
-                    TextFormat.SemiBoldWeight,
-                    TextAlignment.Center),
-                IsRunning ? Colors.AccentTextFillColorPrimary : Colors.TextFillColorPrimary)
-                .HAlign(HorizontalAlignment.Center),
-            Rectangle(
-                Brush.Theme(ThemeColorToken.DividerStrokeColorDefault),
-                new Size(Layout.AxisSegmentWidth, 1f))
-                .VAlign(VerticalAlignment.Center))
-            .Orientation(Orientation.Horizontal)
-            .Spacing(TimerVisuals.Spacing.XLarge)
-            .HAlign(HorizontalAlignment.Center),
-        TextBox()
-            .Text(SessionTitle)
-            .OnTextChanged(Chrome.SetSessionTitle)
-            .Placeholder(Resources.SessionTitlePlaceholder)
-            .Automation(TitleAutomation)
-            .MaxWidth(TimerVisuals.MaxWidth.HeroColumn)
-            .HAlign(HorizontalAlignment.Center),
-        Stack(
-            Button(
-                Icon.Fluent(
-                    IsRunning ? FluentSymbol.Stop : FluentSymbol.Play,
-                    FluentIconVariant.Filled,
-                    TimerVisuals.IconSize.Large,
-                    Brush.CreateSolid(Colors.TextOnAccentFillColorPrimary)),
-                Chrome.StartOrStop,
-                ButtonPalette.FromTheme(Colors, ButtonColorScheme.Accent))
-                .Style(TimerVisuals.Buttons.CircularAction)
-                .Width(TimerVisuals.Height.Hero)
-                .Height(TimerVisuals.Height.Hero)
-                .HAlign(HorizontalAlignment.Center)
-                .Automation(StartStopAutomation),
+            Overlay(
+                Stack(
+                    Rectangle(Brush.Theme(ThemeColorToken.DividerStrokeColorDefault))
+                        .Height(1f)
+                        .Weight(1f)
+                        .VAlign(VerticalAlignment.Center),
+                    Rectangle(Brush.CreateSolid(Colors.SubtleFillColorTransparent), new Size(Layout.AxisGapWidth, 1f)),
+                    Rectangle(Brush.Theme(ThemeColorToken.DividerStrokeColorDefault))
+                        .Height(1f)
+                        .Weight(1f)
+                        .VAlign(VerticalAlignment.Center))
+                    .Orientation(Orientation.Horizontal)
+                    .Width(Layout.AxisTotalWidth)
+                    .HAlign(HorizontalAlignment.Center)
+                    .VAlign(VerticalAlignment.Center)
+                    .Visible(Layout.ShowAxisDecoration),
+                AnimatedText(
+                    TimerFormat.Clock(Elapsed),
+                    new TextFormat(
+                        TextFormat.DefaultFontFamily,
+                        Layout.ClockSize,
+                        TextFormat.BoldWeight,
+                        TextAlignment.Center),
+                    IsRunning ? Colors.AccentTextFillColorPrimary : Colors.TextFillColorPrimary)
+                    .HAlign(HorizontalAlignment.Center)
+                    .VAlign(VerticalAlignment.Center)),
             Text(
-                IsRunning ? Resources.StopTimer : Resources.StartTimer,
-                new TextFormat(TextFormat.DefaultFontFamily, 12f, TextFormat.SemiBoldWeight),
+                IsRunning ? Resources.TimerRunning : Resources.TimerReady,
+                new TextFormat(TextFormat.DefaultFontFamily, 13f, TextFormat.NormalWeight, TextAlignment.Center),
                 Colors.TextFillColorSecondary)
+                .HAlign(HorizontalAlignment.Center),
+            TextBox()
+                .Text(SessionTitle)
+                .OnTextChanged(Chrome.SetSessionTitle)
+                .Placeholder(Resources.SessionTitlePlaceholder)
+                .Centered()
+                .FontSize(16f)
+                .Padding(13f, 9f)
+                .Automation(TitleAutomation)
+                .MaxWidth(TimerVisuals.MaxWidth.SessionField)
+                .HAlign(HorizontalAlignment.Center),
+            Stack(
+                Button(
+                    Icon.Fluent(
+                        IsRunning ? FluentSymbol.Stop : FluentSymbol.Play,
+                        FluentIconVariant.Filled,
+                        TimerVisuals.IconSize.Large,
+                        Brush.CreateSolid(Colors.TextOnAccentFillColorPrimary)),
+                    Chrome.StartOrStop,
+                    ButtonPalette.FromTheme(Colors, ButtonColorScheme.Accent))
+                    .Style(PrimaryActionStyle)
+                    .Width(TimerVisuals.Height.PrimaryAction)
+                    .Height(TimerVisuals.Height.PrimaryAction)
+                    .HAlign(HorizontalAlignment.Center)
+                    .Automation(StartStopAutomation),
+                Text(
+                    IsRunning ? Resources.StopTimer : Resources.StartTimer,
+                    new TextFormat(TextFormat.DefaultFontFamily, 12f, TextFormat.SemiBoldWeight),
+                    Colors.TextFillColorSecondary)
+                    .HAlign(HorizontalAlignment.Center))
+                .Spacing(TimerVisuals.Spacing.XSmall)
                 .HAlign(HorizontalAlignment.Center))
-            .Spacing(TimerVisuals.Spacing.XSmall)
-            .HAlign(HorizontalAlignment.Center))
-        .Spacing(TimerVisuals.Spacing.Large)
+            .Spacing(TimerVisuals.Spacing.Large)
+            .HAlign(HorizontalAlignment.Center)
+            .VAlign(VerticalAlignment.Center))
         .Padding(TimerVisuals.Spacing.XLarge, Layout.StageVerticalPadding);
+
+    /// <summary>The circular primary action: zero padding + a radius that keeps a perfect circle at the 64 epx hero diameter.</summary>
+    internal static ButtonStyle PrimaryActionStyle =>
+        default(ButtonStyle).Padding(0f).CornerRadius(TimerVisuals.Height.PrimaryAction / 2f);
 
     internal static AutomationInfo TitleAutomation => new()
     {
@@ -131,18 +129,17 @@ public readonly partial record struct NormalTimerStageView(
     };
 }
 
-/// <summary>The full-width normal footer: current folder, optional live status, and today's focus.</summary>
+/// <summary>The full-width normal footer: current folder, an optional material-fallback caution, and today's focus.</summary>
 [Composite]
 public readonly partial record struct NormalTimerFooterView(
     ThemeColors Colors,
     TimerNormalLayout Layout,
     string FolderName,
-    bool IsRunning,
     string FocusSummary,
     bool IsBackgroundFallback,
     string BackgroundStatus)
 {
-    /// <summary>The full-width bottom plane; the middle status is structurally absent in the narrow state.</summary>
+    /// <summary>The full-width bottom plane; the middle column collapses to two columns unless a material fallback is showing.</summary>
     public Ui Body => Border(
         Stack(
             Stack(
@@ -158,8 +155,8 @@ public readonly partial record struct NormalTimerFooterView(
                 .VAlign(VerticalAlignment.Center)
                 .Weight(1f),
             When(
-                Layout.ShowMiddleStatus,
-                new NormalFooterStatusView(IsRunning, IsBackgroundFallback, BackgroundStatus, Colors)),
+                Layout.ShowMiddleStatus && IsBackgroundFallback,
+                new NormalFooterStatusView(BackgroundStatus, Colors)),
             Stack(
                 Text(
                     Resources.TodaysFocus,
@@ -207,7 +204,6 @@ public readonly partial record struct NormalTimerView(
             Colors,
             Layout,
             FolderName,
-            IsRunning,
             FocusSummary,
             IsBackgroundFallback,
             BackgroundStatus));

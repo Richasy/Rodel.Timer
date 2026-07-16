@@ -37,12 +37,12 @@ public sealed partial class MainView
             folder.Name,
             created,
             FolderIconCatalog.Resolve(folder.Icon),
-            Brush.CreateSolid(colors.TextFillColorPrimary),
-            Brush.CreateSolid(colors.SubtleFillColorSecondary),
+            Brush.CreateSolid(colors.AccentTextFillColorPrimary),
+            Brush.CreateSolid(colors.AccentFillColorDefault.MultiplyAlpha(0.14f)),
             colors.TextFillColorPrimary,
             colors.TextFillColorSecondary,
-            new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight),
-            new TextFormat(TextFormat.DefaultFontFamily, 12f, TextFormat.NormalWeight));
+            new TextFormat(TextFormat.DefaultFontFamily, 13f, TextFormat.SemiBoldWeight),
+            new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.NormalWeight));
     }
 
     /// <summary>Builds one history card from the projected row data + live theme state (the history list's row template).</summary>
@@ -64,9 +64,9 @@ public sealed partial class MainView
             $"{duration}  \u00B7  {created}",
             colors.TextFillColorPrimary,
             colors.TextFillColorSecondary,
-            new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight),
-            new TextFormat(TextFormat.DefaultFontFamily, 12f, TextFormat.NormalWeight),
-            Brush.CreateSolid(colors.TextFillColorSecondary),
-            Brush.CreateSolid(colors.SubtleFillColorSecondary));
+            new TextFormat(TextFormat.DefaultFontFamily, 13f, TextFormat.SemiBoldWeight),
+            new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.NormalWeight),
+            Brush.CreateSolid(colors.AccentTextFillColorPrimary),
+            Brush.CreateSolid(colors.AccentFillColorDefault.MultiplyAlpha(0.14f)));
     }
 }

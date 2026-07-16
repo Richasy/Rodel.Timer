@@ -70,6 +70,9 @@ internal static class TimerVisuals
         /// <summary>56 epx — the hero start / stop circle diameter and the clock band.</summary>
         internal const float Hero = 56f;
 
+        /// <summary>64 epx — the open-stage primary start / stop action diameter (the prototype's roomier hero button).</summary>
+        internal const float PrimaryAction = 64f;
+
     }
 
     /// <summary>The icon glyph sizes: 16 small, 20 medium, 24 large, plus the 40 epx square row tile.</summary>
@@ -84,8 +87,8 @@ internal static class TimerVisuals
         /// <summary>24 epx — the primary action glyph (start / stop).</summary>
         internal const float Large = 24f;
 
-        /// <summary>40 epx — the square glyph tile that leads a folder / history row.</summary>
-        internal const float Tile = 40f;
+        /// <summary>36 epx — the square glyph tile that leads a folder / history row.</summary>
+        internal const float Tile = 36f;
     }
 
     /// <summary>The rolling-clock font sizes: 56 in the hero, 40 in the compact overlay.</summary>
@@ -107,6 +110,9 @@ internal static class TimerVisuals
         /// <summary>420 epx — the session-title input and the hero's inner content column.</summary>
         internal const float HeroColumn = 420f;
 
+        /// <summary>500 epx — the open-stage session-title field's maximum width (the prototype's <c>min(500, 100%)</c>).</summary>
+        internal const float SessionField = 500f;
+
         /// <summary>500 epx — the settings dialog content column.</summary>
         internal const float Dialog = 500f;
 
@@ -121,11 +127,11 @@ internal static class TimerVisuals
     /// <summary>The row geometry: fixed row extents and the selected-folder accent indicator size.</summary>
     internal static class Row
     {
-        /// <summary>72 epx — a folder row's extent.</summary>
-        internal const float Folder = 72f;
+        /// <summary>58 epx — a folder row's extent.</summary>
+        internal const float Folder = 58f;
 
-        /// <summary>76 epx — a history card's extent.</summary>
-        internal const float History = 76f;
+        /// <summary>60 epx — a history card's extent.</summary>
+        internal const float History = 60f;
 
         /// <summary>The selected-folder left accent indicator width (3 epx).</summary>
         internal const float IndicatorWidth = 3f;

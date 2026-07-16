@@ -25,7 +25,8 @@ public sealed partial class TimerTitleBarControl : Control
     private static readonly FlyoutStyle AnchoredSurfaceStyle = default(FlyoutStyle)
         .Padding(0f)
         .MinWidth(TimerAnchoredSurfaceLayoutResolver.Width)
-        .MaxWidth(TimerAnchoredSurfaceLayoutResolver.Width);
+        .MaxWidth(TimerAnchoredSurfaceLayoutResolver.Width)
+        .MaxHeight(TimerAnchoredSurfaceLayoutResolver.MaximumHeight);
 
     private readonly TimerChrome _chrome;
     private readonly Flyout _foldersFlyout;
@@ -43,15 +44,8 @@ public sealed partial class TimerTitleBarControl : Control
             Placement = PopupPlacement.BottomEdgeAlignedLeft,
             ShouldConstrainToRootBounds = true,
         }
-            .Style(AnchoredSurfaceStyle);
-        _foldersFlyout.Opening += _ =>
-        {
-            _foldersFlyout
-                .Style(SurfaceHeight(TimerAnchoredSurfaceLayoutResolver.Resolve(
-                    _chrome.FolderRows.Count,
-                    TimerVisuals.Row.Folder)))
-                .Automation(FoldersFlyoutAutomation);
-        };
+            .Style(AnchoredSurfaceStyle)
+            .Automation(FoldersFlyoutAutomation);
 
         _historyFlyout = new Flyout(_ =>
             new HistoryPaneControl(_chrome).Automation(HistoryContentAutomation))
@@ -59,15 +53,8 @@ public sealed partial class TimerTitleBarControl : Control
             Placement = PopupPlacement.BottomEdgeAlignedLeft,
             ShouldConstrainToRootBounds = true,
         }
-            .Style(AnchoredSurfaceStyle);
-        _historyFlyout.Opening += _ =>
-        {
-            _historyFlyout
-                .Style(SurfaceHeight(TimerAnchoredSurfaceLayoutResolver.Resolve(
-                    _chrome.HistoryRows.Count,
-                    TimerVisuals.Row.History)))
-                .Automation(HistoryFlyoutAutomation);
-        };
+            .Style(AnchoredSurfaceStyle)
+            .Automation(HistoryFlyoutAutomation);
     }
 
     /// <summary>The normal title-bar band, removed entirely while the compact-overlay presenter is active.</summary>
@@ -119,11 +106,6 @@ public sealed partial class TimerTitleBarControl : Control
         Name = Resources.History,
         AutomationId = TimerAutomationIds.HistoryFlyoutContent,
     };
-
-    private static FlyoutStyle SurfaceHeight(TimerAnchoredSurfaceLayout layout) =>
-        default(FlyoutStyle)
-            .MinHeight(layout.Height)
-            .MaxHeight(layout.Height);
 }
 
 /// <summary>The compact title-bar's fixed leading Exit command; the remaining band stays draggable.</summary>
