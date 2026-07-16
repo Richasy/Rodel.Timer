@@ -173,7 +173,7 @@ public sealed partial class MainView
         }
     }
 
-    /// <summary>Toggles the compact overlay presenter (a 360×203 always-on-top mini timer) on or off.</summary>
+    /// <summary>Toggles the compact overlay presenter (an always-on-top mini timer) on or off.</summary>
     public void ToggleCompact()
     {
         if (IsCompactPresenter)
@@ -183,7 +183,11 @@ public sealed partial class MainView
         }
 
         CompactOverlayPresenter presenter = CompactOverlayPresenter.Create();
-        presenter.InitialSize = new Sprout.Graphics.Size(360f, 203f);
+        presenter.InitialSize = TimerCompactLayoutResolver.DefaultInitialSize;
+
+        // Enforce the overlay's own minimum size so the user cannot shrink the picture-in-picture window into the range
+        // where the tight clock would collide with the primary action (the resolver owns that no-overlap contract).
+        presenter.MinSize = TimerCompactLayoutResolver.MinimumClientSize;
         _window.SetPresenter(presenter);
     }
 
