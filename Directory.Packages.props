@@ -10,11 +10,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageVersion Include="Sprout" Version="0.1.0-local.g46d90f01.compactbackdrop1" />
-    <PackageVersion Include="Sprout.Backend.D2D" Version="0.1.0-local.g46d90f01.compactbackdrop1" />
-    <PackageVersion Include="Sprout.FluentIcon" Version="0.1.0-local.g46d90f01.compactbackdrop1" />
-    <PackageVersion Include="Sprout.LiquidGlass" Version="0.1.0-local.g46d90f01.compactbackdrop1" />
-    <PackageVersion Include="Sprout.Packaging" Version="0.1.0-local.g46d90f01.compactbackdrop1" />
-    <PackageVersion Include="Sprout.WindowsAppSDK" Version="0.1.0-local.g46d90f01.compactbackdrop1" />
+    <PackageVersion Include="Sprout" Version="0.1.0-local.g546982db.rodeltimer7" />
+    <PackageVersion Include="Sprout.Backend.D2D" Version="0.1.0-local.g546982db.rodeltimer7" />
+    <PackageVersion Include="Sprout.FluentIcon" Version="0.1.0-local.g546982db.rodeltimer7" />
+    <PackageVersion Include="Sprout.LiquidGlass" Version="0.1.0-local.g546982db.rodeltimer7" />
+    <PackageVersion Include="Sprout.Packaging" Version="0.1.0-local.g546982db.rodeltimer7" />
+    <PackageVersion Include="Sprout.WindowsAppSDK" Version="0.1.0-local.g546982db.rodeltimer7" />
   </ItemGroup>
 </Project>
