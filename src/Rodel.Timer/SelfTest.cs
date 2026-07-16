@@ -155,7 +155,7 @@ internal static class SelfTest
             wideTitle is { IsVisible: true, ShowBrandLabel: true, ShowCommandLabels: true }
             && narrowTitle is { IsVisible: true, ShowBrandLabel: false, ShowCommandLabels: false }
             && compactTitle is { IsVisible: false }
-            && wideNormal is { ShowMiddleStatus: true, ClockSize: 96f }
+            && wideNormal is { ShowMiddleStatus: true, ClockSize: 110f }
             && narrowNormal is { ShowMiddleStatus: false, ClockSize: 58f }
             && balancedCompact is { Mode: TimerCompactMode.Balanced, ShowContext: true }
             && tightCompact is { Mode: TimerCompactMode.Tight, ShowContext: false }

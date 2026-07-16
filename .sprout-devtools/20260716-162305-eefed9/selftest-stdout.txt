@@ -1,0 +1,2 @@
+packaging: IsPackaged=False (expected false) => ok
+selftest: core=ok persistence=ok store=ok localization=ok ui=ok leaked=0 => PASS
