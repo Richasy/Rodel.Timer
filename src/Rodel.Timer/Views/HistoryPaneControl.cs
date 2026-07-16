@@ -34,7 +34,7 @@ public readonly partial record struct HistoryRowView(
     Brush IconBrush,
     Brush TileBrush)
 {
-    /// <summary>The bordered history card with no synthetic Button or overflow affordance.</summary>
+    /// <summary>The transparent history row content; the ItemContainer owns the 4 epx hover/selection chrome.</summary>
     public Ui Body => Border(
         Stack(
             Border(
@@ -42,7 +42,7 @@ public readonly partial record struct HistoryRowView(
                     .HAlign(HorizontalAlignment.Center)
                     .VAlign(VerticalAlignment.Center))
                 .Background(TileBrush)
-                .CornerRadius(TimerVisuals.Radius.Control)
+                .CornerRadius(TimerVisuals.Radius.App)
                 .Width(TimerVisuals.IconSize.Tile)
                 .Height(TimerVisuals.IconSize.Tile),
             Stack(
@@ -54,11 +54,7 @@ public readonly partial record struct HistoryRowView(
             .Orientation(Orientation.Horizontal)
             .Spacing(TimerVisuals.Spacing.Medium)
             .VAlign(VerticalAlignment.Center))
-        .Background(Brush.Theme(ThemeColorToken.CardBackgroundFillColorDefault))
-        .BorderBrush(Brush.Theme(ThemeColorToken.CardStrokeColorDefault))
-        .BorderThickness(1f)
-        .CornerRadius(TimerVisuals.Radius.Card)
-        .Padding(TimerVisuals.Spacing.Medium);
+        .Padding(TimerVisuals.Spacing.Medium, TimerVisuals.Spacing.Small);
 }
 
 /// <summary>
