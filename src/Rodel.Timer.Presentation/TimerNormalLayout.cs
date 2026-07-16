@@ -3,16 +3,18 @@ namespace Rodel.Timer.Presentation;
 /// <summary>The deterministic normal-workspace metrics resolved from client width and height.</summary>
 /// <param name="ShowMiddleStatus">Whether the footer''s running/material status column is present.</param>
 /// <param name="ClockSize">The rolling-clock font size (continuous, like the prototype''s <c>clamp(84, 10vw, 116)</c>).</param>
-/// <param name="AxisTotalWidth">The full width of the decorative axis line behind the clock.</param>
-/// <param name="AxisGapWidth">The centre gap in the axis line (a little wider than the clock, so the flanking segments never cross the digits) — also the width of the soft backlight behind the clock.</param>
-/// <param name="ShowAxisDecoration">Whether the axis line + backlight are shown (hidden on a narrow window so the clock stays centred).</param>
+/// <param name="AxisTotalWidth">The full width of the decorative axis line behind the clock (its fade + centre gap live in the gradient stops).</param>
+/// <param name="GlowWidth">The width of the soft radial backlight behind the clock (the prototype''s <c>min(620, 72%)</c>).</param>
+/// <param name="GlowHeight">The height of the soft radial backlight ellipse behind the clock.</param>
+/// <param name="ShowAxisDecoration">Whether the axis line is shown (hidden on a narrow window so the clock stays centred).</param>
 /// <param name="StageVerticalPadding">The timer stage''s top/bottom padding.</param>
 /// <param name="FooterVerticalPadding">The footer''s top/bottom padding.</param>
 public readonly record struct TimerNormalLayout(
     bool ShowMiddleStatus,
     float ClockSize,
     float AxisTotalWidth,
-    float AxisGapWidth,
+    float GlowWidth,
+    float GlowHeight,
     bool ShowAxisDecoration,
     float StageVerticalPadding,
     float FooterVerticalPadding);
@@ -34,17 +36,19 @@ public static class TimerNormalLayoutResolver
         // A heavy, continuous clock size — the prototype''s clamp(84px, 10vw, 116px); a short window uses the compact 58.
         float clock = shortWindow ? 58f : (float)Math.Clamp(width * 0.10d, 84d, 116d);
 
-        // The decorative axis line spans min(880, 86% of the client). Its centre gap is a little wider than the clock
-        // (~"00:00:00" is roughly 4.3x the digit size in the tabular UI font) so the flanking segments never run under
-        // the digits, and the same width sizes the soft backlight behind the clock.
+        // The decorative axis line spans min(880, 86% of the client); its inward fade and the centre gap for the clock
+        // live in the gradient stops, so only its total width is metric. The soft backlight ellipse behind the clock is
+        // the prototype''s min(620, 72%) wide and a fixed height (smaller in a short window).
         float axisTotal = (float)Math.Min(880d, width * 0.86d);
-        float gap = MathF.Min(axisTotal, clock * 4.3f);
+        float glowWidth = (float)Math.Min(620d, width * 0.72d);
+        float glowHeight = shortWindow ? 150f : 260f;
 
         return new(
             ShowMiddleStatus: width >= NarrowThreshold,
             ClockSize: clock,
             AxisTotalWidth: axisTotal,
-            AxisGapWidth: gap,
+            GlowWidth: glowWidth,
+            GlowHeight: glowHeight,
             ShowAxisDecoration: width >= NarrowThreshold,
             StageVerticalPadding: shortWindow ? 18f : 36f,
             FooterVerticalPadding: shortWindow ? 10f : 14f);

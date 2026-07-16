@@ -44,18 +44,10 @@ public readonly partial record struct NormalTimerStageView(
     public Ui Body => Overlay(
         Stack(
             Overlay(
-                Stack(
-                    Rectangle(Brush.Theme(ThemeColorToken.DividerStrokeColorDefault))
-                        .Height(1f)
-                        .Weight(1f)
-                        .VAlign(VerticalAlignment.Center),
-                    Rectangle(Brush.CreateSolid(Colors.SubtleFillColorTransparent), new Size(Layout.AxisGapWidth, 1f)),
-                    Rectangle(Brush.Theme(ThemeColorToken.DividerStrokeColorDefault))
-                        .Height(1f)
-                        .Weight(1f)
-                        .VAlign(VerticalAlignment.Center))
-                    .Orientation(Orientation.Horizontal)
-                    .Width(Layout.AxisTotalWidth)
+                Rectangle(ClockGlowBrush(Colors), new Size(Layout.GlowWidth, Layout.GlowHeight))
+                    .HAlign(HorizontalAlignment.Center)
+                    .VAlign(VerticalAlignment.Center),
+                Rectangle(AxisFadeBrush(Colors), new Size(Layout.AxisTotalWidth, 1f))
                     .HAlign(HorizontalAlignment.Center)
                     .VAlign(VerticalAlignment.Center)
                     .Visible(Layout.ShowAxisDecoration),
@@ -113,6 +105,50 @@ public readonly partial record struct NormalTimerStageView(
     /// <summary>The circular primary action: zero padding + a radius that keeps a perfect circle at the 64 epx hero diameter.</summary>
     internal static ButtonStyle PrimaryActionStyle =>
         default(ButtonStyle).Padding(0f).CornerRadius(TimerVisuals.Height.PrimaryAction / 2f);
+
+    /// <summary>
+    /// The fading axis rule line behind the clock: a bounds-relative horizontal gradient that fades in from
+    /// transparent, holds the subtle divider colour, cuts to a transparent centre gap for the digits, then mirrors on
+    /// the far side (the prototype''s <c>.timer-stage::before</c>). A relative gradient is used because the line''s
+    /// laid-out bounds are unknown here in the composite.
+    /// </summary>
+    internal static Brush AxisFadeBrush(ThemeColors colors)
+    {
+        Color line = colors.DividerStrokeColorDefault;
+        Color clear = line.MultiplyAlpha(0f);
+        return Brush.CreateLinearRelative(
+            new Point(0f, 0.5f),
+            new Point(1f, 0.5f),
+            [
+                new GradientStop(0f, clear),
+                new GradientStop(0.12f, line),
+                new GradientStop(0.28f, line),
+                new GradientStop(0.30f, clear),
+                new GradientStop(0.70f, clear),
+                new GradientStop(0.72f, line),
+                new GradientStop(0.88f, line),
+                new GradientStop(1f, clear),
+            ]);
+    }
+
+    /// <summary>
+    /// The soft radial backlight behind the clock: a bounds-relative accent glow fading from a faint centre to
+    /// transparent (the prototype''s blurred <c>.timer-stage::after</c>, approximated with a soft gradient falloff — a
+    /// relative radial so it follows the backlight rectangle''s bounds without knowing them here).
+    /// </summary>
+    internal static Brush ClockGlowBrush(ThemeColors colors)
+    {
+        Color accent = colors.AccentFillColorDefault;
+        return Brush.CreateRadialRelative(
+            new Point(0.5f, 0.5f),
+            0.5f,
+            0.5f,
+            [
+                new GradientStop(0f, accent.MultiplyAlpha(0.13f)),
+                new GradientStop(0.45f, accent.MultiplyAlpha(0.05f)),
+                new GradientStop(0.72f, accent.MultiplyAlpha(0f)),
+            ]);
+    }
 
     internal static AutomationInfo TitleAutomation => new()
     {
