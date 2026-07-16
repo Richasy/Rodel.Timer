@@ -220,7 +220,7 @@ public readonly partial record struct TimerTitleBarView(
                 FoldersFlyout)
                 .Style(CommandStyle)
                 .Palette(TimerVisuals.Ghost(Colors))
-                .Width(CommandWidth)
+                .MinWidth(TimerVisuals.Height.Icon)
                 .Height(TimerVisuals.Height.Icon)
                 .VAlign(VerticalAlignment.Center)
                 .AccessKey("F")
@@ -235,7 +235,7 @@ public readonly partial record struct TimerTitleBarView(
                 HistoryFlyout)
                 .Style(CommandStyle)
                 .Palette(TimerVisuals.Ghost(Colors))
-                .Width(CommandWidth)
+                .MinWidth(TimerVisuals.Height.Icon)
                 .Height(TimerVisuals.Height.Icon)
                 .VAlign(VerticalAlignment.Center)
                 .AccessKey("H")
@@ -275,13 +275,16 @@ public readonly partial record struct TimerTitleBarView(
         .Spacing(TimerVisuals.Spacing.Small)
         .Padding(TimerVisuals.Spacing.Medium, 0f, TimerVisuals.Spacing.Small, 0f);
 
-    internal float CommandWidth =>
-        ShowCommandLabels ? 112f : TimerVisuals.Height.Icon;
-
+    /// <summary>
+    /// The title-bar command drop-down style. WinUI DropDownButtons size to their content, so the buttons carry only a
+    /// <see cref="TimerVisuals.Height.Icon"/> minimum width (a fixed width clipped the icon + label + chevron), the native
+    /// 4 epx control corner, and the control's own decorative chevron (shown only with the label). The zero horizontal
+    /// padding in icon-only mode centres the lone glyph in the minimum-width square.
+    /// </summary>
     internal DropDownButtonStyle CommandStyle =>
         default(DropDownButtonStyle)
-            .Padding(ShowCommandLabels ? 8f : 0f, 5f)
-            .CornerRadius(TimerVisuals.Radius.Control)
+            .Padding(ShowCommandLabels ? 11f : 0f, 5f)
+            .CornerRadius(TimerVisuals.Radius.App)
             .ChevronVisible(ShowCommandLabels);
 
     internal static AutomationInfo FoldersAutomation => new()
