@@ -37,6 +37,7 @@ public sealed class TimerAutomationIdsTests
         TimerAutomationIds.Retry,
         TimerAutomationIds.SettingsDialog,
         TimerAutomationIds.SettingsTheme,
+        TimerAutomationIds.SettingsBackground,
         TimerAutomationIds.SettingsLanguage,
         TimerAutomationIds.SettingsFont,
         TimerAutomationIds.SettingsDailyTarget,

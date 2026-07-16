@@ -48,6 +48,9 @@ public static class TimerAutomationIds
     /// <summary>The settings theme combo box.</summary>
     public const string SettingsTheme = "RodelTimer.Settings.Theme";
 
+    /// <summary>The settings window-background combo box.</summary>
+    public const string SettingsBackground = "RodelTimer.Settings.Background";
+
     /// <summary>The settings language combo box.</summary>
     public const string SettingsLanguage = "RodelTimer.Settings.Language";
 

@@ -29,7 +29,7 @@ public sealed record TimerPreferences
     /// <param name="dailyTargetMinutes">The daily time target, in minutes. Must be between 1 and <see cref="MaximumDailyTargetMinutes"/>.</param>
     /// <param name="lastSeenVersion">The application version that last wrote these preferences, or <see langword="null"/> if unknown.</param>
     /// <exception cref="ArgumentException"><paramref name="language"/> is not a supported language, or <paramref name="fontFamily"/> is null, empty, or whitespace-only.</exception>
-    /// <exception cref="ArgumentOutOfRangeException"><paramref name="dailyTargetMinutes"/> is outside the valid range.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="theme"/> or <paramref name="background"/> is undefined, or <paramref name="dailyTargetMinutes"/> is outside the valid range.</exception>
     public TimerPreferences(
         TimerThemeMode theme,
         TimerBackgroundMode background,
@@ -38,6 +38,16 @@ public sealed record TimerPreferences
         int dailyTargetMinutes,
         string? lastSeenVersion = null)
     {
+        if (!Enum.IsDefined(theme))
+        {
+            throw new ArgumentOutOfRangeException(nameof(theme));
+        }
+
+        if (!Enum.IsDefined(background))
+        {
+            throw new ArgumentOutOfRangeException(nameof(background));
+        }
+
         Theme = theme;
         Background = background;
         Language = NormalizeLanguage(language);

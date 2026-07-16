@@ -9,6 +9,7 @@ using Rodel.Timer.Core.Settings;
 
 using Sprout;
 using Sprout.Backend.D2D;
+using Sprout.LiquidGlass;
 
 if (args.Contains("--selftest", StringComparer.OrdinalIgnoreCase))
 {
@@ -29,6 +30,7 @@ var defaultPreferences = new TimerPreferences(
 return SproutApp.CreateBuilder(args)
     .UseApp<App>()
     .UseD2DBackend()
+    .UseLiquidGlass()
     .UseSingleInstance()
     .UseLanguage(language)
     .ConfigureServices(services =>

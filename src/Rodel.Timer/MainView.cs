@@ -26,6 +26,7 @@ public sealed partial class MainView : Control, ILanguageApplyTarget
     private readonly TimerAppStore _store;
     private readonly IReadOnlyList<FontChoice> _fonts;
     private readonly TimerChrome _chrome;
+    private readonly TimerWindowBackground _windowBackground;
 
     /// <summary>Creates the product view over a window and its reactive store.</summary>
     /// <param name="window">The hosting window (the source of theme, presenter, and dialog hosting).</param>
@@ -38,6 +39,7 @@ public sealed partial class MainView : Control, ILanguageApplyTarget
         _store = store ?? throw new ArgumentNullException(nameof(store));
         _fonts = fonts ?? throw new ArgumentNullException(nameof(fonts));
         _chrome = new TimerChrome(window, this);
+        _windowBackground = new TimerWindowBackground(window);
         ViewportWidth = 1100d;
         SessionTitle = string.Empty;
         SaveErrorMessage = string.Empty;

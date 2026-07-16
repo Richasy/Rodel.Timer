@@ -15,7 +15,7 @@
   <data name="History" xml:space="preserve"><value>History</value></data>
   <data name="HistoryHelp" xml:space="preserve"><value>Show or hide the current folder's timer history</value></data>
   <data name="Settings" xml:space="preserve"><value>Settings</value></data>
-  <data name="SettingsHelp" xml:space="preserve"><value>Theme, language, font, and daily target</value></data>
+  <data name="SettingsHelp" xml:space="preserve"><value>Theme, background, font, language, and daily target</value></data>
   <data name="SessionTitle" xml:space="preserve"><value>Session title</value></data>
   <data name="SessionTitlePlaceholder" xml:space="preserve"><value>What are you working on?</value></data>
   <data name="SessionTitleHelp" xml:space="preserve"><value>The title saved with this timer session</value></data>
@@ -66,6 +66,16 @@
   <data name="ThemeSystem" xml:space="preserve"><value>Use system setting</value></data>
   <data name="ThemeLight" xml:space="preserve"><value>Light</value></data>
   <data name="ThemeDark" xml:space="preserve"><value>Dark</value></data>
+  <data name="Appearance" xml:space="preserve"><value>Appearance</value></data>
+  <data name="Focus" xml:space="preserve"><value>Focus</value></data>
+  <data name="Regional" xml:space="preserve"><value>Regional</value></data>
+  <data name="About" xml:space="preserve"><value>About</value></data>
+  <data name="WindowBackground" xml:space="preserve"><value>Window background</value></data>
+  <data name="WindowBackgroundDescription" xml:space="preserve"><value>Choose the window canvas material; unavailable effects use an opaque theme surface</value></data>
+  <data name="BackgroundSystemMaterial" xml:space="preserve"><value>System Material (Mica)</value></data>
+  <data name="BackgroundSolid" xml:space="preserve"><value>Solid</value></data>
+  <data name="BackgroundAcrylic" xml:space="preserve"><value>Acrylic</value></data>
+  <data name="BackgroundLiquidGlassWallpaper" xml:space="preserve"><value>Liquid Glass (Wallpaper)</value></data>
   <data name="Font" xml:space="preserve"><value>Font</value></data>
   <data name="Language" xml:space="preserve"><value>Language</value></data>
   <data name="LanguageEnglish" xml:space="preserve"><value>English</value></data>

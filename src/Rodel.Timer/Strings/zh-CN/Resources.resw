@@ -15,7 +15,7 @@
   <data name="History" xml:space="preserve"><value>历史记录</value></data>
   <data name="HistoryHelp" xml:space="preserve"><value>显示或隐藏当前分组的计时历史</value></data>
   <data name="Settings" xml:space="preserve"><value>设置</value></data>
-  <data name="SettingsHelp" xml:space="preserve"><value>主题、语言、字体和每日目标</value></data>
+  <data name="SettingsHelp" xml:space="preserve"><value>主题、窗口背景、字体、语言和每日目标</value></data>
   <data name="SessionTitle" xml:space="preserve"><value>计时标题</value></data>
   <data name="SessionTitlePlaceholder" xml:space="preserve"><value>你正在做什么？</value></data>
   <data name="SessionTitleHelp" xml:space="preserve"><value>与本次计时一起保存的标题</value></data>
@@ -66,6 +66,16 @@
   <data name="ThemeSystem" xml:space="preserve"><value>跟随系统</value></data>
   <data name="ThemeLight" xml:space="preserve"><value>浅色</value></data>
   <data name="ThemeDark" xml:space="preserve"><value>深色</value></data>
+  <data name="Appearance" xml:space="preserve"><value>外观</value></data>
+  <data name="Focus" xml:space="preserve"><value>专注</value></data>
+  <data name="Regional" xml:space="preserve"><value>区域</value></data>
+  <data name="About" xml:space="preserve"><value>关于</value></data>
+  <data name="WindowBackground" xml:space="preserve"><value>窗口背景</value></data>
+  <data name="WindowBackgroundDescription" xml:space="preserve"><value>选择窗口画布材质；效果不可用时显示不透明的主题背景</value></data>
+  <data name="BackgroundSystemMaterial" xml:space="preserve"><value>系统材质（云母）</value></data>
+  <data name="BackgroundSolid" xml:space="preserve"><value>纯色</value></data>
+  <data name="BackgroundAcrylic" xml:space="preserve"><value>亚克力</value></data>
+  <data name="BackgroundLiquidGlassWallpaper" xml:space="preserve"><value>液态玻璃（壁纸）</value></data>
   <data name="Font" xml:space="preserve"><value>字体</value></data>
   <data name="Language" xml:space="preserve"><value>语言</value></data>
   <data name="LanguageEnglish" xml:space="preserve"><value>英语</value></data>

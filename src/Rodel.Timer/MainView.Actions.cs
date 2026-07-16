@@ -39,6 +39,30 @@ public sealed partial class MainView
     /// <summary>Bumps <see cref="MainView.ThemeStamp"/> so descendant controls re-resolve their theme colors.</summary>
     public void NotifyThemeChanged() => ThemeStamp++;
 
+    /// <summary>Persists and applies a theme choice through the window's live theme rail.</summary>
+    /// <param name="theme">The new theme preference.</param>
+    public void ApplyTheme(TimerThemeMode theme)
+    {
+        _store.UpdateTheme(theme);
+        ApplyThemeCore(theme);
+    }
+
+    /// <summary>Persists and applies the canonical window font family without remounting the content tree.</summary>
+    /// <param name="fontFamily">The selected family.</param>
+    public void ApplyFontFamily(string fontFamily)
+    {
+        _store.UpdateFontFamily(fontFamily);
+        ApplyFontFamilyCore(fontFamily);
+    }
+
+    /// <summary>Persists and applies the window background/material choice.</summary>
+    /// <param name="background">The selected background mode.</param>
+    public void ApplyBackground(TimerBackgroundMode background)
+    {
+        _store.UpdateBackground(background);
+        ApplyBackgroundCore(background);
+    }
+
     /// <summary>Sets the window caption from the current-language <see cref="Resources.AppName"/> (call after a language switch).</summary>
     public void SyncWindowTitle() => _window.Title = Resources.AppName;
 
@@ -71,7 +95,7 @@ public sealed partial class MainView
     /// <param name="language">The BCP-47 language tag to apply.</param>
     private void ApplyLanguageCore(string language) => LanguageApply.Apply(this, language);
 
-    /// <summary>Applies the persisted language and theme once the workspace has loaded, then announces readiness.</summary>
+    /// <summary>Applies all persisted presentation preferences once the workspace has loaded, then announces readiness.</summary>
     public void OnDataLoaded()
     {
         if (!_store.Bootstrap.IsSuccess)
@@ -82,14 +106,25 @@ public sealed partial class MainView
         SaveErrorMessage = string.Empty;
         TimerPreferences preferences = _store.Preferences;
         ApplyLanguageCore(preferences.Language);
-        _window.RequestedTheme = preferences.Theme switch
+        ApplyThemeCore(preferences.Theme);
+        ApplyFontFamilyCore(preferences.FontFamily);
+        ApplyBackgroundCore(preferences.Background);
+        ShowStartupNotices();
+    }
+
+    private void ApplyThemeCore(TimerThemeMode theme) =>
+        _window.RequestedTheme = theme switch
         {
             TimerThemeMode.Light => ThemeRequest.Light,
             TimerThemeMode.Dark => ThemeRequest.Dark,
             _ => null,
         };
-        ShowStartupNotices();
-    }
+
+    private void ApplyFontFamilyCore(string fontFamily) =>
+        _window.DefaultFontFamilyOverride = fontFamily;
+
+    private void ApplyBackgroundCore(TimerBackgroundMode background) =>
+        _windowBackground.Apply(background);
 
     /// <summary>Shows a blocking save-failure message over the shell with a retry affordance.</summary>
     /// <param name="message">The failure message to display.</param>

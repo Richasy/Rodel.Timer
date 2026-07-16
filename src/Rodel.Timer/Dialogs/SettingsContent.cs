@@ -18,8 +18,8 @@ using static Sprout.Markup;
 namespace Rodel.Timer.Dialogs;
 
 /// <summary>
-/// The live content of the settings dialog — theme, language, UI font, and daily-target editors, plus an open-source
-/// link. Every change applies immediately to the reactive store (and, for theme/language, to the window and localizer),
+/// The live content of the settings dialog — grouped appearance, focus, regional, and about settings. Every change
+/// applies immediately to the reactive store and to the window's theme, background, canonical font, or localizer,
 /// so the product re-renders live behind the dialog. Selection indices are held as reactive state so the editors stay
 /// consistent across a live language switch (which re-localizes their labels and options).
 /// </summary>
@@ -34,7 +34,6 @@ public sealed partial class SettingsContent : Control
     // threshold, which would otherwise push the editor below the header. Lowering the threshold pins the mature
     // right-aligned layout while still wrapping if the dialog is ever made much narrower.
     internal const float CardWrapThreshold = 360f;
-
     /// <summary>Creates the settings content bound to the owning <see cref="MainView"/>.</summary>
     /// <param name="main">The state-owning root view (the store + window + fonts).</param>
     /// <param name="onLanguageChanged">
@@ -50,6 +49,7 @@ public sealed partial class SettingsContent : Control
 
         TimerPreferences preferences = main.Preferences;
         ThemeIndex = (int)preferences.Theme;
+        BackgroundIndex = (int)preferences.Background;
         LanguageIndex = preferences.Language == TimerPreferences.ChineseLanguage ? 1 : 0;
         FontIndex = ResolveFontIndex(preferences.FontFamily);
         TargetMinutes = preferences.DailyTargetMinutes;
@@ -72,6 +72,9 @@ public sealed partial class SettingsContent : Control
     /// <summary>The selected theme index (0 = system, 1 = light, 2 = dark).</summary>
     public partial int ThemeIndex { get; private set; }
 
+    /// <summary>The selected background index, matching <see cref="TimerBackgroundMode"/>.</summary>
+    public partial int BackgroundIndex { get; private set; }
+
     /// <summary>The selected language index (0 = English, 1 = Chinese).</summary>
     public partial int LanguageIndex { get; private set; }
 
@@ -84,55 +87,100 @@ public sealed partial class SettingsContent : Control
     /// <inheritdoc/>
     public Ui Body => Overlay(
         Stack(
-            SettingsCard(
-                Resources.Theme,
-                ComboBox([Resources.ThemeSystem, Resources.ThemeLight, Resources.ThemeDark])
-                    .SelectedIndex(ThemeIndex)
-                    .OnSelectionChanged(OnThemeChanged)
-                    .Automation(ThemeAutomation))
-                .Description(Resources.ThemeDescription)
-                .Icon(new FluentIcon(FluentSymbol.WeatherMoon))
-                .WrapThreshold(CardWrapThreshold),
-            SettingsCard(
-                Resources.Language,
-                ComboBox([Resources.LanguageEnglish, Resources.LanguageChinese])
-                    .SelectedIndex(LanguageIndex)
-                    .OnSelectionChanged(OnLanguageChanged)
-                    .Automation(LanguageAutomation))
-                .Description(Resources.LanguageDescription)
-                .Icon(new FluentIcon(FluentSymbol.LocalLanguage))
-                .WrapThreshold(CardWrapThreshold),
-            SettingsCard(
-                Resources.Font,
-                ComboBox(_fonts.Select(f => f.DisplayName))
-                    .SelectedIndex(FontIndex)
-                    .OnSelectionChanged(OnFontChanged)
-                    .MaxDropDownHeight(320f)
-                    .Automation(FontAutomation))
-                .Description(Resources.FontDescription)
-                .Icon(new FluentIcon(FluentSymbol.TextFont))
-                .WrapThreshold(CardWrapThreshold),
-            SettingsCard(
-                Resources.DailyTarget,
-                NumberBox(TargetMinutes, OnTargetChanged)
-                    .Minimum(1d)
-                    .Maximum(TimerPreferences.MaximumDailyTargetMinutes)
-                    .SmallChange(30d)
-                    .LargeChange(60d)
-                    .AcceptsOnlyNumericInput()
-                    .Automation(DailyTargetAutomation))
-                .Description(Resources.DailyTargetDescription)
-                .Icon(new FluentIcon(FluentSymbol.Target))
-                .WrapThreshold(CardWrapThreshold),
-            HyperlinkButton(Resources.OpenOnGitHub, TimerLinks.OpenSourceUri, HyperlinkButtonPalette.FromTheme(Colors))
-                .Automation(OpenSourceAutomation))
-        .Spacing(TimerVisuals.Spacing.Small)
+            Stack(
+                Text(
+                    Resources.Appearance,
+                    new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight))
+                    .Foreground(Brush.Theme(ThemeColorToken.TextFillColorPrimary)),
+                SettingsCard(
+                    Resources.Theme,
+                    ComboBox([Resources.ThemeSystem, Resources.ThemeLight, Resources.ThemeDark])
+                        .SelectedIndex(ThemeIndex)
+                        .OnSelectionChanged(OnThemeChanged)
+                        .Automation(ThemeAutomation))
+                    .Description(Resources.ThemeDescription)
+                    .Icon(new FluentIcon(FluentSymbol.WeatherMoon))
+                    .WrapThreshold(CardWrapThreshold),
+                SettingsCard(
+                    Resources.WindowBackground,
+                    ComboBox(
+                        [
+                            Resources.BackgroundSystemMaterial,
+                            Resources.BackgroundSolid,
+                            Resources.BackgroundAcrylic,
+                            Resources.BackgroundLiquidGlassWallpaper,
+                        ])
+                        .SelectedIndex(BackgroundIndex)
+                        .OnSelectionChanged(OnBackgroundChanged)
+                        .Automation(BackgroundAutomation))
+                    .Description(Resources.WindowBackgroundDescription)
+                    .Icon(new FluentIcon(FluentSymbol.Color))
+                    .WrapThreshold(CardWrapThreshold),
+                SettingsCard(
+                    Resources.Font,
+                    ComboBox(_fonts.Select(f => f.DisplayName))
+                        .SelectedIndex(FontIndex)
+                        .OnSelectionChanged(OnFontChanged)
+                        .MaxDropDownHeight(320f)
+                        .Automation(FontAutomation))
+                    .Description(Resources.FontDescription)
+                    .Icon(new FluentIcon(FluentSymbol.TextFont))
+                    .WrapThreshold(CardWrapThreshold))
+            .Spacing(TimerVisuals.Spacing.Small),
+            Stack(
+                Text(
+                    Resources.Focus,
+                    new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight))
+                    .Foreground(Brush.Theme(ThemeColorToken.TextFillColorPrimary)),
+                SettingsCard(
+                    Resources.DailyTarget,
+                    NumberBox(TargetMinutes, OnTargetChanged)
+                        .Minimum(1d)
+                        .Maximum(TimerPreferences.MaximumDailyTargetMinutes)
+                        .SmallChange(30d)
+                        .LargeChange(60d)
+                        .AcceptsOnlyNumericInput()
+                        .Automation(DailyTargetAutomation))
+                    .Description(Resources.DailyTargetDescription)
+                    .Icon(new FluentIcon(FluentSymbol.Target))
+                    .WrapThreshold(CardWrapThreshold))
+            .Spacing(TimerVisuals.Spacing.Small),
+            Stack(
+                Text(
+                    Resources.Regional,
+                    new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight))
+                    .Foreground(Brush.Theme(ThemeColorToken.TextFillColorPrimary)),
+                SettingsCard(
+                    Resources.Language,
+                    ComboBox([Resources.LanguageEnglish, Resources.LanguageChinese])
+                        .SelectedIndex(LanguageIndex)
+                        .OnSelectionChanged(OnLanguageChanged)
+                        .Automation(LanguageAutomation))
+                    .Description(Resources.LanguageDescription)
+                    .Icon(new FluentIcon(FluentSymbol.LocalLanguage))
+                    .WrapThreshold(CardWrapThreshold))
+            .Spacing(TimerVisuals.Spacing.Small),
+            Stack(
+                Text(
+                    Resources.About,
+                    new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight))
+                    .Foreground(Brush.Theme(ThemeColorToken.TextFillColorPrimary)),
+                HyperlinkButton(Resources.OpenOnGitHub, TimerLinks.OpenSourceUri, HyperlinkButtonPalette.FromTheme(Colors))
+                    .Automation(OpenSourceAutomation))
+            .Spacing(TimerVisuals.Spacing.Small))
+        .Spacing(TimerVisuals.Spacing.Large)
         .Width(TimerVisuals.MaxWidth.Dialog));
 
     internal static AutomationInfo ThemeAutomation => new()
     {
         Name = Resources.Theme,
         AutomationId = TimerAutomationIds.SettingsTheme,
+    };
+
+    internal static AutomationInfo BackgroundAutomation => new()
+    {
+        Name = Resources.WindowBackground,
+        AutomationId = TimerAutomationIds.SettingsBackground,
     };
 
     internal static AutomationInfo LanguageAutomation => new()
@@ -176,15 +224,13 @@ public sealed partial class SettingsContent : Control
     private void OnThemeChanged(int index)
     {
         ThemeIndex = index;
-        var mode = (TimerThemeMode)index;
-        _main.Store.UpdateTheme(mode);
-        _main.Window.RequestedTheme = mode switch
-        {
-            TimerThemeMode.Light => ThemeRequest.Light,
-            TimerThemeMode.Dark => ThemeRequest.Dark,
-            _ => null,
-        };
-        _main.NotifyThemeChanged();
+        _main.ApplyTheme((TimerThemeMode)index);
+    }
+
+    private void OnBackgroundChanged(int index)
+    {
+        BackgroundIndex = index;
+        _main.ApplyBackground((TimerBackgroundMode)index);
     }
 
     private void OnLanguageChanged(int index)
@@ -203,8 +249,7 @@ public sealed partial class SettingsContent : Control
         }
 
         FontIndex = index;
-        _main.Store.UpdateFontFamily(_fonts[index].FamilyName);
-        _main.NotifyThemeChanged();
+        _main.ApplyFontFamily(_fonts[index].FamilyName);
     }
 
     private void OnTargetChanged(NumberBoxValueChangedEventArgs args)
