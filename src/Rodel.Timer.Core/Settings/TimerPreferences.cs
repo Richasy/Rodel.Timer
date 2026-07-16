@@ -2,7 +2,7 @@ namespace Rodel.Timer.Core.Settings;
 
 /// <summary>
 /// The immutable set of user-configurable preferences attached to a <see cref="Workspace.TimerWorkspace"/>:
-/// theme, language, font, and the daily time target used to track progress toward a day's goal.
+/// theme, window background, language, font, and the daily time target used to track progress toward a day's goal.
 /// </summary>
 public sealed record TimerPreferences
 {
@@ -23,6 +23,7 @@ public sealed record TimerPreferences
 
     /// <summary>Creates a preferences record, normalizing <paramref name="language"/> and <paramref name="fontFamily"/>.</summary>
     /// <param name="theme">The preferred theme.</param>
+    /// <param name="background">The preferred window background/material.</param>
     /// <param name="language">The preferred language. Must be <see cref="EnglishLanguage"/> or <see cref="ChineseLanguage"/> (case-insensitive).</param>
     /// <param name="fontFamily">The preferred font family. Must not be null, empty, or whitespace-only.</param>
     /// <param name="dailyTargetMinutes">The daily time target, in minutes. Must be between 1 and <see cref="MaximumDailyTargetMinutes"/>.</param>
@@ -31,12 +32,14 @@ public sealed record TimerPreferences
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="dailyTargetMinutes"/> is outside the valid range.</exception>
     public TimerPreferences(
         TimerThemeMode theme,
+        TimerBackgroundMode background,
         string language,
         string fontFamily,
         int dailyTargetMinutes,
         string? lastSeenVersion = null)
     {
         Theme = theme;
+        Background = background;
         Language = NormalizeLanguage(language);
         FontFamily = NormalizeFontFamily(fontFamily);
 
@@ -55,12 +58,16 @@ public sealed record TimerPreferences
     /// <summary>The default preferences: system theme, English language, the default font, and the default daily target.</summary>
     public static TimerPreferences Default { get; } = new(
         TimerThemeMode.System,
+        TimerBackgroundMode.SystemMaterial,
         EnglishLanguage,
         DefaultFontFamily,
         DefaultDailyTargetMinutes);
 
     /// <summary>The preferred theme.</summary>
     public TimerThemeMode Theme { get; }
+
+    /// <summary>The preferred window background/material, independent of <see cref="Theme"/>.</summary>
+    public TimerBackgroundMode Background { get; }
 
     /// <summary>The preferred language: <see cref="EnglishLanguage"/> or <see cref="ChineseLanguage"/>.</summary>
     public string Language { get; }

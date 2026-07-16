@@ -31,11 +31,83 @@ public sealed class TimerDataRepositoryTests
         Assert.AreEqual("Read", loaded.Entries[0].Title);
         Assert.AreEqual(300L, loaded.Entries[0].DurationSeconds);
         Assert.AreEqual(TimerThemeMode.Dark, loaded.Preferences.Theme);
+        Assert.AreEqual(TimerBackgroundMode.Acrylic, loaded.Preferences.Background);
 
         string json = await File.ReadAllTextAsync(path);
-        StringAssert.Contains(json, "\"schemaVersion\": 1");
+        StringAssert.Contains(json, "\"schemaVersion\": 2");
+        StringAssert.Contains(json, "\"background\": \"Acrylic\"");
         StringAssert.Contains(json, "\"icon\": \"Book\"");
         Assert.IsEmpty(Directory.GetFiles(directory.Path, "*.tmp"));
+    }
+
+    [TestMethod]
+    public async Task Load_SchemaVersion1_ExplicitlyMigratesBackgroundToSystemMaterial()
+    {
+        using var directory = new TemporaryDirectory();
+        string path = directory.File("timer-data.json");
+        await File.WriteAllTextAsync(
+            path,
+            """
+            {
+              "schemaVersion": 1,
+              "selectedFolderId": "11111111-1111-1111-1111-111111111111",
+              "preferences": {
+                "theme": "Dark",
+                "language": "en-US",
+                "fontFamily": "Segoe UI",
+                "dailyTargetMinutes": 360
+              },
+              "folders": [
+                {
+                  "id": "11111111-1111-1111-1111-111111111111",
+                  "name": "Work",
+                  "createdAt": "2026-07-14T00:00:00+00:00",
+                  "icon": "Briefcase"
+                }
+              ],
+              "entries": []
+            }
+            """);
+        using var repository = new TimerDataRepository(path);
+
+        TimerWorkspace? loaded = await repository.LoadAsync();
+
+        Assert.IsNotNull(loaded);
+        Assert.AreEqual(
+            TimerBackgroundMode.SystemMaterial,
+            loaded.Preferences.Background,
+            "schema v1 explicitly migrates to System Material rather than relying on an enum default.");
+
+        await repository.SaveAsync(loaded);
+        string upgraded = await File.ReadAllTextAsync(path);
+        StringAssert.Contains(upgraded, "\"schemaVersion\": 2");
+        StringAssert.Contains(upgraded, "\"background\": \"SystemMaterial\"");
+    }
+
+    [TestMethod]
+    public async Task Load_SchemaVersion2WithoutBackground_IsCorrupt()
+    {
+        using var directory = new TemporaryDirectory();
+        string path = directory.File("timer-data.json");
+        await File.WriteAllTextAsync(
+            path,
+            """
+            {
+              "schemaVersion": 2,
+              "selectedFolderId": "11111111-1111-1111-1111-111111111111",
+              "preferences": {
+                "theme": "System",
+                "language": "en-US",
+                "fontFamily": "Segoe UI",
+                "dailyTargetMinutes": 360
+              },
+              "folders": [],
+              "entries": []
+            }
+            """);
+        using var repository = new TimerDataRepository(path);
+
+        await Assert.ThrowsAsync<TimerDataCorruptedException>(() => repository.LoadAsync());
     }
 
     [TestMethod]
@@ -117,6 +189,7 @@ public sealed class TimerDataRepositoryTests
             TimerFolderIcon.Book);
         var preferences = new TimerPreferences(
             TimerThemeMode.Dark,
+            TimerBackgroundMode.Acrylic,
             TimerPreferences.EnglishLanguage,
             "Segoe UI",
             480,

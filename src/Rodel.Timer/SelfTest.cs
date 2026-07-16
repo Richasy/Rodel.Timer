@@ -30,6 +30,7 @@ internal static class SelfTest
                 new DateTimeOffset(2026, 7, 14, 1, 0, 0, TimeSpan.Zero));
             var preferences = new TimerPreferences(
                 TimerThemeMode.System,
+                TimerBackgroundMode.SystemMaterial,
                 TimerPreferences.EnglishLanguage,
                 TimerPreferences.DefaultFontFamily,
                 TimerPreferences.DefaultDailyTargetMinutes);

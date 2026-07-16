@@ -368,6 +368,25 @@ public sealed partial class TimerAppStore
         TimerPreferences current = Workspace.Preferences;
         Workspace.UpdatePreferences(new TimerPreferences(
             theme,
+            current.Background,
+            current.Language,
+            current.FontFamily,
+            current.DailyTargetMinutes,
+            current.LastSeenVersion));
+        CommitMutation();
+    }
+
+    /// <summary>Sets the preferred window background/material, preserving every other preference.</summary>
+    /// <param name="background">The new background mode.</param>
+    /// <exception cref="InvalidOperationException">The workspace has not been loaded, or the store is closing.</exception>
+    /// <exception cref="ObjectDisposedException">The store has been disposed.</exception>
+    public void UpdateBackground(TimerBackgroundMode background)
+    {
+        EnsureMutable();
+        TimerPreferences current = Workspace.Preferences;
+        Workspace.UpdatePreferences(new TimerPreferences(
+            current.Theme,
+            background,
             current.Language,
             current.FontFamily,
             current.DailyTargetMinutes,
@@ -387,6 +406,7 @@ public sealed partial class TimerAppStore
         TimerPreferences current = Workspace.Preferences;
         Workspace.UpdatePreferences(new TimerPreferences(
             current.Theme,
+            current.Background,
             language,
             current.FontFamily,
             current.DailyTargetMinutes,
@@ -406,6 +426,7 @@ public sealed partial class TimerAppStore
         TimerPreferences current = Workspace.Preferences;
         Workspace.UpdatePreferences(new TimerPreferences(
             current.Theme,
+            current.Background,
             current.Language,
             fontFamily,
             current.DailyTargetMinutes,
@@ -424,6 +445,7 @@ public sealed partial class TimerAppStore
         TimerPreferences current = Workspace.Preferences;
         Workspace.UpdatePreferences(new TimerPreferences(
             current.Theme,
+            current.Background,
             current.Language,
             current.FontFamily,
             dailyTargetMinutes,
@@ -441,6 +463,7 @@ public sealed partial class TimerAppStore
         TimerPreferences current = Workspace.Preferences;
         Workspace.UpdatePreferences(new TimerPreferences(
             current.Theme,
+            current.Background,
             current.Language,
             current.FontFamily,
             current.DailyTargetMinutes,

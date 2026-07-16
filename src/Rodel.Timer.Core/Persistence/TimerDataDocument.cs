@@ -44,6 +44,8 @@ internal sealed class TimerPreferencesData
 {
     public TimerThemeMode Theme { get; set; }
 
+    public TimerBackgroundMode? Background { get; set; }
+
     public string Language { get; set; } = string.Empty;
 
     public string FontFamily { get; set; } = string.Empty;

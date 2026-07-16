@@ -7,7 +7,8 @@ namespace Rodel.Timer.Core.Persistence;
 
 internal static class TimerDataMapper
 {
-    public const int CurrentSchemaVersion = 1;
+    public const int CurrentSchemaVersion = 2;
+    private const int OldestSupportedSchemaVersion = 1;
 
     public static TimerDataDocument ToDocument(TimerWorkspace workspace)
     {
@@ -20,6 +21,7 @@ internal static class TimerDataMapper
             Preferences = new TimerPreferencesData
             {
                 Theme = workspace.Preferences.Theme,
+                Background = workspace.Preferences.Background,
                 Language = workspace.Preferences.Language,
                 FontFamily = workspace.Preferences.FontFamily,
                 DailyTargetMinutes = workspace.Preferences.DailyTargetMinutes,
@@ -53,7 +55,7 @@ internal static class TimerDataMapper
     {
         ArgumentNullException.ThrowIfNull(document);
 
-        if (document.SchemaVersion != CurrentSchemaVersion)
+        if (document.SchemaVersion is < OldestSupportedSchemaVersion or > CurrentSchemaVersion)
         {
             throw new UnsupportedTimerDataVersionException(
                 document.SchemaVersion,
@@ -71,8 +73,15 @@ internal static class TimerDataMapper
             throw new InvalidDataException("The timer data document contains a null item.");
         }
 
+        TimerBackgroundMode background = document.SchemaVersion switch
+        {
+            1 => TimerBackgroundMode.SystemMaterial,
+            _ => document.Preferences.Background
+                ?? throw new InvalidDataException("Schema version 2 preferences are missing the background mode."),
+        };
         TimerPreferences preferences = new(
             document.Preferences.Theme,
+            background,
             document.Preferences.Language,
             document.Preferences.FontFamily,
             document.Preferences.DailyTargetMinutes,
