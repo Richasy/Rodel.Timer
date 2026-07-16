@@ -11,8 +11,10 @@ The rewrite now includes the complete product surface:
 - daily duration totals and persisted preferences;
 - NativeAOT-safe, versioned JSON written with atomic replacement;
 - one-time import of the original `FolderList.json`, `HistoryList.json`, and `WorkTimer` local settings;
-- a responsive Fluent shell with animated folder/history panes, list reflow, and compact overlay;
-- live English/Chinese localization, system/light/dark themes, system fonts, and localized update notes;
+- a responsive Fluent shell with title-bar-anchored Folders/History surfaces, row context menus, an open-canvas
+  workspace, and an adaptive compact overlay;
+- live English/Chinese localization, system/light/dark themes, system fonts, five window-background materials
+  (Mica, Mica Alt, Acrylic, Acrylic Thin, Liquid Glass Wallpaper), and localized update notes;
 - stable UI Automation ids, accessible names and descriptions, keyboard access keys, and transactional announcements.
 
 ## Repository layout
