@@ -38,10 +38,11 @@ public static class TimerNormalLayoutResolver
 
         // The decorative axis line spans min(880, 86% of the client); its inward fade and the centre gap for the clock
         // live in the gradient stops, so only its total width is metric. The soft backlight ellipse behind the clock is
-        // the prototype''s min(620, 72%) wide and a fixed height (smaller in a short window).
+        // a little wider than the prototype''s min(620, 72%) and taller (a more diffuse halo), and it does NOT inflate
+        // the clock band (the view offsets it out with a negative pad), so a generous size is safe.
         float axisTotal = (float)Math.Min(880d, width * 0.86d);
-        float glowWidth = (float)Math.Min(620d, width * 0.72d);
-        float glowHeight = shortWindow ? 150f : 260f;
+        float glowWidth = (float)Math.Min(700d, width * 0.78d);
+        float glowHeight = shortWindow ? 190f : 320f;
 
         return new(
             ShowMiddleStatus: width >= NarrowThreshold,

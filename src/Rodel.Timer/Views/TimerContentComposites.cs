@@ -60,7 +60,8 @@ public readonly partial record struct NormalTimerStageView(
                         TextAlignment.Center),
                     IsRunning ? Colors.AccentTextFillColorPrimary : Colors.TextFillColorPrimary)
                     .HAlign(HorizontalAlignment.Center)
-                    .VAlign(VerticalAlignment.Center)),
+                    .VAlign(VerticalAlignment.Center))
+                .Padding(0f, -(Layout.GlowHeight - Layout.ClockSize) / 2f),
             Text(
                 IsRunning ? Resources.TimerRunning : Resources.TimerReady,
                 new TextFormat(TextFormat.DefaultFontFamily, 13f, TextFormat.NormalWeight, TextAlignment.Center),
@@ -97,7 +98,7 @@ public readonly partial record struct NormalTimerStageView(
                     .HAlign(HorizontalAlignment.Center))
                 .Spacing(TimerVisuals.Spacing.XSmall)
                 .HAlign(HorizontalAlignment.Center))
-            .Spacing(TimerVisuals.Spacing.Large)
+            .Spacing(TimerVisuals.Spacing.Medium)
             .HAlign(HorizontalAlignment.Center)
             .VAlign(VerticalAlignment.Center))
         .Padding(TimerVisuals.Spacing.XLarge, Layout.StageVerticalPadding);
@@ -121,12 +122,12 @@ public readonly partial record struct NormalTimerStageView(
             new Point(1f, 0.5f),
             [
                 new GradientStop(0f, clear),
-                new GradientStop(0.12f, line),
-                new GradientStop(0.28f, line),
-                new GradientStop(0.30f, clear),
-                new GradientStop(0.70f, clear),
-                new GradientStop(0.72f, line),
-                new GradientStop(0.88f, line),
+                new GradientStop(0.05f, line),
+                new GradientStop(0.13f, line),
+                new GradientStop(0.18f, clear),
+                new GradientStop(0.82f, clear),
+                new GradientStop(0.87f, line),
+                new GradientStop(0.95f, line),
                 new GradientStop(1f, clear),
             ]);
     }
@@ -144,9 +145,10 @@ public readonly partial record struct NormalTimerStageView(
             0.5f,
             0.5f,
             [
-                new GradientStop(0f, accent.MultiplyAlpha(0.13f)),
-                new GradientStop(0.45f, accent.MultiplyAlpha(0.05f)),
-                new GradientStop(0.72f, accent.MultiplyAlpha(0f)),
+                new GradientStop(0f, accent.MultiplyAlpha(0.22f)),
+                new GradientStop(0.30f, accent.MultiplyAlpha(0.12f)),
+                new GradientStop(0.62f, accent.MultiplyAlpha(0.035f)),
+                new GradientStop(1f, accent.MultiplyAlpha(0f)),
             ]);
     }
 

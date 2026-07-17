@@ -26,7 +26,7 @@ public sealed class TimerNormalLayoutTests
         Assert.IsFalse(layout.ShowMiddleStatus);
         Assert.IsFalse(layout.ShowAxisDecoration, "a narrow window hides the axis decoration so the clock stays centred.");
         Assert.AreEqual(58f, layout.ClockSize, "a short window uses the compact clock size.");
-        Assert.AreEqual(150f, layout.GlowHeight, "a short window uses the compact glow ellipse height.");
+        Assert.AreEqual(190f, layout.GlowHeight, "a short window uses the compact glow ellipse height.");
         Assert.AreEqual(18f, layout.StageVerticalPadding);
         Assert.AreEqual(10f, layout.FooterVerticalPadding);
     }
@@ -56,11 +56,11 @@ public sealed class TimerNormalLayoutTests
     {
         TimerNormalLayout wide = TimerNormalLayoutResolver.Resolve(1100d, 720d);
         Assert.AreEqual(880f, wide.AxisTotalWidth, "the axis line caps at 880.");
-        Assert.AreEqual(620f, wide.GlowWidth, "the glow caps at 620 (72% of 1100 = 792 > 620).");
-        Assert.AreEqual(260f, wide.GlowHeight, "a tall window uses the full glow ellipse height.");
+        Assert.AreEqual(700f, wide.GlowWidth, "the glow caps at 700 (78% of 1100 = 858 > 700).");
+        Assert.AreEqual(320f, wide.GlowHeight, "a tall window uses the full glow ellipse height.");
 
         TimerNormalLayout mid = TimerNormalLayoutResolver.Resolve(760d, 720d);
         Assert.AreEqual((float)(760d * 0.86d), mid.AxisTotalWidth, 0.01f, "below ~1023 wide the axis line is 86% of the client.");
-        Assert.AreEqual((float)(760d * 0.72d), mid.GlowWidth, 0.01f, "below ~861 wide the glow is 72% of the client.");
+        Assert.AreEqual((float)(760d * 0.78d), mid.GlowWidth, 0.01f, "below ~897 wide the glow is 78% of the client.");
     }
 }
