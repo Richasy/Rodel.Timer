@@ -44,7 +44,7 @@ public readonly partial record struct NormalTimerStageView(
     public Ui Body => Overlay(
         Stack(
             Overlay(
-                Rectangle(ClockGlowBrush(Colors), new Size(Layout.GlowWidth, Layout.GlowHeight))
+                Rectangle(ClockGlowBrush(Colors, Chrome.IsDarkTheme), new Size(Layout.GlowWidth, Layout.GlowHeight))
                     .HAlign(HorizontalAlignment.Center)
                     .VAlign(VerticalAlignment.Center),
                 Rectangle(AxisFadeBrush(Colors), new Size(Layout.AxisTotalWidth, 1f))
@@ -133,21 +133,26 @@ public readonly partial record struct NormalTimerStageView(
     }
 
     /// <summary>
-    /// The soft radial backlight behind the clock: a bounds-relative accent glow fading from a faint centre to
-    /// transparent (the prototype''s blurred <c>.timer-stage::after</c>, approximated with a soft gradient falloff — a
-    /// relative radial so it follows the backlight rectangle''s bounds without knowing them here).
+    /// The soft radial backlight behind the clock: a bounds-relative accent glow fading from a bright centre through a
+    /// long, gentle tail to transparent (the prototype''s blurred <c>.timer-stage::after</c>, approximated with a soft
+    /// gradient falloff — a relative radial so it follows the backlight rectangle''s bounds without knowing them here).
+    /// The falloff is theme-aware: light needs a much brighter core because an accent glow washes out against the pale
+    /// canvas, while dark keeps a restrained core; both share the same long diffuse tail so the edge dissolves rather
+    /// than reading as a hard-edged oval.
     /// </summary>
-    internal static Brush ClockGlowBrush(ThemeColors colors)
+    internal static Brush ClockGlowBrush(ThemeColors colors, bool dark)
     {
         Color accent = colors.AccentFillColorDefault;
+        float peak = dark ? 0.24f : 0.40f;
         return Brush.CreateRadialRelative(
             new Point(0.5f, 0.5f),
             0.5f,
             0.5f,
             [
-                new GradientStop(0f, accent.MultiplyAlpha(0.22f)),
-                new GradientStop(0.30f, accent.MultiplyAlpha(0.12f)),
-                new GradientStop(0.62f, accent.MultiplyAlpha(0.035f)),
+                new GradientStop(0f, accent.MultiplyAlpha(peak)),
+                new GradientStop(0.26f, accent.MultiplyAlpha(peak * 0.62f)),
+                new GradientStop(0.56f, accent.MultiplyAlpha(peak * 0.24f)),
+                new GradientStop(0.82f, accent.MultiplyAlpha(peak * 0.07f)),
                 new GradientStop(1f, accent.MultiplyAlpha(0f)),
             ]);
     }
