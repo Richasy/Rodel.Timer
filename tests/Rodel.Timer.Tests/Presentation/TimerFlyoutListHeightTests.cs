@@ -6,9 +6,10 @@ namespace Rodel.Timer.Tests.Presentation;
 /// The folder/history flyout list is given a DEFINITE height (not a bare max cap) so the ItemsView scroller
 /// activates: a definite height makes the composite measure tight, and the OverlayPanel measures its child loosely
 /// against that maximum, so the inner ScrollView sees a bounded viewport &lt; content and scrolls. This pins the
-/// hug-then-cap contract the height resolver encodes: a tiny list holds the empty-state minimum, a mid list hugs its
-/// content exactly (no empty tail — the round-4 complaint), and a long list caps at the maximum (beyond which it
-/// scrolls internally — the round-7 complaint), all without re-hard-coding the row-stride arithmetic here.
+/// hug-then-cap contract the height resolver encodes: an EMPTY list holds the empty-state minimum, a one-or-more-row
+/// list hugs its content exactly (no empty tail — the round-4 / round-10 complaint), and a long list caps at the
+/// maximum (beyond which it scrolls internally — the round-7 complaint), all without re-hard-coding the row-stride
+/// arithmetic here.
 /// </summary>
 [TestClass]
 public sealed class TimerFlyoutListHeightTests
@@ -16,15 +17,24 @@ public sealed class TimerFlyoutListHeightTests
     private const float Delta = 0.01f;
 
     [TestMethod]
-    [DataRow(0)]
-    [DataRow(1)]
-    public void TinyList_ClampsToTheEmptyStateMinimum(int rowCount)
+    public void EmptyList_UsesTheEmptyStateMinimum()
     {
-        // 0 rows (12) and 1 row (66) are both below the 80 minimum that holds the centered empty-state text.
+        // 0 rows (content 12) sits below the 80 minimum that holds the centered empty-state text.
         Assert.AreEqual(
             TimerAnchoredSurfaceLayoutResolver.MinimumListHeight,
-            TimerAnchoredSurfaceLayoutResolver.ListHeight(rowCount),
+            TimerAnchoredSurfaceLayoutResolver.ListHeight(0),
             Delta);
+    }
+
+    [TestMethod]
+    public void OneRow_HugsItsContent_NotTheEmptyStateMinimum()
+    {
+        // A single row hugs its own content (54 + 12 = 66) rather than padding out to the empty-state minimum — the
+        // round-10 complaint that a one-folder flyout showed a big empty bottom margin inconsistent with the other edges.
+        float height = TimerAnchoredSurfaceLayoutResolver.ListHeight(1);
+
+        Assert.AreEqual(66f, height, Delta);
+        Assert.IsLessThan(TimerAnchoredSurfaceLayoutResolver.MinimumListHeight, height);
     }
 
     [TestMethod]
@@ -52,11 +62,12 @@ public sealed class TimerFlyoutListHeightTests
     }
 
     [TestMethod]
-    public void ListHeight_IsMonotonicUntilTheCap()
+    public void ListHeight_IsMonotonicFromOneRowUntilTheCap()
     {
-        // A hug means each extra row (until the cap) makes the surface taller — never shorter.
-        float previous = TimerAnchoredSurfaceLayoutResolver.ListHeight(0);
-        for (int rowCount = 1; rowCount <= 40; rowCount++)
+        // A hug means each extra row (from the first, until the cap) makes the surface taller — never shorter. (0 rows
+        // is the empty-state minimum, a separate case that can sit above a tight one-row list.)
+        float previous = TimerAnchoredSurfaceLayoutResolver.ListHeight(1);
+        for (int rowCount = 2; rowCount <= 40; rowCount++)
         {
             float height = TimerAnchoredSurfaceLayoutResolver.ListHeight(rowCount);
             Assert.IsGreaterThanOrEqualTo(previous, height, $"height regressed at {rowCount} rows: {height} < {previous}");

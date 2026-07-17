@@ -98,7 +98,9 @@ public sealed partial class MainView
                 PrimaryButtonText = Resources.Save,
                 CloseButtonText = Resources.Cancel,
                 DefaultButton = ContentDialogButton.Primary,
+                IsPrimaryButtonEnabled = false,
             };
+            content.NameChanged += name => dialog.IsPrimaryButtonEnabled = !string.IsNullOrWhiteSpace(name);
             dialog.PrimaryButtonClick += args =>
             {
                 if (string.IsNullOrWhiteSpace(content.FolderName))
@@ -138,7 +140,9 @@ public sealed partial class MainView
                 PrimaryButtonText = Resources.Save,
                 CloseButtonText = Resources.Cancel,
                 DefaultButton = ContentDialogButton.Primary,
+                IsPrimaryButtonEnabled = !string.IsNullOrWhiteSpace(folder.Name),
             };
+            content.NameChanged += name => dialog.IsPrimaryButtonEnabled = !string.IsNullOrWhiteSpace(name);
             dialog.PrimaryButtonClick += args =>
             {
                 if (string.IsNullOrWhiteSpace(content.FolderName))
@@ -259,7 +263,9 @@ public sealed partial class MainView
                 PrimaryButtonText = Resources.Save,
                 CloseButtonText = Resources.Cancel,
                 DefaultButton = ContentDialogButton.Primary,
+                IsPrimaryButtonEnabled = !string.IsNullOrWhiteSpace(entry.Title),
             }.Automation(new AutomationInfo { AutomationId = "RodelTimer.HistoryDetails.Dialog" });
+            content.TitleChanged += title => dialog.IsPrimaryButtonEnabled = !string.IsNullOrWhiteSpace(title);
             dialog.PrimaryButtonClick += args =>
             {
                 if (string.IsNullOrWhiteSpace(content.Title))

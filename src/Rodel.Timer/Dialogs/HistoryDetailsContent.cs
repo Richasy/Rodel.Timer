@@ -47,6 +47,9 @@ public sealed partial class HistoryDetailsContent : Control
     /// <summary>The edited session title (read by the host on commit).</summary>
     public partial string Title { get; private set; }
 
+    /// <summary>Raised (with the new title) whenever the edited title changes, so the host can enable/disable its commit button.</summary>
+    public event Action<string>? TitleChanged;
+
     /// <summary>The edited session note, trimmed by the entry on commit (read by the host on commit).</summary>
     public partial string Comment { get; private set; }
 
@@ -70,7 +73,7 @@ public sealed partial class HistoryDetailsContent : Control
                 Text(Resources.SessionTitle, LabelStyle, Colors.TextFillColorSecondary),
                 TextBox()
                     .Text(Title)
-                    .OnTextChanged(value => Title = value ?? string.Empty)
+                    .OnTextChanged(SetTitle)
                     .Placeholder(Resources.SessionTitlePlaceholder)
                     .Automation(new AutomationInfo
                     {
@@ -115,6 +118,12 @@ public sealed partial class HistoryDetailsContent : Control
                 .Spacing(TimerVisuals.Spacing.XSmall))
             .Spacing(TimerVisuals.Spacing.Medium)
             .Width(TimerVisuals.MaxWidth.FolderDialog));
+
+    private void SetTitle(string? value)
+    {
+        Title = value ?? string.Empty;
+        TitleChanged?.Invoke(Title);
+    }
 
     internal static TextFormat LabelStyle =>
         new(TextFormat.DefaultFontFamily, 12f, TextFormat.NormalWeight);

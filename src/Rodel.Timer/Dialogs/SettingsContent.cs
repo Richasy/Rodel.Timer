@@ -67,97 +67,73 @@ public sealed partial class SettingsSectionsControl : Control
 
     /// <summary>Appearance, Focus, Regional, and About groups in reading order.</summary>
     public Ui Body => Stack(
-        Stack(
-            Text(
-                Resources.Appearance,
-                new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight))
-                .Foreground(Brush.Theme(ThemeColorToken.TextFillColorPrimary)),
-            SettingsCard(
-                Resources.Theme,
-                ComboBox([Resources.ThemeSystem, Resources.ThemeLight, Resources.ThemeDark])
-                    .SelectedIndex(_chrome.ThemeIndex)
-                    .OnSelectionChanged(_chrome.ThemeChanged)
-                    .FaceplateSizing(ComboBoxFaceplateSizing.SelectedItem)
-                    .Automation(SettingsContent.ThemeAutomation)
-                    .LayoutBox(minWidth: SettingsContent.SettingsEditorMinWidth, maxWidth: SettingsContent.SettingsEditorMaxWidth))
-                .Description(Resources.ThemeDescription)
-                .Icon(new FluentIcon(FluentSymbol.WeatherMoon))
-                .WrapThreshold(SettingsContent.CardWrapThreshold),
-            SettingsCard(
-                Resources.WindowBackground,
-                ComboBox(
-                    [
-                        Resources.BackgroundMica,
-                        Resources.BackgroundMicaAlt,
-                        Resources.BackgroundAcrylic,
-                        Resources.BackgroundAcrylicThin,
-                    ])
-                    .SelectedIndex(_chrome.BackgroundIndex)
-                    .OnSelectionChanged(_chrome.BackgroundChanged)
-                    .FaceplateSizing(ComboBoxFaceplateSizing.SelectedItem)
-                    .Automation(SettingsContent.BackgroundAutomation)
-                    .LayoutBox(minWidth: SettingsContent.SettingsEditorMinWidth, maxWidth: SettingsContent.SettingsEditorMaxWidth))
-                .Description(Resources.WindowBackgroundDescription)
-                .Icon(new FluentIcon(FluentSymbol.Color))
-                .WrapThreshold(SettingsContent.CardWrapThreshold),
-            SettingsCard(
-                Resources.Font,
-                ComboBox(_chrome.Fonts.Select(static font => font.DisplayName))
-                    .SelectedIndex(_chrome.FontIndex)
-                    .OnSelectionChanged(_chrome.FontChanged)
-                    .MaxDropDownHeight(320f)
-                    .FaceplateSizing(ComboBoxFaceplateSizing.SelectedItem)
-                    .Automation(SettingsContent.FontAutomation)
-                    .LayoutBox(minWidth: SettingsContent.SettingsEditorMinWidth, maxWidth: SettingsContent.SettingsEditorMaxWidth))
-                .Description(Resources.FontDescription)
-                .Icon(new FluentIcon(FluentSymbol.TextFont))
-                .WrapThreshold(SettingsContent.CardWrapThreshold))
-        .Spacing(TimerVisuals.Spacing.Small),
-        Stack(
-            Text(
-                Resources.Focus,
-                new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight))
-                .Foreground(Brush.Theme(ThemeColorToken.TextFillColorPrimary)),
-            SettingsCard(
-                Resources.DailyTarget,
-                NumberBox(_chrome.TargetMinutes, _chrome.TargetChanged)
-                    .Minimum(1d)
-                    .Maximum(TimerPreferences.MaximumDailyTargetMinutes)
-                    .SmallChange(30d)
-                    .LargeChange(60d)
-                    .AcceptsOnlyNumericInput()
-                    .Formatter(new DecimalNumberFormatter { MaxFractionDigits = 0 })
-                    .Automation(SettingsContent.DailyTargetAutomation)
-                    .LayoutBox(width: SettingsContent.SettingsNumberBoxWidth))
-                .Description(Resources.DailyTargetDescription)
-                .Icon(new FluentIcon(FluentSymbol.Target))
-                .WrapThreshold(SettingsContent.CardWrapThreshold))
-        .Spacing(TimerVisuals.Spacing.Small),
-        Stack(
-            Text(
-                Resources.Regional,
-                new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight))
-                .Foreground(Brush.Theme(ThemeColorToken.TextFillColorPrimary)),
-            SettingsCard(
-                Resources.Language,
-                ComboBox([Resources.LanguageEnglish, Resources.LanguageChinese, Resources.LanguageTraditionalChinese])
-                    .SelectedIndex(_chrome.LanguageIndex)
-                    .OnSelectionChanged(_chrome.LanguageChanged)
-                    .FaceplateSizing(ComboBoxFaceplateSizing.SelectedItem)
-                    .Automation(SettingsContent.LanguageAutomation)
-                    .LayoutBox(minWidth: SettingsContent.SettingsEditorMinWidth, maxWidth: SettingsContent.SettingsEditorMaxWidth))
-                .Description(Resources.LanguageDescription)
-                .Icon(new FluentIcon(FluentSymbol.LocalLanguage))
-                .WrapThreshold(SettingsContent.CardWrapThreshold))
-        .Spacing(TimerVisuals.Spacing.Small),
-        Stack(
-            Text(
-                Resources.About,
-                new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight))
-                .Foreground(Brush.Theme(ThemeColorToken.TextFillColorPrimary)),
-            Keyed(_chrome.LanguageIndex, new AboutSettingsView(_chrome.Colors)))
-        .Spacing(TimerVisuals.Spacing.Small))
-        .Spacing(TimerVisuals.Spacing.Large);
+        SettingsCard(
+            Resources.Theme,
+            ComboBox([Resources.ThemeSystem, Resources.ThemeLight, Resources.ThemeDark])
+                .SelectedIndex(_chrome.ThemeIndex)
+                .OnSelectionChanged(_chrome.ThemeChanged)
+                .FaceplateSizing(ComboBoxFaceplateSizing.SelectedItem)
+                .Automation(SettingsContent.ThemeAutomation)
+                .LayoutBox(minWidth: SettingsContent.SettingsEditorMinWidth, maxWidth: SettingsContent.SettingsEditorMaxWidth))
+            .Description(Resources.ThemeDescription)
+            .Icon(new FluentIcon(FluentSymbol.WeatherMoon))
+            .WrapThreshold(SettingsContent.CardWrapThreshold),
+        SettingsCard(
+            Resources.WindowBackground,
+            ComboBox(
+                [
+                    Resources.BackgroundMica,
+                    Resources.BackgroundMicaAlt,
+                    Resources.BackgroundAcrylic,
+                    Resources.BackgroundAcrylicThin,
+                ])
+                .SelectedIndex(_chrome.BackgroundIndex)
+                .OnSelectionChanged(_chrome.BackgroundChanged)
+                .FaceplateSizing(ComboBoxFaceplateSizing.SelectedItem)
+                .Automation(SettingsContent.BackgroundAutomation)
+                .LayoutBox(minWidth: SettingsContent.SettingsEditorMinWidth, maxWidth: SettingsContent.SettingsEditorMaxWidth))
+            .Description(Resources.WindowBackgroundDescription)
+            .Icon(new FluentIcon(FluentSymbol.Color))
+            .WrapThreshold(SettingsContent.CardWrapThreshold),
+        SettingsCard(
+            Resources.Font,
+            ComboBox(_chrome.Fonts.Select(static font => font.DisplayName))
+                .SelectedIndex(_chrome.FontIndex)
+                .OnSelectionChanged(_chrome.FontChanged)
+                .MaxDropDownHeight(320f)
+                .FaceplateSizing(ComboBoxFaceplateSizing.SelectedItem)
+                .Automation(SettingsContent.FontAutomation)
+                .LayoutBox(minWidth: SettingsContent.SettingsEditorMinWidth, maxWidth: SettingsContent.SettingsEditorMaxWidth))
+            .Description(Resources.FontDescription)
+            .Icon(new FluentIcon(FluentSymbol.TextFont))
+            .WrapThreshold(SettingsContent.CardWrapThreshold),
+        SettingsCard(
+            Resources.DailyTarget,
+            NumberBox(_chrome.TargetMinutes, _chrome.TargetChanged)
+                .Minimum(1d)
+                .Maximum(TimerPreferences.MaximumDailyTargetMinutes)
+                .SmallChange(30d)
+                .LargeChange(60d)
+                .AcceptsOnlyNumericInput()
+                .Formatter(new DecimalNumberFormatter { MaxFractionDigits = 0 })
+                .Automation(SettingsContent.DailyTargetAutomation)
+                .LayoutBox(width: SettingsContent.SettingsNumberBoxWidth))
+            .Description(Resources.DailyTargetDescription)
+            .Icon(new FluentIcon(FluentSymbol.Target))
+            .WrapThreshold(SettingsContent.CardWrapThreshold),
+        SettingsCard(
+            Resources.Language,
+            ComboBox([Resources.LanguageEnglish, Resources.LanguageChinese, Resources.LanguageTraditionalChinese])
+                .SelectedIndex(_chrome.LanguageIndex)
+                .OnSelectionChanged(_chrome.LanguageChanged)
+                .FaceplateSizing(ComboBoxFaceplateSizing.SelectedItem)
+                .Automation(SettingsContent.LanguageAutomation)
+                .LayoutBox(minWidth: SettingsContent.SettingsEditorMinWidth, maxWidth: SettingsContent.SettingsEditorMaxWidth))
+            .Description(Resources.LanguageDescription)
+            .Icon(new FluentIcon(FluentSymbol.LocalLanguage))
+            .WrapThreshold(SettingsContent.CardWrapThreshold),
+        Keyed(_chrome.LanguageIndex, new AboutSettingsView(_chrome.Colors)))
+        .Spacing(TimerVisuals.Spacing.Small);
 }
 
 /// <summary>

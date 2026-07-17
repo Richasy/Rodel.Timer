@@ -35,5 +35,7 @@ public static class TimerAnchoredSurfaceLayoutResolver
     /// <param name="rowCount">The number of rows in the list (0 yields the empty-state minimum).</param>
     /// <returns>The definite list height in epx.</returns>
     public static float ListHeight(int rowCount) =>
-        System.Math.Clamp((rowCount * RowStride) + ListPadding, MinimumListHeight, MaximumListHeight);
+        rowCount == 0
+            ? MinimumListHeight
+            : System.Math.Min((rowCount * RowStride) + ListPadding, MaximumListHeight);
 }
