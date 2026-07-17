@@ -127,7 +127,7 @@ public sealed partial class SettingsSectionsControl : Control
                     .LargeChange(60d)
                     .AcceptsOnlyNumericInput()
                     .Automation(SettingsContent.DailyTargetAutomation)
-                    .LayoutBox(minWidth: SettingsContent.SettingsEditorMinWidth, maxWidth: SettingsContent.SettingsEditorMaxWidth))
+                    .LayoutBox(width: SettingsContent.SettingsNumberBoxWidth))
                 .Description(Resources.DailyTargetDescription)
                 .Icon(new FluentIcon(FluentSymbol.Target))
                 .WrapThreshold(SettingsContent.CardWrapThreshold))
@@ -189,12 +189,16 @@ public sealed partial class SettingsContent : Control
     internal const float CardWrapThreshold = 360f;
 
     // Every settings editor (the four combo boxes + the target NumberBox) sizes to its OWN content, bounded to a
-    // shared [min, max] band so the column stays tidy: a ComboBox auto-sizes to its WIDEST dropdown item (WinUI),
-    // which let the font picker — whose list holds long family names — balloon far wider than its short neighbours.
-    // The max caps that balloon (a long row then ellipsises and shows its full name on hover); the 120 min is the
-    // universal floor so a short editor is never cramped. Editors therefore differ in width, each fitting its content.
+    // shared [min, max] band so the column stays tidy. The combo boxes use FaceplateSizing.SelectedItem, so the closed
+    // box hugs the CURRENT selection (not the widest option); the 120 min is the universal floor so a short editor is
+    // never cramped, and the max only caps a very long current selection (the balloon is already gone) — generous
+    // enough that a normal font name like "Microsoft YaHei UI" fits without trimming.
     internal const float SettingsEditorMinWidth = 120f;
-    internal const float SettingsEditorMaxWidth = 240f;
+    internal const float SettingsEditorMaxWidth = 300f;
+
+    // The daily-target NumberBox is not a combo (no selected-item sizing) and stretches, so it gets its own tight,
+    // fixed width — a number editor never needs the combo band.
+    internal const float SettingsNumberBoxWidth = 150f;
     /// <summary>Creates the settings content bound to the owning <see cref="MainView"/>.</summary>
     /// <param name="main">The state-owning root view (the store + window + fonts).</param>
     /// <param name="onLanguageChanged">
