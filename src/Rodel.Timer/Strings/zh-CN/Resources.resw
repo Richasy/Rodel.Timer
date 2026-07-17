@@ -81,12 +81,12 @@
   <data name="BackgroundMicaAlt" xml:space="preserve"><value>云母 Alt</value></data>
   <data name="BackgroundAcrylic" xml:space="preserve"><value>亚克力</value></data>
   <data name="BackgroundAcrylicThin" xml:space="preserve"><value>亚克力（Thin）</value></data>
-  <data name="BackgroundLiquidGlassWallpaper" xml:space="preserve"><value>流体玻璃（壁纸）</value></data>
+  <data name="BackgroundLiquidGlassWallpaper" xml:space="preserve"><value>流体玻璃</value></data>
   <data name="BackgroundStatusMica" xml:space="preserve"><value>云母</value></data>
   <data name="BackgroundStatusMicaAlt" xml:space="preserve"><value>云母 Alt</value></data>
   <data name="BackgroundStatusAcrylic" xml:space="preserve"><value>亚克力</value></data>
   <data name="BackgroundStatusAcrylicThin" xml:space="preserve"><value>亚克力（Thin）</value></data>
-  <data name="BackgroundStatusLiquidGlass" xml:space="preserve"><value>流体玻璃 · 壁纸</value></data>
+  <data name="BackgroundStatusLiquidGlass" xml:space="preserve"><value>流体玻璃</value></data>
   <data name="BackgroundStatusActive" xml:space="preserve"><value>已启用</value></data>
   <data name="BackgroundStatusFallback" xml:space="preserve"><value>回退</value></data>
   <data name="Font" xml:space="preserve"><value>字体</value></data>
