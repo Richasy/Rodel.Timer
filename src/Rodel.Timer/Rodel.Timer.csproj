@@ -33,4 +33,13 @@
     <ProjectReference Include="..\Rodel.Timer.Presentation\Rodel.Timer.Presentation.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Embed the app logo into the assembly so the About icon resolves identically whether the app runs packaged
+         (MSIX) or as the loose published exe (the DevTools capture host) — the MSIX Assets are not copied to the
+         loose publish output. -->
+    <EmbeddedResource Include="Assets\Square44x44Logo.png">
+      <LogicalName>Rodel.Timer.AppLogo.png</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>

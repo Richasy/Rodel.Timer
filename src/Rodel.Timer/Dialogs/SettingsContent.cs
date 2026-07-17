@@ -77,7 +77,8 @@ public sealed partial class SettingsSectionsControl : Control
                 ComboBox([Resources.ThemeSystem, Resources.ThemeLight, Resources.ThemeDark])
                     .SelectedIndex(_chrome.ThemeIndex)
                     .OnSelectionChanged(_chrome.ThemeChanged)
-                    .Automation(SettingsContent.ThemeAutomation))
+                    .Automation(SettingsContent.ThemeAutomation)
+                    .LayoutBox(minWidth: SettingsContent.SettingsEditorMinWidth, maxWidth: SettingsContent.SettingsEditorMaxWidth))
                 .Description(Resources.ThemeDescription)
                 .Icon(new FluentIcon(FluentSymbol.WeatherMoon))
                 .WrapThreshold(SettingsContent.CardWrapThreshold),
@@ -92,7 +93,8 @@ public sealed partial class SettingsSectionsControl : Control
                     ])
                     .SelectedIndex(_chrome.BackgroundIndex)
                     .OnSelectionChanged(_chrome.BackgroundChanged)
-                    .Automation(SettingsContent.BackgroundAutomation))
+                    .Automation(SettingsContent.BackgroundAutomation)
+                    .LayoutBox(minWidth: SettingsContent.SettingsEditorMinWidth, maxWidth: SettingsContent.SettingsEditorMaxWidth))
                 .Description(Resources.WindowBackgroundDescription)
                 .Icon(new FluentIcon(FluentSymbol.Color))
                 .WrapThreshold(SettingsContent.CardWrapThreshold),
@@ -102,7 +104,8 @@ public sealed partial class SettingsSectionsControl : Control
                     .SelectedIndex(_chrome.FontIndex)
                     .OnSelectionChanged(_chrome.FontChanged)
                     .MaxDropDownHeight(320f)
-                    .Automation(SettingsContent.FontAutomation))
+                    .Automation(SettingsContent.FontAutomation)
+                    .LayoutBox(minWidth: SettingsContent.SettingsEditorMinWidth, maxWidth: SettingsContent.SettingsEditorMaxWidth))
                 .Description(Resources.FontDescription)
                 .Icon(new FluentIcon(FluentSymbol.TextFont))
                 .WrapThreshold(SettingsContent.CardWrapThreshold))
@@ -120,7 +123,8 @@ public sealed partial class SettingsSectionsControl : Control
                     .SmallChange(30d)
                     .LargeChange(60d)
                     .AcceptsOnlyNumericInput()
-                    .Automation(SettingsContent.DailyTargetAutomation))
+                    .Automation(SettingsContent.DailyTargetAutomation)
+                    .LayoutBox(minWidth: SettingsContent.SettingsEditorMinWidth, maxWidth: SettingsContent.SettingsEditorMaxWidth))
                 .Description(Resources.DailyTargetDescription)
                 .Icon(new FluentIcon(FluentSymbol.Target))
                 .WrapThreshold(SettingsContent.CardWrapThreshold))
@@ -135,7 +139,8 @@ public sealed partial class SettingsSectionsControl : Control
                 ComboBox([Resources.LanguageEnglish, Resources.LanguageChinese, Resources.LanguageTraditionalChinese])
                     .SelectedIndex(_chrome.LanguageIndex)
                     .OnSelectionChanged(_chrome.LanguageChanged)
-                    .Automation(SettingsContent.LanguageAutomation))
+                    .Automation(SettingsContent.LanguageAutomation)
+                    .LayoutBox(minWidth: SettingsContent.SettingsEditorMinWidth, maxWidth: SettingsContent.SettingsEditorMaxWidth))
                 .Description(Resources.LanguageDescription)
                 .Icon(new FluentIcon(FluentSymbol.LocalLanguage))
                 .WrapThreshold(SettingsContent.CardWrapThreshold))
@@ -146,15 +151,15 @@ public sealed partial class SettingsSectionsControl : Control
                 new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight))
                 .Foreground(Brush.Theme(ThemeColorToken.TextFillColorPrimary)),
             SettingsExpander(Resources.AppName)
-                .Icon(new FluentIcon(FluentSymbol.Timer))
+                .Icon(new ImageIcon(TimerAssets.AppLogo()) { Size = new Size(28f, 28f) })
+                .WrapThreshold(SettingsContent.CardWrapThreshold)
                 .Content(Text(
                     $"v{MainView.CurrentVersion}",
                     new TextFormat(TextFormat.DefaultFontFamily, 13f, TextFormat.NormalWeight),
                     _chrome.Colors.TextFillColorSecondary))
                 .Items(
-                    SettingsCard(Resources.AppDescription),
                     SettingsCard(
-                        Resources.OpenSource,
+                        Resources.AppDescription,
                         HyperlinkButton(Resources.OpenOnGitHub, TimerLinks.OpenSourceUri, HyperlinkButtonPalette.FromTheme(_chrome.Colors)))))
         .Spacing(TimerVisuals.Spacing.Small))
         .Spacing(TimerVisuals.Spacing.Large);
@@ -178,6 +183,14 @@ public sealed partial class SettingsContent : Control
     // threshold, which would otherwise push the editor below the header. Lowering the threshold pins the mature
     // right-aligned layout while still wrapping if the dialog is ever made much narrower.
     internal const float CardWrapThreshold = 360f;
+
+    // Every settings editor (the four combo boxes + the target NumberBox) sizes to its OWN content, bounded to a
+    // shared [min, max] band so the column stays tidy: a ComboBox auto-sizes to its WIDEST dropdown item (WinUI),
+    // which let the font picker — whose list holds long family names — balloon far wider than its short neighbours.
+    // The max caps that balloon (a long row then ellipsises and shows its full name on hover); the 120 min is the
+    // universal floor so a short editor is never cramped. Editors therefore differ in width, each fitting its content.
+    internal const float SettingsEditorMinWidth = 120f;
+    internal const float SettingsEditorMaxWidth = 240f;
     /// <summary>Creates the settings content bound to the owning <see cref="MainView"/>.</summary>
     /// <param name="main">The state-owning root view (the store + window + fonts).</param>
     /// <param name="onLanguageChanged">
@@ -273,7 +286,7 @@ public sealed partial class SettingsContent : Control
 
     internal static AutomationInfo OpenSourceAutomation => new()
     {
-        Name = Resources.OpenSource,
+        Name = Resources.OpenOnGitHub,
         HelpText = Resources.OpenSourceHelp,
         AutomationId = TimerAutomationIds.SettingsOpenSource,
     };

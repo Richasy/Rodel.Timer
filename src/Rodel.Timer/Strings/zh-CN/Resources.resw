@@ -99,8 +99,7 @@
   <data name="LanguageChinese" xml:space="preserve"><value>简体中文</value></data>
   <data name="LanguageTraditionalChinese" xml:space="preserve"><value>繁体中文</value></data>
   <data name="DailyTargetMinutes" xml:space="preserve"><value>每日目标分钟数</value></data>
-  <data name="OpenSource" xml:space="preserve"><value>已归档的 Work-Timer 源代码</value></data>
-  <data name="OpenSourceHelp" xml:space="preserve"><value>在 GitHub 上打开已归档的 Work-Timer 源代码</value></data>
+  <data name="OpenSourceHelp" xml:space="preserve"><value>在 GitHub 上打开 Rodel Timer 的源代码</value></data>
   <data name="ThemeDescription" xml:space="preserve"><value>选择应用的外观</value></data>
   <data name="LanguageDescription" xml:space="preserve"><value>设置显示语言</value></data>
   <data name="FontDescription" xml:space="preserve"><value>选择应用使用的字体</value></data>

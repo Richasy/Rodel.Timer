@@ -99,8 +99,7 @@
   <data name="LanguageChinese" xml:space="preserve"><value>Simplified Chinese</value></data>
   <data name="LanguageTraditionalChinese" xml:space="preserve"><value>Traditional Chinese</value></data>
   <data name="DailyTargetMinutes" xml:space="preserve"><value>Daily target in minutes</value></data>
-  <data name="OpenSource" xml:space="preserve"><value>Archived Work-Timer source</value></data>
-  <data name="OpenSourceHelp" xml:space="preserve"><value>Open the archived Work-Timer source code on GitHub</value></data>
+  <data name="OpenSourceHelp" xml:space="preserve"><value>Open the Rodel Timer source code on GitHub</value></data>
   <data name="ThemeDescription" xml:space="preserve"><value>Choose how the app looks</value></data>
   <data name="LanguageDescription" xml:space="preserve"><value>Set the display language</value></data>
   <data name="FontDescription" xml:space="preserve"><value>Pick the font used across the app</value></data>
