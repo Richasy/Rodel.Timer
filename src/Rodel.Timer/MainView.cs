@@ -163,6 +163,21 @@ public sealed partial class MainView : Control, ILanguageApplyTarget
         }
     }
 
+    /// <summary>
+    /// Whether liquid glass is the requested window material AND it is actually active (not the opaque policy
+    /// fallback) — the flyouts then match the window with an in-app liquid-glass surface instead of the default
+    /// acrylic. Reactive through the same material-policy read as <see cref="IsBackgroundFallback"/>.
+    /// </summary>
+    internal bool IsLiquidGlassBackground
+    {
+        get
+        {
+            _ = MaterialPolicy.Current.System;
+            return Preferences.Background == TimerBackgroundMode.LiquidGlassWallpaper
+                && !_windowBackground.Resolve(Preferences.Background).IsFallback;
+        }
+    }
+
     /// <summary>The blocking-message title (save-failed when a save error is pending, else the load-error title).</summary>
     internal string MessageTitle =>
         SaveErrorMessage.Length > 0 ? Resources.SaveFailed : Resources.DataLoadErrorTitle;

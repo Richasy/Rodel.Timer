@@ -5,6 +5,7 @@ using Sprout;
 using Sprout.Controls;
 using Sprout.Graphics;
 using Sprout.Layout;
+using Sprout.LiquidGlass;
 using Sprout.Popups;
 using Sprout.Reconcile;
 using Sprout.Semantics;
@@ -55,6 +56,20 @@ public sealed partial class TimerTitleBarControl : Control
         }
             .Style(AnchoredSurfaceStyle)
             .Automation(HistoryFlyoutAutomation);
+
+        // Match the flyout surface to the window material: when liquid glass is the active window background, give the
+        // anchored flyouts an in-app liquid-glass surface too (resolved per open from the current mode + theme), else
+        // leave the framework default (in-app acrylic).
+        _foldersFlyout.Opening += _ => ApplyFlyoutSurface(_foldersFlyout);
+        _historyFlyout.Opening += _ => ApplyFlyoutSurface(_historyFlyout);
+    }
+
+    private void ApplyFlyoutSurface(Flyout flyout)
+    {
+        bool dark = _chrome.IsDarkTheme;
+        flyout.Chrome = _chrome.IsLiquidGlassBackground
+            ? PopupChrome.Flyout(_chrome.Colors, dark) with { Background = Brush.LiquidGlass(LiquidGlassMaterial.Regular(dark)) }
+            : null;
     }
 
     /// <summary>The normal title-bar band, removed entirely while the compact-overlay presenter is active.</summary>

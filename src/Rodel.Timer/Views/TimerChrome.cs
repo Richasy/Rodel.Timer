@@ -79,6 +79,12 @@ public sealed class TimerChrome
     /// <summary>Whether the requested window material is currently in its opaque policy fallback (reactive).</summary>
     public bool IsBackgroundFallback => _main.IsBackgroundFallback;
 
+    /// <summary>Whether liquid glass is the active window material (not the opaque fallback) — the flyouts then use an in-app liquid-glass surface to match the window (reactive).</summary>
+    public bool IsLiquidGlassBackground => _main.IsLiquidGlassBackground;
+
+    /// <summary>Whether the hosting window's effective theme is dark — used to pick a dark/light material recipe.</summary>
+    public bool IsDarkTheme => _window.ActualTheme == ThemeMode.Dark;
+
     /// <summary>The current folders (reactive; a fresh reference on every store revision).</summary>
     public IReadOnlyList<TimerFolder> Folders => _main.Folders;
 
