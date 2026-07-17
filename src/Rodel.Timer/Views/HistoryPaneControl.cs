@@ -67,6 +67,7 @@ public readonly partial record struct HistoryListView(
     Func<HistoryRowData, HistoryRowView> BuildRow,
     Func<HistoryRowData, AutomationInfo> BuildAutomation,
     Func<HistoryRowData, IFlyout> BuildContextMenu,
+    Action<HistoryRowData> OnInvoke,
     ThemeColors Colors)
 {
     /// <summary>The bounded history list over a localized empty state.</summary>
@@ -86,13 +87,18 @@ public readonly partial record struct HistoryListView(
             .VAlign(VerticalAlignment.Center)
             .Visible(Rows.Count == 0));
 
-    internal ItemsView BuildItemsView() =>
-        TimerRowListFactory.History(
-            Rows,
+    internal ItemsView BuildItemsView()
+    {
+        IReadOnlyList<HistoryRowData> rows = Rows;
+        Action<HistoryRowData> onInvoke = OnInvoke;
+        return TimerRowListFactory.History(
+            rows,
             BuildRow,
             new StackLayout { ItemExtent = TimerVisuals.Row.History, Spacing = TimerVisuals.Spacing.XSmall },
             BuildAutomation,
-            BuildContextMenu);
+            BuildContextMenu,
+            index => onInvoke(rows[index]));
+    }
 }
 
 /// <summary>
@@ -131,6 +137,7 @@ public sealed partial class HistoryPaneControl : Control
             _chrome.BuildHistoryRow,
             _buildAutomation,
             _buildContextMenu,
+            data => _chrome.ShowHistoryDetails(data.Entry.Id),
             Colors)
             .Weight(1f))
         .Spacing(TimerVisuals.Spacing.Medium)

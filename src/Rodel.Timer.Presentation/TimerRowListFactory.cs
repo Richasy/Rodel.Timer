@@ -37,15 +37,17 @@ public static class TimerRowListFactory
         .OnSelectionChanged(onSelectionChanged)
         .SingleSelectionFollowsFocus(false);
 
-    /// <summary>Builds the honest non-selecting, focusable history list.</summary>
+    /// <summary>Builds the honest non-selecting, focusable history list. When <paramref name="onItemInvoked"/> is supplied a primary click / Enter / Space invokes the row (opening its detail) without selecting it.</summary>
     public static ItemsView History<TView>(
         IReadOnlyList<HistoryRowData> rows,
         Func<HistoryRowData, TView> template,
         VirtualizingLayout layout,
         Func<HistoryRowData, AutomationInfo> itemAutomation,
-        Func<HistoryRowData, IFlyout> itemContextFlyout)
-        where TView : IView =>
-        ItemsView(
+        Func<HistoryRowData, IFlyout> itemContextFlyout,
+        Action<int>? onItemInvoked = null)
+        where TView : IView
+    {
+        ItemsView view = ItemsView(
             rows,
             static data => data.Entry.Id,
             template,
@@ -54,4 +56,12 @@ public static class TimerRowListFactory
             itemAutomation: itemAutomation,
             itemContextFlyout: itemContextFlyout)
         .SelectionMode(SelectionMode.None);
+
+        if (onItemInvoked is not null)
+        {
+            view.OnItemInvoked(onItemInvoked);
+        }
+
+        return view;
+    }
 }

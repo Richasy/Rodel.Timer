@@ -38,6 +38,7 @@ public sealed class TimerChrome
         SelectFolder = main.SelectFolder;
         BuildFolderContextMenu = main.BuildFolderContextMenu;
         BuildHistoryContextMenu = main.BuildHistoryContextMenu;
+        ShowHistoryDetails = main.ShowHistoryDetailsDialog;
     }
 
     /// <summary>The live theme colours resolved from the hosting window's current theme.</summary>
@@ -141,4 +142,7 @@ public sealed class TimerChrome
 
     /// <summary>Builds a fresh context menu for a history row.</summary>
     public Func<Guid, MenuFlyout> BuildHistoryContextMenu { get; }
+
+    /// <summary>Opens the session-details dialog for a history entry (a row left-click / invoke).</summary>
+    public Action<Guid> ShowHistoryDetails { get; }
 }

@@ -207,7 +207,7 @@ public readonly partial record struct TimerTitleBarView(
                 .Height(TimerVisuals.Height.Icon)
                 .VAlign(VerticalAlignment.Center)
                 .AccessKey("F")
-                .ToolTip(Resources.Folders)
+                .ToolTip(ShowCommandLabels ? null : Resources.Folders)
                 .Automation(FoldersAutomation),
             DropDownButton(
                 new TimerTitleBarDropDownContentView(
@@ -223,7 +223,7 @@ public readonly partial record struct TimerTitleBarView(
                 .Height(TimerVisuals.Height.Icon)
                 .VAlign(VerticalAlignment.Center)
                 .AccessKey("H")
-                .ToolTip(Resources.History)
+                .ToolTip(ShowCommandLabels ? null : Resources.History)
                 .Automation(HistoryAutomation))
             .Orientation(Orientation.Horizontal)
             .Spacing(TimerVisuals.Spacing.Small)
