@@ -164,7 +164,12 @@ public sealed partial class SettingsSectionsControl : Control
                 .Items(
                     SettingsCard(
                         Resources.AppDescription,
-                        HyperlinkButton(Resources.OpenOnGitHub, TimerLinks.OpenSourceUri, HyperlinkButtonPalette.FromTheme(_chrome.Colors)))))
+                        Text(
+                            Resources.OpenOnGitHub,
+                            new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.NormalWeight),
+                            _chrome.Colors.AccentTextFillColorPrimary))
+                        .OnClick(() => TimerLauncher.OpenUrl(TimerLinks.OpenSourceUri))
+                        .Automation(SettingsContent.OpenSourceAutomation)))
         .Spacing(TimerVisuals.Spacing.Small))
         .Spacing(TimerVisuals.Spacing.Large);
 }
