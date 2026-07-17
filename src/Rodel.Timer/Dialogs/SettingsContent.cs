@@ -298,7 +298,7 @@ public sealed partial class SettingsContent : Control
 
     internal static AutomationInfo OpenSourceAutomation => new()
     {
-        Name = Resources.OpenOnGitHub,
+        Name = Resources.AppDescription,
         HelpText = Resources.OpenSourceHelp,
         AutomationId = TimerAutomationIds.SettingsOpenSource,
     };
