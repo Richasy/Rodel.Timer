@@ -141,7 +141,7 @@ public sealed partial class HistoryPaneControl : Control
             _buildContextMenu,
             data => _chrome.ShowHistoryDetails(data.Entry.Id),
             Colors)
-            .Weight(1f))
+            .Height(TimerAnchoredSurfaceLayoutResolver.ListHeight(_chrome.HistoryRows.Count)))
         .Spacing(0f);
 
     [SuppressMessage(

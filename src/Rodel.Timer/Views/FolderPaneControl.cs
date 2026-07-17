@@ -143,7 +143,7 @@ public sealed partial class FolderPaneControl : Control
             SelectedIndices,
             _onSelectionChanged,
             _buildContextMenu)
-            .Weight(1f))
+            .Height(TimerAnchoredSurfaceLayoutResolver.ListHeight(Rows.Count)))
         .Spacing(0f);
 
     private IReadOnlyList<FolderRowData> Rows => _chrome.FolderRows;
