@@ -61,7 +61,7 @@ public readonly partial record struct NormalTimerStageView(
                     IsRunning ? Colors.AccentTextFillColorPrimary : Colors.TextFillColorPrimary)
                     .HAlign(HorizontalAlignment.Center)
                     .VAlign(VerticalAlignment.Center))
-                .Padding(0f, -(Layout.GlowHeight - Layout.ClockSize) / 2f),
+                .Padding(0f, -(Layout.GlowHeight - (Layout.ClockSize * 1.5f)) / 2f),
             Text(
                 IsRunning ? Resources.TimerRunning : Resources.TimerReady,
                 new TextFormat(TextFormat.DefaultFontFamily, 13f, TextFormat.NormalWeight, TextAlignment.Center),

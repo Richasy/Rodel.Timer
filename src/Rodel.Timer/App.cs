@@ -41,7 +41,7 @@ public sealed class App : Application, IDisposable
         {
             Title = Resources.AppName,
             Size = new Size(1100f, 720f),
-            MinSize = new Size(480f, 360f),
+            MinSize = new Size(480f, 460f),
             TitleBarHeight = TitleBarHeight.Tall,
             SystemBackdrop = SystemBackdrop.Mica,
         });
