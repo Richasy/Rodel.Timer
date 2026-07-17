@@ -115,7 +115,7 @@ public sealed class TimerDataRepositoryTests
             ("SystemMaterial", TimerBackgroundMode.Mica),
             ("Solid", TimerBackgroundMode.Mica),
             ("Acrylic", TimerBackgroundMode.AcrylicThin),
-            ("LiquidGlassWallpaper", TimerBackgroundMode.LiquidGlassWallpaper),
+            ("LiquidGlassWallpaper", TimerBackgroundMode.Mica),
         ];
 
         foreach ((string persisted, TimerBackgroundMode expected) in cases)
@@ -170,6 +170,23 @@ public sealed class TimerDataRepositoryTests
 
             await Assert.ThrowsAsync<TimerDataCorruptedException>(() => repository.LoadAsync());
         }
+    }
+
+    [TestMethod]
+    public async Task Load_SchemaVersion3_MigratesRemovedLiquidGlassToMica()
+    {
+        using var directory = new TemporaryDirectory();
+        string path = directory.File("timer-data.json");
+        await File.WriteAllTextAsync(path, SchemaVersion3Document("LiquidGlassWallpaper"));
+        using var repository = new TimerDataRepository(path);
+
+        TimerWorkspace? loaded = await repository.LoadAsync();
+
+        Assert.IsNotNull(loaded);
+        Assert.AreEqual(
+            TimerBackgroundMode.Mica,
+            loaded.Preferences.Background,
+            "The removed Liquid Glass material migrates to Mica rather than corrupting the file.");
     }
 
     [TestMethod]

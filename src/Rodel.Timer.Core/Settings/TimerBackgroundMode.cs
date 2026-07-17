@@ -14,7 +14,4 @@ public enum TimerBackgroundMode
 
     /// <summary>Use the theme-aware, more translucent Composition Acrylic variant.</summary>
     AcrylicThin = 3,
-
-    /// <summary>Use the screen-recordable wallpaper-backed Liquid Glass material.</summary>
-    LiquidGlassWallpaper = 4,
 }

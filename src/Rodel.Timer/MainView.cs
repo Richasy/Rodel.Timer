@@ -139,7 +139,6 @@ public sealed partial class MainView : Control, ILanguageApplyTarget
                 TimerBackgroundMode.MicaAlt => Resources.BackgroundStatusMicaAlt,
                 TimerBackgroundMode.Acrylic => Resources.BackgroundStatusAcrylic,
                 TimerBackgroundMode.AcrylicThin => Resources.BackgroundStatusAcrylicThin,
-                TimerBackgroundMode.LiquidGlassWallpaper => Resources.BackgroundStatusLiquidGlass,
                 _ => throw new InvalidOperationException("The persisted background mode is not supported."),
             };
             string state = resolution.IsFallback
@@ -160,21 +159,6 @@ public sealed partial class MainView : Control, ILanguageApplyTarget
         {
             _ = MaterialPolicy.Current.System;
             return _windowBackground.Resolve(Preferences.Background).IsFallback;
-        }
-    }
-
-    /// <summary>
-    /// Whether liquid glass is the requested window material AND it is actually active (not the opaque policy
-    /// fallback) — the flyouts then match the window with an in-app liquid-glass surface instead of the default
-    /// acrylic. Reactive through the same material-policy read as <see cref="IsBackgroundFallback"/>.
-    /// </summary>
-    internal bool IsLiquidGlassBackground
-    {
-        get
-        {
-            _ = MaterialPolicy.Current.System;
-            return Preferences.Background == TimerBackgroundMode.LiquidGlassWallpaper
-                && !_windowBackground.Resolve(Preferences.Background).IsFallback;
         }
     }
 

@@ -126,10 +126,16 @@ internal static class TimerDataMapper
 
             if (string.Equals(value, "LiquidGlassWallpaper", StringComparison.OrdinalIgnoreCase))
             {
-                return TimerBackgroundMode.LiquidGlassWallpaper;
+                return TimerBackgroundMode.Mica;
             }
 
             throw new InvalidDataException($"Schema version 2 preferences contain unsupported background mode '{value}'.");
+        }
+
+        // The Liquid Glass material was removed; a value persisted while it was selected migrates to Mica.
+        if (string.Equals(value, "LiquidGlassWallpaper", StringComparison.OrdinalIgnoreCase))
+        {
+            return TimerBackgroundMode.Mica;
         }
 
         if (Enum.TryParse(value, ignoreCase: true, out TimerBackgroundMode background)

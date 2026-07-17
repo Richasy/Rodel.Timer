@@ -14,7 +14,6 @@ public sealed class TimerBackgroundResolutionTests
             TimerBackgroundMode.MicaAlt,
             TimerBackgroundMode.Acrylic,
             TimerBackgroundMode.AcrylicThin,
-            TimerBackgroundMode.LiquidGlassWallpaper,
         ];
 
         foreach (TimerBackgroundMode material in materials)
@@ -37,7 +36,6 @@ public sealed class TimerBackgroundResolutionTests
             TimerBackgroundMode.MicaAlt,
             TimerBackgroundMode.Acrylic,
             TimerBackgroundMode.AcrylicThin,
-            TimerBackgroundMode.LiquidGlassWallpaper,
         ];
 
         foreach (TimerBackgroundMode material in materials)

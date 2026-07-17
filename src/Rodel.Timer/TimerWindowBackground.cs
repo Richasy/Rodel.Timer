@@ -2,7 +2,6 @@ using Rodel.Timer.Core.Settings;
 
 using Sprout;
 using Sprout.Graphics;
-using Sprout.LiquidGlass;
 using Sprout.Theming;
 
 namespace Rodel.Timer;
@@ -18,7 +17,6 @@ internal sealed class TimerWindowBackground
 {
     private readonly Window _window;
     private readonly WindowBackdropMaterial _acrylicThin;
-    private readonly WindowBackdropMaterial _liquidGlass;
     private TimerBackgroundMode _requestedMode = TimerBackgroundMode.Mica;
 
     /// <summary>Creates the background owner for <paramref name="window"/>.</summary>
@@ -27,13 +25,6 @@ internal sealed class TimerWindowBackground
     {
         _window = window ?? throw new ArgumentNullException(nameof(window));
         _acrylicThin = WindowBackdropMaterial.Custom(ResolveAcrylicThin);
-
-        // Opt into the EXPERIMENTAL live-desktop liquid glass: it refracts the real desktop behind the window and
-        // self-excludes the window's own content from the capture (WDA_EXCLUDEFROMCAPTURE), so the glass never samples
-        // itself — unlike the recordable wallpaper-only variant. Not screen-recordable while active.
-#pragma warning disable SPROUTGLASS001
-        _liquidGlass = WindowBackdropMaterial.LiquidGlass(ResolveLiquidGlass);
-#pragma warning restore SPROUTGLASS001
     }
 
     /// <summary>Persists and applies <paramref name="mode"/> live for the current presenter.</summary>
@@ -74,9 +65,6 @@ internal sealed class TimerWindowBackground
             case TimerBackgroundMode.AcrylicThin:
                 ApplyMaterial(_acrylicThin);
                 break;
-            case TimerBackgroundMode.LiquidGlassWallpaper:
-                ApplyMaterial(_liquidGlass);
-                break;
             default:
                 throw new InvalidOperationException("The requested background mode is not supported.");
         }
@@ -87,9 +75,6 @@ internal sealed class TimerWindowBackground
 
     private AcrylicMaterial ResolveAcrylicThin(ThemeMode mode) =>
         AcrylicMaterial.Thin(mode == ThemeMode.Dark) with { FallbackColor = FallbackColor };
-
-    private LiquidGlassMaterial ResolveLiquidGlass(ThemeMode mode) =>
-        LiquidGlassMaterial.Regular(mode == ThemeMode.Dark) with { FallbackColor = FallbackColor };
 
     private void ApplyMaterial(WindowBackdropMaterial material)
     {

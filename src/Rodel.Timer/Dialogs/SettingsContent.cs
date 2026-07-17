@@ -89,7 +89,6 @@ public sealed partial class SettingsSectionsControl : Control
                         Resources.BackgroundMicaAlt,
                         Resources.BackgroundAcrylic,
                         Resources.BackgroundAcrylicThin,
-                        Resources.BackgroundLiquidGlassWallpaper,
                     ])
                     .SelectedIndex(_chrome.BackgroundIndex)
                     .OnSelectionChanged(_chrome.BackgroundChanged)

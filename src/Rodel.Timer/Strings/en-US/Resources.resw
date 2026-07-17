@@ -81,12 +81,10 @@
   <data name="BackgroundMicaAlt" xml:space="preserve"><value>Mica Alt</value></data>
   <data name="BackgroundAcrylic" xml:space="preserve"><value>Acrylic</value></data>
   <data name="BackgroundAcrylicThin" xml:space="preserve"><value>Acrylic Thin</value></data>
-  <data name="BackgroundLiquidGlassWallpaper" xml:space="preserve"><value>Liquid Glass</value></data>
   <data name="BackgroundStatusMica" xml:space="preserve"><value>Mica</value></data>
   <data name="BackgroundStatusMicaAlt" xml:space="preserve"><value>Mica Alt</value></data>
   <data name="BackgroundStatusAcrylic" xml:space="preserve"><value>Acrylic</value></data>
   <data name="BackgroundStatusAcrylicThin" xml:space="preserve"><value>Acrylic Thin</value></data>
-  <data name="BackgroundStatusLiquidGlass" xml:space="preserve"><value>Liquid Glass</value></data>
   <data name="BackgroundStatusActive" xml:space="preserve"><value>Active</value></data>
   <data name="BackgroundStatusFallback" xml:space="preserve"><value>Fallback</value></data>
   <data name="Font" xml:space="preserve"><value>Font</value></data>
