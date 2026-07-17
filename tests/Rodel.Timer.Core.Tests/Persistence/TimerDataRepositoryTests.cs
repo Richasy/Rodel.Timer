@@ -30,6 +30,7 @@ public sealed class TimerDataRepositoryTests
         Assert.HasCount(1, loaded.Entries);
         Assert.AreEqual("Read", loaded.Entries[0].Title);
         Assert.AreEqual(300L, loaded.Entries[0].DurationSeconds);
+        Assert.IsNull(loaded.Entries[0].Comment, "An entry saved without a comment round-trips as null.");
         Assert.AreEqual(TimerThemeMode.Dark, loaded.Preferences.Theme);
         Assert.AreEqual(TimerBackgroundMode.Acrylic, loaded.Preferences.Background);
 
@@ -38,6 +39,34 @@ public sealed class TimerDataRepositoryTests
         StringAssert.Contains(json, "\"background\": \"Acrylic\"");
         StringAssert.Contains(json, "\"icon\": \"Book\"");
         Assert.IsEmpty(Directory.GetFiles(directory.Path, "*.tmp"));
+    }
+
+    [TestMethod]
+    public async Task SaveAndLoad_RoundTripsAnEntryComment()
+    {
+        using var directory = new TemporaryDirectory();
+        string path = directory.File("timer-data.json");
+        using var repository = new TimerDataRepository(path);
+        var folder = new TimerFolder(
+            Guid.ParseExact("11111111111111111111111111111111", "N"),
+            "Work",
+            DateTimeOffset.UnixEpoch,
+            TimerFolderIcon.Activity);
+        TimerWorkspace workspace = TimerWorkspace.Create(folder);
+        workspace.AddEntry(new TimerEntry(
+            Guid.ParseExact("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "N"),
+            folder.Id,
+            "Read",
+            300,
+            DateTimeOffset.UnixEpoch,
+            "Chapter 4 notes"));
+
+        await repository.SaveAsync(workspace);
+        TimerWorkspace? loaded = await repository.LoadAsync();
+
+        Assert.IsNotNull(loaded);
+        Assert.AreEqual("Chapter 4 notes", loaded.Entries[0].Comment);
+        StringAssert.Contains(await File.ReadAllTextAsync(path), "\"comment\": \"Chapter 4 notes\"");
     }
 
     [TestMethod]

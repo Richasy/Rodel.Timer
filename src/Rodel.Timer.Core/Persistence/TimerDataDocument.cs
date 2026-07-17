@@ -38,6 +38,8 @@ internal sealed class TimerEntryData
     public long DurationSeconds { get; set; }
 
     public DateTimeOffset CreatedAt { get; set; }
+
+    public string? Comment { get; set; }
 }
 
 internal sealed class TimerPreferencesData

@@ -46,6 +46,7 @@ internal static class TimerDataMapper
                     Title = entry.Title,
                     DurationSeconds = entry.DurationSeconds,
                     CreatedAt = entry.CreatedAt,
+                    Comment = entry.Comment,
                 }),
             ],
         };
@@ -93,7 +94,8 @@ internal static class TimerDataMapper
             entry.FolderId,
             entry.Title,
             entry.DurationSeconds,
-            entry.CreatedAt));
+            entry.CreatedAt,
+            entry.Comment));
 
         return TimerWorkspace.Restore(folders, entries, document.SelectedFolderId, preferences);
     }

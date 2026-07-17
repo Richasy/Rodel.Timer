@@ -56,6 +56,10 @@ public sealed partial class MainView
     {
         TimerEntry entry = _store.Entries.FirstOrDefault(candidate => candidate.Id == entryId)
             ?? throw new KeyNotFoundException($"History entry '{entryId}' does not exist.");
+        var edit = new MenuFlyoutItem(Resources.EditHistory, () => ShowHistoryDetailsDialog(entryId))
+        {
+            Automation = new AutomationInfo { AutomationId = TimerAutomationIds.HistoryEdit(entryId) },
+        };
         var move = new MenuFlyoutItem(Resources.MoveHistory, () => ShowMoveHistoryDialog(entryId))
         {
             IsEnabled = _store.Folders.Count > 1,
@@ -65,7 +69,7 @@ public sealed partial class MainView
         {
             Automation = new AutomationInfo { AutomationId = TimerAutomationIds.HistoryDelete(entryId) },
         };
-        return new MenuFlyout(move, delete)
+        return new MenuFlyout(edit, move, delete)
         {
             Placement = PopupPlacement.RightEdgeAlignedTop,
         }
@@ -227,6 +231,47 @@ public sealed partial class MainView
             {
                 _store.MoveEntry(entryId, content.SelectedFolderId);
                 Announce(Resources.HistoryMovedAnnouncement);
+            }
+        }
+        catch (Exception exception) when (IsDataException(exception))
+        {
+            ShowSaveError(exception.Message);
+        }
+    }
+
+    /// <summary>Opens the session-details dialog and applies the edited title/comment on commit.</summary>
+    /// <param name="entryId">The history entry to show and edit.</param>
+    public async void ShowHistoryDetailsDialog(Guid entryId)
+    {
+        if (!_store.Bootstrap.IsSuccess || !TryGetEntry(entryId, out TimerEntry entry))
+        {
+            return;
+        }
+
+        try
+        {
+            string folderName = TryGetFolder(entry.FolderId, out TimerFolder folder) ? folder.Name : string.Empty;
+            var content = new HistoryDetailsContent(this, entry, folderName);
+            var dialog = new ContentDialog
+            {
+                Title = Resources.HistoryDetails,
+                ContentComponent = () => content,
+                PrimaryButtonText = Resources.Save,
+                CloseButtonText = Resources.Cancel,
+                DefaultButton = ContentDialogButton.Primary,
+            }.Automation(new AutomationInfo { AutomationId = "RodelTimer.HistoryDetails.Dialog" });
+            dialog.PrimaryButtonClick += args =>
+            {
+                if (string.IsNullOrWhiteSpace(content.Title))
+                {
+                    args.Cancel = true;
+                }
+            };
+
+            if (await dialog.ShowAsync(_window).ConfigureAwait(true) == ContentDialogResult.Primary)
+            {
+                _store.UpdateEntry(entryId, content.Title.Trim(), content.Comment);
+                Announce(Resources.HistoryUpdatedAnnouncement);
             }
         }
         catch (Exception exception) when (IsDataException(exception))

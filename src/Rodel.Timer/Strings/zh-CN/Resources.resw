@@ -43,6 +43,11 @@
   <data name="AddFolder" xml:space="preserve"><value>添加分组</value></data>
   <data name="AddFolderHelp" xml:space="preserve"><value>创建用于整理计时记录的分组</value></data>
   <data name="EditFolder" xml:space="preserve"><value>编辑分组</value></data>
+  <data name="EditHistory" xml:space="preserve"><value>编辑</value></data>
+  <data name="HistoryDetails" xml:space="preserve"><value>会话详情</value></data>
+  <data name="RecordedAt" xml:space="preserve"><value>计时时间</value></data>
+  <data name="Comment" xml:space="preserve"><value>备注</value></data>
+  <data name="CommentPlaceholder" xml:space="preserve"><value>添加备注（可选）</value></data>
   <data name="DeleteFolder" xml:space="preserve"><value>删除分组</value></data>
   <data name="FolderName" xml:space="preserve"><value>分组名称</value></data>
   <data name="FolderNamePlaceholder" xml:space="preserve"><value>为分组命名</value></data>
@@ -61,6 +66,7 @@
   <data name="DeleteHistoryTitle" xml:space="preserve"><value>删除这条记录？</value></data>
   <data name="DeleteHistoryMessage" xml:space="preserve"><value>这条计时历史将被永久删除。</value></data>
   <data name="HistoryMovedAnnouncement" xml:space="preserve"><value>已移动记录。</value></data>
+  <data name="HistoryUpdatedAnnouncement" xml:space="preserve"><value>已更新记录。</value></data>
   <data name="HistoryDeletedAnnouncement" xml:space="preserve"><value>已删除记录。</value></data>
   <data name="Duration" xml:space="preserve"><value>用时</value></data>
   <data name="Created" xml:space="preserve"><value>创建时间</value></data>

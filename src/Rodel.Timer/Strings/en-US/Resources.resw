@@ -43,6 +43,11 @@
   <data name="AddFolder" xml:space="preserve"><value>Add folder</value></data>
   <data name="AddFolderHelp" xml:space="preserve"><value>Create a folder for organizing timer sessions</value></data>
   <data name="EditFolder" xml:space="preserve"><value>Edit folder</value></data>
+  <data name="EditHistory" xml:space="preserve"><value>Edit</value></data>
+  <data name="HistoryDetails" xml:space="preserve"><value>Session details</value></data>
+  <data name="RecordedAt" xml:space="preserve"><value>Recorded</value></data>
+  <data name="Comment" xml:space="preserve"><value>Comment</value></data>
+  <data name="CommentPlaceholder" xml:space="preserve"><value>Add a note (optional)</value></data>
   <data name="DeleteFolder" xml:space="preserve"><value>Delete folder</value></data>
   <data name="FolderName" xml:space="preserve"><value>Folder name</value></data>
   <data name="FolderNamePlaceholder" xml:space="preserve"><value>Name this folder</value></data>
@@ -61,6 +66,7 @@
   <data name="DeleteHistoryTitle" xml:space="preserve"><value>Delete this session?</value></data>
   <data name="DeleteHistoryMessage" xml:space="preserve"><value>This timer history entry will be permanently deleted.</value></data>
   <data name="HistoryMovedAnnouncement" xml:space="preserve"><value>Session moved.</value></data>
+  <data name="HistoryUpdatedAnnouncement" xml:space="preserve"><value>Session updated.</value></data>
   <data name="HistoryDeletedAnnouncement" xml:space="preserve"><value>Session deleted.</value></data>
   <data name="Duration" xml:space="preserve"><value>Duration</value></data>
   <data name="Created" xml:space="preserve"><value>Created</value></data>

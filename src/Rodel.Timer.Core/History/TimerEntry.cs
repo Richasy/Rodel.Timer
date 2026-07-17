@@ -13,6 +13,7 @@ public sealed record TimerEntry
     /// <param name="title">The entry's title. Must not be null, empty, or whitespace-only.</param>
     /// <param name="durationSeconds">The recorded duration, in whole seconds. Must not be negative.</param>
     /// <param name="createdAt">The timestamp at which the timed session finished.</param>
+    /// <param name="comment">An optional free-form note; whitespace-only input is stored as <see langword="null"/>.</param>
     /// <exception cref="ArgumentException">
     /// <paramref name="id"/> or <paramref name="folderId"/> is <see cref="Guid.Empty"/>, or <paramref name="title"/>
     /// is null, empty, or whitespace-only.
@@ -23,7 +24,8 @@ public sealed record TimerEntry
         Guid folderId,
         string title,
         long durationSeconds,
-        DateTimeOffset createdAt)
+        DateTimeOffset createdAt,
+        string? comment = null)
     {
         if (id == Guid.Empty)
         {
@@ -43,6 +45,7 @@ public sealed record TimerEntry
         Title = title.Trim();
         DurationSeconds = durationSeconds;
         CreatedAt = createdAt;
+        Comment = string.IsNullOrWhiteSpace(comment) ? null : comment.Trim();
     }
 
     /// <summary>The entry's identifier. Stable for the entry's lifetime; never <see cref="Guid.Empty"/>.</summary>
@@ -60,11 +63,14 @@ public sealed record TimerEntry
     /// <summary>The timestamp at which the timed session finished.</summary>
     public DateTimeOffset CreatedAt { get; }
 
+    /// <summary>An optional free-form note for the session, or <see langword="null"/> when none was recorded. Trimmed to non-whitespace content; whitespace-only input is stored as <see langword="null"/>.</summary>
+    public string? Comment { get; }
+
     /// <summary>The recorded duration expressed as a <see cref="TimeSpan"/>, derived from <see cref="DurationSeconds"/>.</summary>
     public TimeSpan Duration => TimeSpan.FromSeconds(DurationSeconds);
 
     /// <summary>Returns a copy of this entry re-homed under <paramref name="folderId"/>, keeping every other field.</summary>
     /// <param name="folderId">The identifier of the folder the returned entry should belong to.</param>
     /// <returns>A new <see cref="TimerEntry"/> instance with the updated folder.</returns>
-    public TimerEntry MoveTo(Guid folderId) => new(Id, folderId, Title, DurationSeconds, CreatedAt);
+    public TimerEntry MoveTo(Guid folderId) => new(Id, folderId, Title, DurationSeconds, CreatedAt, Comment);
 }

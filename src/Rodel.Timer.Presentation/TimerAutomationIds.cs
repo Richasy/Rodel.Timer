@@ -111,6 +111,10 @@ public static class TimerAutomationIds
     public static string HistoryMove(Guid entryId) =>
         string.Create(CultureInfo.InvariantCulture, $"RodelTimer.History.{entryId:N}.Move");
 
+    /// <summary>Builds the id for a history context menu's Edit command.</summary>
+    public static string HistoryEdit(Guid entryId) =>
+        string.Create(CultureInfo.InvariantCulture, $"RodelTimer.History.{entryId:N}.Edit");
+
     /// <summary>Builds the id for a history context menu's Delete command.</summary>
     public static string HistoryDelete(Guid entryId) =>
         string.Create(CultureInfo.InvariantCulture, $"RodelTimer.History.{entryId:N}.Delete");

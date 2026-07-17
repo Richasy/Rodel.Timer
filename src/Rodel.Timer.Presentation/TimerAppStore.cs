@@ -346,6 +346,21 @@ public sealed partial class TimerAppStore
         CommitMutation();
     }
 
+    /// <summary>Replaces the title and comment of the history entry identified by <paramref name="entryId"/>.</summary>
+    /// <param name="entryId">The entry to update.</param>
+    /// <param name="title">The new title. Must not be null, empty, or whitespace-only.</param>
+    /// <param name="comment">The new comment, or <see langword="null"/>/whitespace to clear it.</param>
+    /// <exception cref="KeyNotFoundException"><paramref name="entryId"/> does not exist.</exception>
+    /// <exception cref="ArgumentException"><paramref name="title"/> is null, empty, or whitespace-only.</exception>
+    /// <exception cref="InvalidOperationException">The workspace has not been loaded, or the store is closing.</exception>
+    /// <exception cref="ObjectDisposedException">The store has been disposed.</exception>
+    public void UpdateEntry(Guid entryId, string title, string? comment)
+    {
+        EnsureMutable();
+        Workspace.UpdateEntry(entryId, title, comment);
+        CommitMutation();
+    }
+
     /// <summary>Removes the history entry identified by <paramref name="entryId"/>.</summary>
     /// <param name="entryId">The entry to remove.</param>
     /// <exception cref="KeyNotFoundException"><paramref name="entryId"/> does not exist.</exception>
