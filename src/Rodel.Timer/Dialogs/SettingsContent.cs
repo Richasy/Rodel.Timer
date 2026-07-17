@@ -145,8 +145,17 @@ public sealed partial class SettingsSectionsControl : Control
                 Resources.About,
                 new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight))
                 .Foreground(Brush.Theme(ThemeColorToken.TextFillColorPrimary)),
-            HyperlinkButton(Resources.OpenOnGitHub, TimerLinks.OpenSourceUri, HyperlinkButtonPalette.FromTheme(_chrome.Colors))
-                .Automation(SettingsContent.OpenSourceAutomation))
+            SettingsExpander(Resources.AppName)
+                .Icon(new FluentIcon(FluentSymbol.Timer))
+                .Content(Text(
+                    $"v{MainView.CurrentVersion}",
+                    new TextFormat(TextFormat.DefaultFontFamily, 13f, TextFormat.NormalWeight),
+                    _chrome.Colors.TextFillColorSecondary))
+                .Items(
+                    SettingsCard(Resources.AppDescription),
+                    SettingsCard(
+                        Resources.OpenSource,
+                        HyperlinkButton(Resources.OpenOnGitHub, TimerLinks.OpenSourceUri, HyperlinkButtonPalette.FromTheme(_chrome.Colors)))))
         .Spacing(TimerVisuals.Spacing.Small))
         .Spacing(TimerVisuals.Spacing.Large);
 }
@@ -224,12 +233,8 @@ public sealed partial class SettingsContent : Control
 
     /// <inheritdoc/>
     public Ui Body => Overlay(
-        ScrollView(
-            new SettingsSectionsControl(_sections))
-        .Vertical(ScrollMode.Auto)
-        .HorizontalScrollBar(ScrollBarVisibility.Hidden)
-        .Width(TimerVisuals.MaxWidth.Dialog)
-        .Height(500f));
+        new SettingsSectionsControl(_sections)
+            .Width(TimerVisuals.MaxWidth.Dialog));
 
     internal static AutomationInfo ThemeAutomation => new()
     {

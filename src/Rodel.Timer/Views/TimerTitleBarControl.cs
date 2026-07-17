@@ -118,7 +118,7 @@ public readonly partial record struct CompactTimerTitleBarView(
     public Ui Body => Stack(
         Button(
             Icon.Fluent(
-                FluentSymbol.PictureInPictureExit,
+                FluentSymbol.ContractDownLeft,
                 FluentIconVariant.Regular,
                 TimerVisuals.IconSize.Small,
                 Brush.CreateSolid(Colors.TextFillColorPrimary)),
@@ -128,6 +128,7 @@ public readonly partial record struct CompactTimerTitleBarView(
             .Width(28f)
             .Height(28f)
             .VAlign(VerticalAlignment.Center)
+            .ToolTip(Resources.ExitCompactOverlay)
             .Automation(ExitAutomation))
         .Orientation(Orientation.Horizontal)
         .Padding(TimerVisuals.Spacing.XSmall, 0f);
@@ -206,6 +207,7 @@ public readonly partial record struct TimerTitleBarView(
                 .Height(TimerVisuals.Height.Icon)
                 .VAlign(VerticalAlignment.Center)
                 .AccessKey("F")
+                .ToolTip(Resources.Folders)
                 .Automation(FoldersAutomation),
             DropDownButton(
                 new TimerTitleBarDropDownContentView(
@@ -221,6 +223,7 @@ public readonly partial record struct TimerTitleBarView(
                 .Height(TimerVisuals.Height.Icon)
                 .VAlign(VerticalAlignment.Center)
                 .AccessKey("H")
+                .ToolTip(Resources.History)
                 .Automation(HistoryAutomation))
             .Orientation(Orientation.Horizontal)
             .Spacing(TimerVisuals.Spacing.Small)
@@ -228,7 +231,7 @@ public readonly partial record struct TimerTitleBarView(
             .Weight(1f),
         Button(
             Icon.Fluent(
-                FluentSymbol.PictureInPictureEnter,
+                FluentSymbol.ContractUpRight,
                 FluentIconVariant.Regular,
                 TimerVisuals.IconSize.Medium,
                 Brush.CreateSolid(Colors.TextFillColorPrimary)),
@@ -238,6 +241,7 @@ public readonly partial record struct TimerTitleBarView(
             .Width(TimerVisuals.Height.Icon)
             .Height(TimerVisuals.Height.Icon)
             .VAlign(VerticalAlignment.Center)
+            .ToolTip(Resources.CompactOverlay)
             .Automation(CompactAutomation),
         Button(
             Icon.Fluent(
@@ -252,6 +256,7 @@ public readonly partial record struct TimerTitleBarView(
             .Height(TimerVisuals.Height.Icon)
             .VAlign(VerticalAlignment.Center)
             .AccessKey("S")
+            .ToolTip(Resources.Settings)
             .Automation(SettingsAutomation))
         .Orientation(Orientation.Horizontal)
         .Spacing(TimerVisuals.Spacing.Small)

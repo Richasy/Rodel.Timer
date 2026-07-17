@@ -20,7 +20,7 @@ namespace Rodel.Timer;
 public sealed partial class MainView
 {
     /// <summary>The current product version, compared against the persisted last-seen version for the what's-new dialog.</summary>
-    private const string CurrentVersion = "2.0.0";
+    internal const string CurrentVersion = "2.0.0";
 
     /// <summary>Builds a fresh per-folder context menu from the latest store state.</summary>
     /// <param name="folderId">The folder the menu acts on.</param>

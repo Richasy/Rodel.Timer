@@ -127,11 +127,11 @@ internal static class TimerVisuals
     /// <summary>The row geometry: fixed row extents and the selected-folder accent indicator size.</summary>
     internal static class Row
     {
-        /// <summary>58 epx — a folder row's extent.</summary>
-        internal const float Folder = 58f;
+        /// <summary>50 epx — a folder row's extent (36 tile + 2×7 padding, matching the prototype's <c>.folder-row</c>).</summary>
+        internal const float Folder = 50f;
 
-        /// <summary>60 epx — a history card's extent.</summary>
-        internal const float History = 60f;
+        /// <summary>50 epx — a history card's extent (36 tile + 2×7 padding, matching the prototype's <c>.history-row</c>).</summary>
+        internal const float History = 50f;
 
         /// <summary>The selected-folder left accent indicator width (3 epx).</summary>
         internal const float IndicatorWidth = 3f;

@@ -52,7 +52,7 @@ public readonly partial record struct FolderRowView(
             .Orientation(Orientation.Horizontal)
             .Spacing(10f)
             .VAlign(VerticalAlignment.Center))
-        .Padding(9f, 7f);
+        .Padding(9f, 7f, 7f, 7f);
 }
 
 /// <summary>
@@ -114,7 +114,7 @@ public sealed partial class FolderPaneControl : Control
             Stack(
                 Text(
                     Resources.Folders,
-                    new TextFormat(TextFormat.DefaultFontFamily, 18f, TextFormat.SemiBoldWeight),
+                    new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight),
                     Colors.TextFillColorPrimary),
                 Text(
                     Resources.FoldersFlyoutSubtitle,
@@ -131,6 +131,7 @@ public sealed partial class FolderPaneControl : Control
                 .Width(TimerVisuals.Height.Icon)
                 .Height(TimerVisuals.Height.Icon)
                 .AccessKey("A")
+                .ToolTip(Resources.AddFolder)
                 .Automation(AddAutomation))
             .Orientation(Orientation.Horizontal)
             .Spacing(TimerVisuals.Spacing.Small)

@@ -54,7 +54,7 @@ public readonly partial record struct HistoryRowView(
             .Orientation(Orientation.Horizontal)
             .Spacing(10f)
             .VAlign(VerticalAlignment.Center))
-        .Padding(9f, 7f);
+        .Padding(9f, 7f, 7f, 7f);
 }
 
 /// <summary>
@@ -90,7 +90,7 @@ public readonly partial record struct HistoryListView(
         TimerRowListFactory.History(
             Rows,
             BuildRow,
-            new StackLayout { ItemExtent = TimerVisuals.Row.History, Spacing = TimerVisuals.Spacing.Small },
+            new StackLayout { ItemExtent = TimerVisuals.Row.History, Spacing = TimerVisuals.Spacing.XSmall },
             BuildAutomation,
             BuildContextMenu);
 }
@@ -119,7 +119,7 @@ public sealed partial class HistoryPaneControl : Control
         Stack(
             Text(
                 Resources.History,
-                new TextFormat(TextFormat.DefaultFontFamily, 18f, TextFormat.SemiBoldWeight),
+                new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight),
                 Colors.TextFillColorPrimary),
             Text(
                 HistorySubtitle,
