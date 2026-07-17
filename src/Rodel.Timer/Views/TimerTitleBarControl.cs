@@ -63,13 +63,18 @@ public sealed partial class TimerTitleBarControl : Control
             Layout.IsVisible,
             new TimerTitleBarView(
                 _chrome,
-                _foldersFlyout,
-                _historyFlyout,
+                Relabel(_foldersFlyout, FoldersFlyoutAutomation),
+                Relabel(_historyFlyout, HistoryFlyoutAutomation),
                 Colors,
                 Layout.ShowBrandLabel,
                 Layout.ShowCommandLabels,
                 Resources.AppName),
             new CompactTimerTitleBarView(_chrome, Colors)));
+
+    // Re-apply a stable anchored flyout's UIA pane Name (read fresh from the current language) each time this body is
+    // evaluated, so a language switch — which re-runs the body — relabels the flyout on its next open. Flyout.Automation
+    // just stores the info that is read at open time, and the flyout instances themselves are constructed once as fields.
+    private static Flyout Relabel(Flyout flyout, AutomationInfo automation) => flyout.Automation(automation);
 
     private TimerTitleBarLayout Layout =>
         TimerTitleBarLayoutResolver.Resolve(_chrome.ViewportWidth, _chrome.IsCompact);

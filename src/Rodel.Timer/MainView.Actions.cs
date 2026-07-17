@@ -67,7 +67,31 @@ public sealed partial class MainView
     public void SyncWindowTitle() => _window.Title = Resources.AppName;
 
     /// <inheritdoc/>
-    void ILanguageApplyTarget.SetCurrentLanguage(string language) => Localizer.CurrentLanguage = language;
+    void ILanguageApplyTarget.SetCurrentLanguage(string language)
+    {
+        Localizer.CurrentLanguage = language;
+        ApplyThreadCulture(language);
+    }
+
+    // Track the selected language on the thread culture too, so CultureInfo.CurrentCulture-based date/number formatting
+    // (history timestamps, footer minute counts) follows the app language instead of staying on the OS culture.
+    private static void ApplyThreadCulture(string language)
+    {
+        System.Globalization.CultureInfo culture;
+        try
+        {
+            culture = System.Globalization.CultureInfo.GetCultureInfo(language);
+        }
+        catch (System.Globalization.CultureNotFoundException)
+        {
+            return;
+        }
+
+        System.Globalization.CultureInfo.CurrentCulture = culture;
+        System.Globalization.CultureInfo.CurrentUICulture = culture;
+        System.Globalization.CultureInfo.DefaultThreadCurrentCulture = culture;
+        System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = culture;
+    }
 
     /// <inheritdoc/>
     void ILanguageApplyTarget.SyncWindowTitle() => SyncWindowTitle();

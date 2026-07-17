@@ -15,10 +15,7 @@ if (args.Contains("--selftest", StringComparer.OrdinalIgnoreCase))
     return SelfTest.Run();
 }
 
-string language = CultureInfo.CurrentUICulture.Name.StartsWith("zh", StringComparison.OrdinalIgnoreCase)
-    ? TimerPreferences.ChineseLanguage
-    : TimerPreferences.EnglishLanguage;
-string defaultFolderName = language == TimerPreferences.ChineseLanguage ? "默认" : "Default";
+string language = ResolveStartupLanguage(CultureInfo.CurrentUICulture);
 var defaultPreferences = new TimerPreferences(
     TimerThemeMode.System,
     TimerBackgroundMode.Mica,
@@ -37,7 +34,7 @@ return SproutApp.CreateBuilder(args)
         services.AddSingleton<ILegacyWorkTimerDataSource>(new PackagedLegacyWorkTimerDataSource());
         services.AddSingleton(_ => new TimerDataRepository(AppDataPaths.TimerDataFile()));
         services.AddSingleton(_ => new LegacyWorkTimerImporter(
-            defaultFolderName,
+            Resources.DefaultFolder,
             defaultPreferences,
             TimeZoneInfo.Local));
         services.AddSingleton(serviceProvider => new TimerDataBootstrapper(
@@ -45,8 +42,28 @@ return SproutApp.CreateBuilder(args)
             serviceProvider.GetRequiredService<ILegacyWorkTimerDataSource>(),
             serviceProvider.GetRequiredService<LegacyWorkTimerImporter>(),
             serviceProvider.GetRequiredService<TimeProvider>(),
-            defaultFolderName,
+            Resources.DefaultFolder,
             defaultPreferences));
     })
     .Build()
     .Run();
+
+static string ResolveStartupLanguage(CultureInfo culture)
+{
+    for (CultureInfo current = culture; !string.IsNullOrEmpty(current.Name); current = current.Parent)
+    {
+        if (current.Name.Equals("zh-Hant", StringComparison.OrdinalIgnoreCase))
+        {
+            return TimerPreferences.TraditionalChineseLanguage;
+        }
+
+        if (current.Name.Equals("zh-Hans", StringComparison.OrdinalIgnoreCase))
+        {
+            return TimerPreferences.ChineseLanguage;
+        }
+    }
+
+    return culture.TwoLetterISOLanguageName.Equals("zh", StringComparison.OrdinalIgnoreCase)
+        ? TimerPreferences.ChineseLanguage
+        : TimerPreferences.EnglishLanguage;
+}

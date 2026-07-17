@@ -126,6 +126,7 @@ public sealed partial class SettingsSectionsControl : Control
                     .SmallChange(30d)
                     .LargeChange(60d)
                     .AcceptsOnlyNumericInput()
+                    .Formatter(new DecimalNumberFormatter { MaxFractionDigits = 0 })
                     .Automation(SettingsContent.DailyTargetAutomation)
                     .LayoutBox(width: SettingsContent.SettingsNumberBoxWidth))
                 .Description(Resources.DailyTargetDescription)
@@ -154,23 +155,37 @@ public sealed partial class SettingsSectionsControl : Control
                 Resources.About,
                 new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight))
                 .Foreground(Brush.Theme(ThemeColorToken.TextFillColorPrimary)),
-            SettingsExpander(Resources.AppName)
-                .Icon(new ImageIcon(TimerAssets.AppLogo()) { Size = new Size(28f, 28f) })
-                .WrapThreshold(SettingsContent.CardWrapThreshold)
-                .Content(Text(
-                    $"v{MainView.CurrentVersion}",
-                    new TextFormat(TextFormat.DefaultFontFamily, 13f, TextFormat.NormalWeight),
-                    _chrome.Colors.TextFillColorSecondary))
-                .Items(
-                    SettingsCard(
-                        Resources.AppDescription,
-                        HyperlinkButton(
-                            Resources.OpenOnGitHub,
-                            HyperlinkButtonPalette.FromTheme(_chrome.Colors))
-                            .OnClick(() => TimerLauncher.OpenUrl(TimerLinks.OpenSourceUri)))
-                        .Automation(SettingsContent.OpenSourceAutomation)))
+            Keyed(_chrome.LanguageIndex, new AboutSettingsView(_chrome.Colors)))
         .Spacing(TimerVisuals.Spacing.Small))
         .Spacing(TimerVisuals.Spacing.Large);
+}
+
+/// <summary>
+/// The About settings section: an expander (app icon + name, version at the tail) whose expanded row carries the app
+/// description and a "open on GitHub" link. It is hosted through a language-keyed remount (see its call site) because a
+/// a <c>SettingsExpander</c> does not thread its items on reconcile, so a remount is what re-localizes the expanded
+/// description and link text on a live language switch.
+/// </summary>
+[Composite]
+public readonly partial record struct AboutSettingsView(ThemeColors Colors)
+{
+    /// <summary>The About expander.</summary>
+    public Ui Body => Overlay(
+        SettingsExpander(Resources.AppName)
+            .Icon(new ImageIcon(TimerAssets.AppLogo()) { Size = new Size(20f, 20f) })
+            .WrapThreshold(SettingsContent.CardWrapThreshold)
+            .Content(Text(
+                $"v{MainView.CurrentVersion}",
+                new TextFormat(TextFormat.DefaultFontFamily, 13f, TextFormat.NormalWeight),
+                Colors.TextFillColorSecondary))
+            .Items(
+                SettingsCard(
+                    Resources.AppDescription,
+                    HyperlinkButton(
+                        Resources.OpenOnGitHub,
+                        HyperlinkButtonPalette.FromTheme(Colors))
+                        .OnClick(() => TimerLauncher.OpenUrl(TimerLinks.OpenSourceUri)))
+                    .Automation(SettingsContent.OpenSourceAutomation)));
 }
 
 /// <summary>

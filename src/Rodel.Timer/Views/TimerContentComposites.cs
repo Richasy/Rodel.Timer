@@ -58,7 +58,7 @@ public readonly partial record struct NormalTimerStageView(
                         Layout.ClockSize,
                         TextFormat.BoldWeight,
                         TextAlignment.Center),
-                    IsRunning ? Colors.AccentTextFillColorPrimary : Colors.TextFillColorPrimary)
+                    Colors.TextFillColorPrimary)
                     .HAlign(HorizontalAlignment.Center)
                     .VAlign(VerticalAlignment.Center))
                 .Padding(0f, -(Layout.GlowHeight - (Layout.ClockSize * 1.5f)) / 2f),
@@ -180,14 +180,16 @@ public readonly partial record struct NormalTimerFooterView(
     string FolderName,
     string FocusSummary,
     bool IsBackgroundFallback,
-    string BackgroundStatus)
+    string BackgroundStatus,
+    string CurrentFolderLabel,
+    string TodaysFocusLabel)
 {
     /// <summary>The full-width bottom plane; the middle column collapses to two columns unless a material fallback is showing.</summary>
     public Ui Body => Border(
         Stack(
             Stack(
                 Text(
-                    Resources.CurrentFolder,
+                    CurrentFolderLabel,
                     new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.SemiBoldWeight),
                     Colors.TextFillColorSecondary),
                 Text(
@@ -202,7 +204,7 @@ public readonly partial record struct NormalTimerFooterView(
                 new NormalFooterStatusView(BackgroundStatus, Colors)),
             Stack(
                 Text(
-                    Resources.TodaysFocus,
+                    TodaysFocusLabel,
                     new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.SemiBoldWeight, TextAlignment.Trailing),
                     Colors.TextFillColorSecondary)
                     .HAlign(HorizontalAlignment.Right),
@@ -237,7 +239,9 @@ public readonly partial record struct NormalTimerView(
     string SessionTitle,
     string FocusSummary,
     bool IsBackgroundFallback,
-    string BackgroundStatus)
+    string BackgroundStatus,
+    string CurrentFolderLabel,
+    string TodaysFocusLabel)
 {
     /// <summary>The open timer stage and full-width footer, with no enclosing hero card.</summary>
     public Ui Body => Stack(
@@ -249,7 +253,9 @@ public readonly partial record struct NormalTimerView(
             FolderName,
             FocusSummary,
             IsBackgroundFallback,
-            BackgroundStatus));
+            BackgroundStatus,
+            CurrentFolderLabel,
+            TodaysFocusLabel));
 }
 
 /// <summary>The folder and running-state context that Tight removes from all three trees.</summary>
@@ -305,7 +311,7 @@ public readonly partial record struct CompactAdaptiveView(
                 Layout.ClockSize,
                 TextFormat.SemiBoldWeight,
                 TextAlignment.Leading),
-            IsRunning ? Colors.AccentTextFillColorPrimary : Colors.TextFillColorPrimary)
+            Colors.TextFillColorPrimary)
             .HAlign(HorizontalAlignment.Left)
             .VAlign(VerticalAlignment.Center)
             .Cell(0, ClockRow),
