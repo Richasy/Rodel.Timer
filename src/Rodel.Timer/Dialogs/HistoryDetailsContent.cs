@@ -78,21 +78,27 @@ public sealed partial class HistoryDetailsContent : Control
                         AutomationId = "RodelTimer.HistoryDetails.Title",
                     }))
                 .Spacing(TimerVisuals.Spacing.XSmall),
-            Stack(
+            Border(
                 Stack(
-                    Text(Resources.Folders, LabelStyle, Colors.TextFillColorSecondary),
-                    Text(_folderName, ValueStyle, Colors.TextFillColorPrimary))
-                    .Spacing(2f),
-                Stack(
-                    Text(Resources.RecordedAt, LabelStyle, Colors.TextFillColorSecondary),
-                    Text(_recordedAt, ValueStyle, Colors.TextFillColorPrimary))
-                    .Spacing(2f),
-                Stack(
-                    Text(Resources.Duration, LabelStyle, Colors.TextFillColorSecondary),
-                    Text(_duration, ValueStyle, Colors.TextFillColorPrimary))
-                    .Spacing(2f))
-                .Orientation(Orientation.Horizontal)
-                .Spacing(TimerVisuals.Spacing.XLarge),
+                    Stack(
+                        Text(Resources.Folders, LabelStyle, Colors.TextFillColorSecondary).Weight(1f),
+                        Text(_folderName, ValueStyle, Colors.TextFillColorPrimary))
+                        .Orientation(Orientation.Horizontal)
+                        .Spacing(TimerVisuals.Spacing.Medium),
+                    Stack(
+                        Text(Resources.RecordedAt, LabelStyle, Colors.TextFillColorSecondary).Weight(1f),
+                        Text(_recordedAt, ValueStyle, Colors.TextFillColorPrimary))
+                        .Orientation(Orientation.Horizontal)
+                        .Spacing(TimerVisuals.Spacing.Medium),
+                    Stack(
+                        Text(Resources.Duration, LabelStyle, Colors.TextFillColorSecondary).Weight(1f),
+                        Text(_duration, ValueStyle, Colors.TextFillColorPrimary))
+                        .Orientation(Orientation.Horizontal)
+                        .Spacing(TimerVisuals.Spacing.Medium))
+                    .Spacing(TimerVisuals.Spacing.Small))
+                .Background(Brush.CreateSolid(Colors.CardBackgroundFillColorDefault))
+                .CornerRadius(TimerVisuals.Radius.Control)
+                .Padding(14f, 12f, 14f, 12f),
             Stack(
                 Text(Resources.Comment, LabelStyle, Colors.TextFillColorSecondary),
                 TextBox()

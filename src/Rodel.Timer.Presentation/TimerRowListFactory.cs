@@ -32,6 +32,7 @@ public static class TimerRowListFactory
             accessibleName: static data => data.Folder.Name,
             itemAutomation: itemAutomation,
             itemContextFlyout: itemContextFlyout)
+        .Padding(8f)
         .SelectionMode(SelectionMode.Single)
         .SelectedIndices(selectedIndices)
         .OnSelectionChanged(onSelectionChanged)
@@ -55,6 +56,7 @@ public static class TimerRowListFactory
             accessibleName: static data => data.Entry.Title,
             itemAutomation: itemAutomation,
             itemContextFlyout: itemContextFlyout)
+        .Padding(8f)
         .SelectionMode(SelectionMode.None);
 
         if (onItemInvoked is not null)

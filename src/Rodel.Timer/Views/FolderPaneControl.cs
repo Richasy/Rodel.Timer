@@ -52,7 +52,7 @@ public readonly partial record struct FolderRowView(
             .Orientation(Orientation.Horizontal)
             .Spacing(10f)
             .VAlign(VerticalAlignment.Center))
-        .Padding(9f, 7f, 7f, 7f);
+        .Padding(16f, 7f, 7f, 7f);
 }
 
 /// <summary>
@@ -108,7 +108,7 @@ public sealed partial class FolderPaneControl : Control
         _buildContextMenu = BuildContextMenu;
     }
 
-    /// <summary>The section header and controlled folder list.</summary>
+    /// <summary>The section header (own padding) over a divider, then the controlled folder list (own padding).</summary>
     public Ui Body => Stack(
         Stack(
             Stack(
@@ -135,7 +135,8 @@ public sealed partial class FolderPaneControl : Control
                 .Automation(AddAutomation))
             .Orientation(Orientation.Horizontal)
             .Spacing(TimerVisuals.Spacing.Small)
-            .VAlign(VerticalAlignment.Center),
+            .Padding(16f, 13f, 14f, 11f),
+        Divider.Horizontal(),
         new FolderListView(
             Rows,
             _chrome.BuildFolderRow,
@@ -143,8 +144,7 @@ public sealed partial class FolderPaneControl : Control
             _onSelectionChanged,
             _buildContextMenu)
             .Weight(1f))
-        .Spacing(TimerVisuals.Spacing.Medium)
-        .Padding(TimerVisuals.Spacing.Large);
+        .Spacing(0f);
 
     private IReadOnlyList<FolderRowData> Rows => _chrome.FolderRows;
 

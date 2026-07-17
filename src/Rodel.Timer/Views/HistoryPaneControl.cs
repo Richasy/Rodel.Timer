@@ -120,7 +120,7 @@ public sealed partial class HistoryPaneControl : Control
         _buildContextMenu = BuildContextMenu;
     }
 
-    /// <summary>The section header and history list.</summary>
+    /// <summary>The section header (own padding) over a divider, then the history list (own padding).</summary>
     public Ui Body => Stack(
         Stack(
             Text(
@@ -131,7 +131,9 @@ public sealed partial class HistoryPaneControl : Control
                 HistorySubtitle,
                 new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.NormalWeight),
                 Colors.TextFillColorSecondary))
-            .Spacing(2f),
+            .Spacing(2f)
+            .Padding(16f, 13f, 14f, 11f),
+        Divider.Horizontal(),
         new HistoryListView(
             _chrome.HistoryRows,
             _chrome.BuildHistoryRow,
@@ -140,8 +142,7 @@ public sealed partial class HistoryPaneControl : Control
             data => _chrome.ShowHistoryDetails(data.Entry.Id),
             Colors)
             .Weight(1f))
-        .Spacing(TimerVisuals.Spacing.Medium)
-        .Padding(TimerVisuals.Spacing.Large);
+        .Spacing(0f);
 
     [SuppressMessage(
         "Performance",
