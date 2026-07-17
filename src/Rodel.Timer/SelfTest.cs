@@ -84,10 +84,12 @@ internal static class SelfTest
             try
             {
                 Localizer.CurrentLanguage = TimerPreferences.EnglishLanguage;
-                bool english = Resources.AppName == "Rodel Timer";
+                bool english = Resources.AppName == "Work Timer";
                 Localizer.CurrentLanguage = TimerPreferences.ChineseLanguage;
-                bool chinese = Resources.AppName == "Rodel 计时器";
-                localizationPassed = english && chinese;
+                bool chinese = Resources.AppName == "工作计时器";
+                Localizer.CurrentLanguage = TimerPreferences.TraditionalChineseLanguage;
+                bool traditional = Resources.AppName == "工作計時器";
+                localizationPassed = english && chinese && traditional;
             }
             finally
             {

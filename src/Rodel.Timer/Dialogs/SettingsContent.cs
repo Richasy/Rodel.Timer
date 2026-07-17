@@ -132,7 +132,7 @@ public sealed partial class SettingsSectionsControl : Control
                 .Foreground(Brush.Theme(ThemeColorToken.TextFillColorPrimary)),
             SettingsCard(
                 Resources.Language,
-                ComboBox([Resources.LanguageEnglish, Resources.LanguageChinese])
+                ComboBox([Resources.LanguageEnglish, Resources.LanguageChinese, Resources.LanguageTraditionalChinese])
                     .SelectedIndex(_chrome.LanguageIndex)
                     .OnSelectionChanged(_chrome.LanguageChanged)
                     .Automation(SettingsContent.LanguageAutomation))
@@ -195,7 +195,12 @@ public sealed partial class SettingsContent : Control
         TimerPreferences preferences = main.Preferences;
         ThemeIndex = (int)preferences.Theme;
         BackgroundIndex = (int)preferences.Background;
-        LanguageIndex = preferences.Language == TimerPreferences.ChineseLanguage ? 1 : 0;
+        LanguageIndex = preferences.Language switch
+        {
+            TimerPreferences.ChineseLanguage => 1,
+            TimerPreferences.TraditionalChineseLanguage => 2,
+            _ => 0,
+        };
         FontIndex = ResolveFontIndex(preferences.FontFamily);
         TargetMinutes = preferences.DailyTargetMinutes;
     }
@@ -301,7 +306,12 @@ public sealed partial class SettingsContent : Control
     internal void OnLanguageChanged(int index)
     {
         LanguageIndex = index;
-        string language = index == 1 ? TimerPreferences.ChineseLanguage : TimerPreferences.EnglishLanguage;
+        string language = index switch
+        {
+            1 => TimerPreferences.ChineseLanguage,
+            2 => TimerPreferences.TraditionalChineseLanguage,
+            _ => TimerPreferences.EnglishLanguage,
+        };
         _main.ApplyLanguage(language);
         _onLanguageChanged?.Invoke();
     }

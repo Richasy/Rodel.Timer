@@ -6,10 +6,10 @@
   <resheader name="version">
     <value>2.0</value>
   </resheader>
-  <data name="AppName" xml:space="preserve"><value>Rodel 计时器</value></data>
+  <data name="AppName" xml:space="preserve"><value>工作计时器</value></data>
   <data name="AppDescription" xml:space="preserve"><value>专注、简洁的 Windows 正向计时器</value></data>
   <data name="PreparingData" xml:space="preserve"><value>正在准备计时数据…</value></data>
-  <data name="DataLoadErrorTitle" xml:space="preserve"><value>Rodel 计时器无法加载数据</value></data>
+  <data name="DataLoadErrorTitle" xml:space="preserve"><value>工作计时器无法加载数据</value></data>
   <data name="Folders" xml:space="preserve"><value>分组</value></data>
   <data name="FoldersHelp" xml:space="preserve"><value>打开计时器分组</value></data>
   <data name="FoldersFlyoutSubtitle" xml:space="preserve"><value>选择本次计时所属的分组</value></data>
@@ -97,6 +97,7 @@
   <data name="Language" xml:space="preserve"><value>语言</value></data>
   <data name="LanguageEnglish" xml:space="preserve"><value>英语</value></data>
   <data name="LanguageChinese" xml:space="preserve"><value>简体中文</value></data>
+  <data name="LanguageTraditionalChinese" xml:space="preserve"><value>繁体中文</value></data>
   <data name="DailyTargetMinutes" xml:space="preserve"><value>每日目标分钟数</value></data>
   <data name="OpenSource" xml:space="preserve"><value>已归档的 Work-Timer 源代码</value></data>
   <data name="OpenSourceHelp" xml:space="preserve"><value>在 GitHub 上打开已归档的 Work-Timer 源代码</value></data>
@@ -106,7 +107,7 @@
   <data name="DailyTargetDescription" xml:space="preserve"><value>每天的专注目标（分钟）</value></data>
   <data name="OpenOnGitHub" xml:space="preserve"><value>在 GitHub 上打开</value></data>
   <data name="WhatsNewTitle" xml:space="preserve"><value>新版内容</value></data>
-  <data name="WhatsNewBody" xml:space="preserve"><value>Rodel 计时器现已基于 Sprout 完整重写，采用 Fluent Design，支持实时语言和主题切换、无障碍控件，并可安全迁移现有 Work-Timer 数据。</value></data>
+  <data name="WhatsNewBody" xml:space="preserve"><value>工作计时器现已基于 Sprout 完整重写，采用 Fluent Design，支持实时语言和主题切换、无障碍控件，并可安全迁移你现有的数据。</value></data>
   <data name="Save" xml:space="preserve"><value>保存</value></data>
   <data name="Cancel" xml:space="preserve"><value>取消</value></data>
   <data name="Delete" xml:space="preserve"><value>删除</value></data>

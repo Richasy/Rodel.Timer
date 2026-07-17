@@ -6,10 +6,10 @@
   <resheader name="version">
     <value>2.0</value>
   </resheader>
-  <data name="AppName" xml:space="preserve"><value>Rodel Timer</value></data>
+  <data name="AppName" xml:space="preserve"><value>Work Timer</value></data>
   <data name="AppDescription" xml:space="preserve"><value>A focused forward timer for Windows</value></data>
   <data name="PreparingData" xml:space="preserve"><value>Preparing your timer data…</value></data>
-  <data name="DataLoadErrorTitle" xml:space="preserve"><value>Rodel Timer could not load its data</value></data>
+  <data name="DataLoadErrorTitle" xml:space="preserve"><value>Work Timer could not load its data</value></data>
   <data name="Folders" xml:space="preserve"><value>Folders</value></data>
   <data name="FoldersHelp" xml:space="preserve"><value>Open the timer folders</value></data>
   <data name="FoldersFlyoutSubtitle" xml:space="preserve"><value>Choose where this session belongs</value></data>
@@ -97,6 +97,7 @@
   <data name="Language" xml:space="preserve"><value>Language</value></data>
   <data name="LanguageEnglish" xml:space="preserve"><value>English</value></data>
   <data name="LanguageChinese" xml:space="preserve"><value>Simplified Chinese</value></data>
+  <data name="LanguageTraditionalChinese" xml:space="preserve"><value>Traditional Chinese</value></data>
   <data name="DailyTargetMinutes" xml:space="preserve"><value>Daily target in minutes</value></data>
   <data name="OpenSource" xml:space="preserve"><value>Archived Work-Timer source</value></data>
   <data name="OpenSourceHelp" xml:space="preserve"><value>Open the archived Work-Timer source code on GitHub</value></data>
@@ -106,7 +107,7 @@
   <data name="DailyTargetDescription" xml:space="preserve"><value>Your daily focus goal in minutes</value></data>
   <data name="OpenOnGitHub" xml:space="preserve"><value>Open on GitHub</value></data>
   <data name="WhatsNewTitle" xml:space="preserve"><value>What's new</value></data>
-  <data name="WhatsNewBody" xml:space="preserve"><value>Rodel Timer is a complete Sprout-based rewrite with Fluent Design, live language and theme switching, accessible controls, and safe migration of your existing Work-Timer data.</value></data>
+  <data name="WhatsNewBody" xml:space="preserve"><value>Work Timer is a complete Sprout-based rewrite with Fluent Design, live language and theme switching, accessible controls, and safe migration of your existing data.</value></data>
   <data name="Save" xml:space="preserve"><value>Save</value></data>
   <data name="Cancel" xml:space="preserve"><value>Cancel</value></data>
   <data name="Delete" xml:space="preserve"><value>Delete</value></data>

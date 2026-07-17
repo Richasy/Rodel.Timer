@@ -21,6 +21,9 @@ public sealed record TimerPreferences
     /// <summary>The supported Chinese language tag.</summary>
     public const string ChineseLanguage = "zh-CN";
 
+    /// <summary>The supported Traditional Chinese language tag.</summary>
+    public const string TraditionalChineseLanguage = "zh-Hant";
+
     /// <summary>Creates a preferences record, normalizing <paramref name="language"/> and <paramref name="fontFamily"/>.</summary>
     /// <param name="theme">The preferred theme.</param>
     /// <param name="background">The preferred window background/material.</param>
@@ -103,6 +106,11 @@ public sealed record TimerPreferences
         if (string.Equals(language, ChineseLanguage, StringComparison.OrdinalIgnoreCase))
         {
             return ChineseLanguage;
+        }
+
+        if (string.Equals(language, TraditionalChineseLanguage, StringComparison.OrdinalIgnoreCase))
+        {
+            return TraditionalChineseLanguage;
         }
 
         throw new ArgumentException($"Unsupported language '{language}'.", nameof(language));
