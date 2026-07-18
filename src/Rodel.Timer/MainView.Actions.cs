@@ -14,11 +14,16 @@ namespace Rodel.Timer;
 /// <summary>Command and state-mutation surface of <see cref="MainView"/> (invoked by the shell, slots, rows, and dialogs).</summary>
 public sealed partial class MainView
 {
-    /// <summary>Updates the viewport width used for the responsive pane breakpoints.</summary>
-    /// <param name="width">The new viewport width in effective pixels.</param>
-    public void SetViewportWidth(double width) => ViewportWidth = width;
+    /// <summary>Updates the effective-pixel viewport used by the normal and compact layout resolvers.</summary>
+    /// <param name="width">The client width.</param>
+    /// <param name="height">The client height.</param>
+    public void SetViewportSize(double width, double height)
+    {
+        ViewportWidth = width;
+        ViewportHeight = height;
+    }
 
-    /// <summary>Records the current compact-overlay presenter state (closes both panes when entering compact).</summary>
+    /// <summary>Records the current compact-overlay presenter state.</summary>
     /// <param name="isCompact">Whether the window is now in the compact overlay presenter.</param>
     public void SetCompactPresenter(bool isCompact)
     {
@@ -26,24 +31,67 @@ public sealed partial class MainView
 
         // Collapse the extended title bar to the standard 32 epx band while compact (its brand + command band is also
         // torn out of all three trees by the title bar's When(!IsCompact) switch), and restore the 48 epx tall band on
-        // exit so the brand + settings + compact commands return.
+        // exit so the brand + settings + compact commands return. The window material is degraded to the opaque themed
+        // fallback automatically by the framework while the window is a topmost compact overlay, and restored on exit.
         _window.TitleBarHeight = isCompact ? TitleBarHeight.Standard : TitleBarHeight.Tall;
-
-        if (isCompact)
-        {
-            FolderPaneOpen = false;
-            HistoryPaneOpen = false;
-        }
     }
 
     /// <summary>Bumps <see cref="MainView.ThemeStamp"/> so descendant controls re-resolve their theme colors.</summary>
     public void NotifyThemeChanged() => ThemeStamp++;
 
+    /// <summary>Persists and applies a theme choice through the window's live theme rail.</summary>
+    /// <param name="theme">The new theme preference.</param>
+    public void ApplyTheme(TimerThemeMode theme)
+    {
+        _store.UpdateTheme(theme);
+        ApplyThemeCore(theme);
+    }
+
+    /// <summary>Persists and applies the canonical window font family without remounting the content tree.</summary>
+    /// <param name="fontFamily">The selected family.</param>
+    public void ApplyFontFamily(string fontFamily)
+    {
+        _store.UpdateFontFamily(fontFamily);
+        ApplyFontFamilyCore(fontFamily);
+    }
+
+    /// <summary>Persists and applies the window background/material choice.</summary>
+    /// <param name="background">The selected background mode.</param>
+    public void ApplyBackground(TimerBackgroundMode background)
+    {
+        _store.UpdateBackground(background);
+        ApplyBackgroundCore(background);
+    }
+
     /// <summary>Sets the window caption from the current-language <see cref="Resources.AppName"/> (call after a language switch).</summary>
     public void SyncWindowTitle() => _window.Title = Resources.AppName;
 
     /// <inheritdoc/>
-    void ILanguageApplyTarget.SetCurrentLanguage(string language) => Localizer.CurrentLanguage = language;
+    void ILanguageApplyTarget.SetCurrentLanguage(string language)
+    {
+        Localizer.CurrentLanguage = language;
+        ApplyThreadCulture(language);
+    }
+
+    // Track the selected language on the thread culture too, so CultureInfo.CurrentCulture-based date/number formatting
+    // (history timestamps, footer minute counts) follows the app language instead of staying on the OS culture.
+    private static void ApplyThreadCulture(string language)
+    {
+        System.Globalization.CultureInfo culture;
+        try
+        {
+            culture = System.Globalization.CultureInfo.GetCultureInfo(language);
+        }
+        catch (System.Globalization.CultureNotFoundException)
+        {
+            return;
+        }
+
+        System.Globalization.CultureInfo.CurrentCulture = culture;
+        System.Globalization.CultureInfo.CurrentUICulture = culture;
+        System.Globalization.CultureInfo.DefaultThreadCurrentCulture = culture;
+        System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = culture;
+    }
 
     /// <inheritdoc/>
     void ILanguageApplyTarget.SyncWindowTitle() => SyncWindowTitle();
@@ -71,7 +119,7 @@ public sealed partial class MainView
     /// <param name="language">The BCP-47 language tag to apply.</param>
     private void ApplyLanguageCore(string language) => LanguageApply.Apply(this, language);
 
-    /// <summary>Applies the persisted language and theme once the workspace has loaded, then announces readiness.</summary>
+    /// <summary>Applies all persisted presentation preferences once the workspace has loaded, then announces readiness.</summary>
     public void OnDataLoaded()
     {
         if (!_store.Bootstrap.IsSuccess)
@@ -82,50 +130,29 @@ public sealed partial class MainView
         SaveErrorMessage = string.Empty;
         TimerPreferences preferences = _store.Preferences;
         ApplyLanguageCore(preferences.Language);
-        _window.RequestedTheme = preferences.Theme switch
+        ApplyThemeCore(preferences.Theme);
+        ApplyFontFamilyCore(preferences.FontFamily);
+        ApplyBackgroundCore(preferences.Background);
+        ShowStartupNotices();
+    }
+
+    private void ApplyThemeCore(TimerThemeMode theme) =>
+        _window.RequestedTheme = theme switch
         {
             TimerThemeMode.Light => ThemeRequest.Light,
             TimerThemeMode.Dark => ThemeRequest.Dark,
             _ => null,
         };
-        ShowStartupNotices();
-    }
+
+    private void ApplyFontFamilyCore(string fontFamily) =>
+        _window.DefaultFontFamilyOverride = fontFamily;
+
+    private void ApplyBackgroundCore(TimerBackgroundMode background) =>
+        _windowBackground.Apply(background);
 
     /// <summary>Shows a blocking save-failure message over the shell with a retry affordance.</summary>
     /// <param name="message">The failure message to display.</param>
     public void ShowSaveError(string message) => SaveErrorMessage = message;
-
-    /// <summary>Opens or closes the folder pane (controlled by the split view); closes the history pane if they are mutually exclusive.</summary>
-    /// <param name="open">Whether the pane should be open.</param>
-    public void SetFolderPaneOpen(bool open)
-    {
-        FolderPaneOpen = open;
-        if (open && PanesAreMutuallyExclusive)
-        {
-            HistoryPaneOpen = false;
-        }
-    }
-
-    /// <summary>Opens or closes the history pane (controlled by the split view); closes the folder pane if they are mutually exclusive.</summary>
-    /// <param name="open">Whether the pane should be open.</param>
-    public void SetHistoryPaneOpen(bool open)
-    {
-        HistoryPaneOpen = open;
-        if (open && PanesAreMutuallyExclusive)
-        {
-            FolderPaneOpen = false;
-        }
-    }
-
-    /// <summary>Toggles the folder pane open state (closing the history pane when the two are mutually exclusive).</summary>
-    public void ToggleFolderPane() => SetFolderPaneOpen(!FolderPaneOpen);
-
-    /// <summary>Toggles the history pane open state (closing the folder pane when the two are mutually exclusive).</summary>
-    public void ToggleHistoryPane() => SetHistoryPaneOpen(!HistoryPaneOpen);
-
-    /// <summary>Whether the two panes cannot be open at once at the current viewport (both overlay), so opening one closes the other.</summary>
-    private bool PanesAreMutuallyExclusive =>
-        TimerShell.PanesAreMutuallyExclusive(ViewportWidth, IsCompactPresenter);
 
     /// <summary>Updates the in-progress session title being edited.</summary>
     /// <param name="title">The new title text.</param>
@@ -168,7 +195,7 @@ public sealed partial class MainView
         }
     }
 
-    /// <summary>Toggles the compact overlay presenter (a 360×203 always-on-top mini timer) on or off.</summary>
+    /// <summary>Toggles the compact overlay presenter (an always-on-top mini timer) on or off.</summary>
     public void ToggleCompact()
     {
         if (IsCompactPresenter)
@@ -178,7 +205,11 @@ public sealed partial class MainView
         }
 
         CompactOverlayPresenter presenter = CompactOverlayPresenter.Create();
-        presenter.InitialSize = new Sprout.Graphics.Size(360f, 203f);
+        presenter.InitialSize = TimerCompactLayoutResolver.DefaultInitialSize;
+
+        // Enforce the overlay's own minimum size so the user cannot shrink the picture-in-picture window into the range
+        // where the tight clock would collide with the primary action (the resolver owns that no-overlap contract).
+        presenter.MinSize = TimerCompactLayoutResolver.MinimumClientSize;
         _window.SetPresenter(presenter);
     }
 

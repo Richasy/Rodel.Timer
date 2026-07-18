@@ -38,11 +38,15 @@ internal sealed class TimerEntryData
     public long DurationSeconds { get; set; }
 
     public DateTimeOffset CreatedAt { get; set; }
+
+    public string? Comment { get; set; }
 }
 
 internal sealed class TimerPreferencesData
 {
     public TimerThemeMode Theme { get; set; }
+
+    public string? Background { get; set; }
 
     public string Language { get; set; } = string.Empty;
 

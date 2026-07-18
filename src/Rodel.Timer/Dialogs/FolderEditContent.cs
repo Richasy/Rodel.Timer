@@ -34,7 +34,7 @@ public readonly partial record struct IconCellView(
     Action OnPick,
     AutomationInfo Info)
 {
-    /// <summary>A square glyph button sized for the picker grid.</summary>
+    /// <summary>A square glyph button sized for the picker grid, centred in its (stretched) grid cell.</summary>
     public Ui Body => Overlay(
         Button(
             Icon.Fluent(Symbol, FluentIconVariant.Regular, TimerVisuals.IconSize.Medium, IconBrush),
@@ -43,6 +43,7 @@ public readonly partial record struct IconCellView(
             .Style(TimerVisuals.Buttons.Icon)
             .Width(44f)
             .Height(44f)
+            .HAlign(HorizontalAlignment.Center)
             .Automation(Info));
 }
 
@@ -72,6 +73,7 @@ public readonly partial record struct IconPickerView(
                     ItemHeight = 44f,
                     ColumnSpacing = 8f,
                     RowSpacing = 8f,
+                    ItemsStretch = UniformGridItemsStretch.Fill,
                 }))
             .Vertical(ScrollMode.Auto)
             .HorizontalScrollBar(ScrollBarVisibility.Hidden)
@@ -106,6 +108,9 @@ public sealed partial class FolderEditContent : Control
     /// <summary>The selected folder icon (read by the host on commit).</summary>
     public partial TimerFolderIcon SelectedIcon { get; private set; }
 
+    /// <summary>Raised (with the new name) whenever the edited name changes, so the host can enable/disable its commit button.</summary>
+    public event Action<string>? NameChanged;
+
     /// <summary>
     /// The live theme colours resolved from the owning view's current theme; reading <see cref="MainView.ThemeStamp"/>
     /// subscribes this dialog's body so an in-place theme or language switch re-renders it with the live palette.
@@ -133,7 +138,7 @@ public sealed partial class FolderEditContent : Control
                 }),
             Text(
                 Resources.ChooseIcon,
-                new TextFormat(TimerPreferences.DefaultFontFamily, 13f, TextFormat.NormalWeight),
+                new TextFormat(TextFormat.DefaultFontFamily, 13f, TextFormat.NormalWeight),
                 Colors.TextFillColorSecondary),
             new IconPickerView(FolderIconCatalog.Choices(SelectedIcon, _main.ThemeStamp), BuildCell))
             .Spacing(TimerVisuals.Spacing.Medium)
@@ -165,5 +170,9 @@ public sealed partial class FolderEditContent : Control
             });
     }
 
-    private void SetName(string value) => FolderName = value ?? string.Empty;
+    private void SetName(string value)
+    {
+        FolderName = value ?? string.Empty;
+        NameChanged?.Invoke(FolderName);
+    }
 }

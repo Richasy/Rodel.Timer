@@ -57,6 +57,41 @@ public sealed class TimerWorkspaceTests
     }
 
     [TestMethod]
+    public void UpdateEntry_ReplacesTitleAndCommentAndPreservesIdentity()
+    {
+        TimerFolder folder = Folder("11111111111111111111111111111111", "First");
+        TimerWorkspace workspace = TimerWorkspace.Create(folder);
+        TimerEntry entry = Entry("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", folder.Id, 30);
+        workspace.AddEntry(entry);
+
+        workspace.UpdateEntry(entry.Id, "Renamed", "A note");
+
+        Assert.AreEqual(entry.Id, workspace.Entries[0].Id);
+        Assert.AreEqual(folder.Id, workspace.Entries[0].FolderId);
+        Assert.AreEqual(30L, workspace.Entries[0].DurationSeconds);
+        Assert.AreEqual("Renamed", workspace.Entries[0].Title);
+        Assert.AreEqual("A note", workspace.Entries[0].Comment);
+    }
+
+    [TestMethod]
+    public void UpdateEntry_StoresWhitespaceCommentAsNull()
+    {
+        TimerFolder folder = Folder("11111111111111111111111111111111", "First");
+        TimerWorkspace workspace = TimerWorkspace.Create(folder);
+        workspace.AddEntry(new TimerEntry(
+            Guid.ParseExact("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "N"),
+            folder.Id,
+            "Task",
+            30,
+            DateTimeOffset.UnixEpoch,
+            "old note"));
+
+        workspace.UpdateEntry(workspace.Entries[0].Id, "Task", "   ");
+
+        Assert.IsNull(workspace.Entries[0].Comment);
+    }
+
+    [TestMethod]
     public void GetTotalDuration_UsesTheRequestedLocalCalendarDate()
     {
         TimerFolder folder = Folder("11111111111111111111111111111111", "Work");

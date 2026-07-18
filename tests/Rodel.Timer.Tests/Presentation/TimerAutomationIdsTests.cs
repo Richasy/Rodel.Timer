@@ -31,12 +31,15 @@ public sealed class TimerAutomationIdsTests
         TimerAutomationIds.Compact,
         TimerAutomationIds.FoldersToggle,
         TimerAutomationIds.HistoryToggle,
-        TimerAutomationIds.FoldersSplit,
-        TimerAutomationIds.HistorySplit,
+        TimerAutomationIds.FoldersFlyout,
+        TimerAutomationIds.FoldersFlyoutContent,
+        TimerAutomationIds.HistoryFlyout,
+        TimerAutomationIds.HistoryFlyoutContent,
         TimerAutomationIds.AddFolder,
         TimerAutomationIds.Retry,
         TimerAutomationIds.SettingsDialog,
         TimerAutomationIds.SettingsTheme,
+        TimerAutomationIds.SettingsBackground,
         TimerAutomationIds.SettingsLanguage,
         TimerAutomationIds.SettingsFont,
         TimerAutomationIds.SettingsDailyTarget,
@@ -54,20 +57,31 @@ public sealed class TimerAutomationIdsTests
             Guid folderId = Guid.NewGuid();
             Guid entryId = Guid.NewGuid();
             ids.Add(TimerAutomationIds.FolderSelect(folderId));
-            ids.Add(TimerAutomationIds.FolderMore(folderId));
+            ids.Add(TimerAutomationIds.FolderMenu(folderId));
+            ids.Add(TimerAutomationIds.FolderEdit(folderId));
+            ids.Add(TimerAutomationIds.FolderDelete(folderId));
             ids.Add(TimerAutomationIds.HistoryItem(entryId));
-            ids.Add(TimerAutomationIds.HistoryMore(entryId));
+            ids.Add(TimerAutomationIds.HistoryMenu(entryId));
+            ids.Add(TimerAutomationIds.HistoryMove(entryId));
+            ids.Add(TimerAutomationIds.HistoryDelete(entryId));
         }
 
         Assert.AreEqual(ids.Count, ids.Distinct(StringComparer.Ordinal).Count(), "every per-row id must be unique.");
     }
 
     [TestMethod]
-    public void SameEntityProducesDistinctSelectAndMoreIds()
+    public void SameEntityProducesDistinctRowAndCommandIds()
     {
         Guid folderId = Guid.NewGuid();
 
-        Assert.AreNotEqual(TimerAutomationIds.FolderSelect(folderId), TimerAutomationIds.FolderMore(folderId));
+        string[] ids =
+        [
+            TimerAutomationIds.FolderSelect(folderId),
+            TimerAutomationIds.FolderMenu(folderId),
+            TimerAutomationIds.FolderEdit(folderId),
+            TimerAutomationIds.FolderDelete(folderId),
+        ];
+        Assert.AreEqual(ids.Length, ids.Distinct(StringComparer.Ordinal).Count());
     }
 
     [TestMethod]

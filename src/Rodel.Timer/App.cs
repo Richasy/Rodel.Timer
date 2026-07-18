@@ -41,7 +41,7 @@ public sealed class App : Application, IDisposable
         {
             Title = Resources.AppName,
             Size = new Size(1100f, 720f),
-            MinSize = new Size(480f, 360f),
+            MinSize = new Size(480f, 460f),
             TitleBarHeight = TitleBarHeight.Tall,
             SystemBackdrop = SystemBackdrop.Mica,
         });
@@ -69,7 +69,7 @@ public sealed class App : Application, IDisposable
         _window.SetContent(_mainView);
         _window.SetTitleBarContent(new TimerTitleBarControl(_mainView.Chrome));
         _window.Show();
-        _mainView.SetViewportWidth(_window.ClientSize.Width);
+        _mainView.SetViewportSize(_window.ClientSize.Width, _window.ClientSize.Height);
 
         LoadDataAsync();
     }
@@ -107,7 +107,7 @@ public sealed class App : Application, IDisposable
     }
 
     private void OnSizeChanged(object? sender, WindowSizeChangedEventArgs e) =>
-        _mainView.SetViewportWidth(e.Size.Width);
+        _mainView.SetViewportSize(e.Size.Width, e.Size.Height);
 
     private void OnPresenterChanged(object? sender, EventArgs e) =>
         _mainView.SetCompactPresenter(_window.Presenter.Kind == WindowPresenterKind.CompactOverlay);

@@ -7,7 +7,8 @@ namespace Rodel.Timer.Core.Persistence;
 
 internal static class TimerDataMapper
 {
-    public const int CurrentSchemaVersion = 1;
+    public const int CurrentSchemaVersion = 3;
+    private const int OldestSupportedSchemaVersion = 1;
 
     public static TimerDataDocument ToDocument(TimerWorkspace workspace)
     {
@@ -20,6 +21,7 @@ internal static class TimerDataMapper
             Preferences = new TimerPreferencesData
             {
                 Theme = workspace.Preferences.Theme,
+                Background = workspace.Preferences.Background.ToString(),
                 Language = workspace.Preferences.Language,
                 FontFamily = workspace.Preferences.FontFamily,
                 DailyTargetMinutes = workspace.Preferences.DailyTargetMinutes,
@@ -44,6 +46,7 @@ internal static class TimerDataMapper
                     Title = entry.Title,
                     DurationSeconds = entry.DurationSeconds,
                     CreatedAt = entry.CreatedAt,
+                    Comment = entry.Comment,
                 }),
             ],
         };
@@ -53,7 +56,7 @@ internal static class TimerDataMapper
     {
         ArgumentNullException.ThrowIfNull(document);
 
-        if (document.SchemaVersion != CurrentSchemaVersion)
+        if (document.SchemaVersion is < OldestSupportedSchemaVersion or > CurrentSchemaVersion)
         {
             throw new UnsupportedTimerDataVersionException(
                 document.SchemaVersion,
@@ -71,8 +74,10 @@ internal static class TimerDataMapper
             throw new InvalidDataException("The timer data document contains a null item.");
         }
 
+        TimerBackgroundMode background = MapBackground(document.SchemaVersion, document.Preferences.Background);
         TimerPreferences preferences = new(
             document.Preferences.Theme,
+            background,
             document.Preferences.Language,
             document.Preferences.FontFamily,
             document.Preferences.DailyTargetMinutes,
@@ -89,8 +94,59 @@ internal static class TimerDataMapper
             entry.FolderId,
             entry.Title,
             entry.DurationSeconds,
-            entry.CreatedAt));
+            entry.CreatedAt,
+            entry.Comment));
 
         return TimerWorkspace.Restore(folders, entries, document.SelectedFolderId, preferences);
+    }
+
+    private static TimerBackgroundMode MapBackground(int schemaVersion, string? persisted)
+    {
+        if (schemaVersion == 1)
+        {
+            return TimerBackgroundMode.Mica;
+        }
+
+        if (string.IsNullOrWhiteSpace(persisted))
+        {
+            throw new InvalidDataException($"Schema version {schemaVersion} preferences are missing the background mode.");
+        }
+
+        string value = persisted.Trim();
+        if (schemaVersion == 2)
+        {
+            if (string.Equals(value, "SystemMaterial", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(value, "Solid", StringComparison.OrdinalIgnoreCase))
+            {
+                return TimerBackgroundMode.Mica;
+            }
+
+            if (string.Equals(value, "Acrylic", StringComparison.OrdinalIgnoreCase))
+            {
+                return TimerBackgroundMode.AcrylicThin;
+            }
+
+            if (string.Equals(value, "LiquidGlassWallpaper", StringComparison.OrdinalIgnoreCase))
+            {
+                return TimerBackgroundMode.Mica;
+            }
+
+            throw new InvalidDataException($"Schema version 2 preferences contain unsupported background mode '{value}'.");
+        }
+
+        // The Liquid Glass material was removed; a value persisted while it was selected migrates to Mica.
+        if (string.Equals(value, "LiquidGlassWallpaper", StringComparison.OrdinalIgnoreCase))
+        {
+            return TimerBackgroundMode.Mica;
+        }
+
+        if (Enum.TryParse(value, ignoreCase: true, out TimerBackgroundMode background)
+            && Enum.IsDefined(background)
+            && string.Equals(value, background.ToString(), StringComparison.OrdinalIgnoreCase))
+        {
+            return background;
+        }
+
+        throw new InvalidDataException($"Schema version {schemaVersion} preferences contain unsupported background mode '{value}'.");
     }
 }

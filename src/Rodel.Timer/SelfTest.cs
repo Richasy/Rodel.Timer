@@ -30,6 +30,7 @@ internal static class SelfTest
                 new DateTimeOffset(2026, 7, 14, 1, 0, 0, TimeSpan.Zero));
             var preferences = new TimerPreferences(
                 TimerThemeMode.System,
+                TimerBackgroundMode.Mica,
                 TimerPreferences.EnglishLanguage,
                 TimerPreferences.DefaultFontFamily,
                 TimerPreferences.DefaultDailyTargetMinutes);
@@ -83,10 +84,12 @@ internal static class SelfTest
             try
             {
                 Localizer.CurrentLanguage = TimerPreferences.EnglishLanguage;
-                bool english = Resources.AppName == "Rodel Timer";
+                bool english = Resources.AppName == "Working Timer";
                 Localizer.CurrentLanguage = TimerPreferences.ChineseLanguage;
-                bool chinese = Resources.AppName == "Rodel 计时器";
-                localizationPassed = english && chinese;
+                bool chinese = Resources.AppName == "工作计时器";
+                Localizer.CurrentLanguage = TimerPreferences.TraditionalChineseLanguage;
+                bool traditional = Resources.AppName == "工作計時器";
+                localizationPassed = english && chinese && traditional;
             }
             finally
             {
@@ -128,7 +131,7 @@ internal static class SelfTest
     }
 
     /// <summary>
-    /// Pure, window-free checks of the UI-layer helpers (viewport breakpoints, shell resolution, clock formatting,
+    /// Pure, window-free checks of the UI-layer helpers (normal/title-bar layout, clock formatting,
     /// row automation-id uniqueness, and the ready / compact accessibility contract). Everything here is deterministic
     /// and NativeAOT-safe (no reflection, no window, no wall clock).
     /// </summary>
@@ -142,28 +145,23 @@ internal static class SelfTest
     /// </remarks>
     private static bool RunUiChecks()
     {
-        // Breakpoints: wide => both inline; medium => folder overlay / history inline; narrow => both overlay.
-        TimerPaneModes wide = TimerBreakpoints.Resolve(1400d);
-        TimerPaneModes medium = TimerBreakpoints.Resolve(1000d);
-        TimerPaneModes narrow = TimerBreakpoints.Resolve(800d);
-        bool breakpoints =
-            wide is { Folder: SplitViewDisplayMode.Inline, History: SplitViewDisplayMode.Inline }
-            && medium is { Folder: SplitViewDisplayMode.Overlay, History: SplitViewDisplayMode.Inline }
-            && narrow is { Folder: SplitViewDisplayMode.Overlay, History: SplitViewDisplayMode.Overlay };
-
-        // Compact forces both panes overlay + closed regardless of the open flags.
-        TimerShellLayout compact = TimerShell.Resolve(1400d, isCompact: true, folderPaneOpen: true, historyPaneOpen: true);
-        TimerShellLayout open = TimerShell.Resolve(1400d, isCompact: false, folderPaneOpen: true, historyPaneOpen: false);
-        bool shell =
-            compact is { FolderMode: SplitViewDisplayMode.Overlay, HistoryMode: SplitViewDisplayMode.Overlay, FolderPaneOpen: false, HistoryPaneOpen: false }
-            && open is { FolderMode: SplitViewDisplayMode.Inline, FolderPaneOpen: true, HistoryPaneOpen: false };
-
-        // Pane mutual-exclusion: narrow (both overlay) => opening one closes the other; medium/wide/compact => not.
-        bool mutualExclusion =
-            TimerShell.PanesAreMutuallyExclusive(800d, isCompact: false)
-            && !TimerShell.PanesAreMutuallyExclusive(1000d, isCompact: false)
-            && !TimerShell.PanesAreMutuallyExclusive(1400d, isCompact: false)
-            && !TimerShell.PanesAreMutuallyExclusive(800d, isCompact: true);
+        TimerTitleBarLayout wideTitle = TimerTitleBarLayoutResolver.Resolve(1100d, isCompact: false);
+        TimerTitleBarLayout narrowTitle = TimerTitleBarLayoutResolver.Resolve(640d, isCompact: false);
+        TimerTitleBarLayout compactTitle = TimerTitleBarLayoutResolver.Resolve(360d, isCompact: true);
+        TimerNormalLayout wideNormal = TimerNormalLayoutResolver.Resolve(1100d, 720d);
+        TimerNormalLayout narrowNormal = TimerNormalLayoutResolver.Resolve(640d, 480d);
+        TimerCompactLayout balancedCompact = TimerCompactLayoutResolver.Resolve(360d, 203d);
+        TimerCompactLayout tightCompact = TimerCompactLayoutResolver.Resolve(300d, 150d);
+        TimerCompactLayout wideCompact = TimerCompactLayoutResolver.Resolve(480d, 180d);
+        bool responsiveLayout =
+            wideTitle is { IsVisible: true, ShowBrandLabel: true, ShowCommandLabels: true }
+            && narrowTitle is { IsVisible: true, ShowBrandLabel: false, ShowCommandLabels: false }
+            && compactTitle is { IsVisible: false }
+            && wideNormal is { ShowMiddleStatus: true, ClockSize: 110f }
+            && narrowNormal is { ShowMiddleStatus: false, ClockSize: 58f }
+            && balancedCompact is { Mode: TimerCompactMode.Balanced, ShowContext: true }
+            && tightCompact is { Mode: TimerCompactMode.Tight, ShowContext: false }
+            && wideCompact is { Mode: TimerCompactMode.Wide, ShowContext: true };
 
         // Clock formatting: zero-padded HH:mm:ss, hours can exceed 24, negatives clamp to zero.
         bool format =
@@ -171,17 +169,21 @@ internal static class SelfTest
             && TimerFormat.Clock(TimeSpan.Zero) == "00:00:00"
             && TimerFormat.Clock(TimeSpan.FromSeconds(-5)) == "00:00:00";
 
-        // Row automation ids are unique per Guid and disjoint between select/more/history.
+        // Row and fresh context-menu automation ids are unique per Guid and role.
         Guid a = Guid.ParseExact("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "N");
         Guid b = Guid.ParseExact("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "N");
         string[] ids =
         [
             TimerAutomationIds.FolderSelect(a),
-            TimerAutomationIds.FolderMore(a),
+            TimerAutomationIds.FolderMenu(a),
+            TimerAutomationIds.FolderEdit(a),
+            TimerAutomationIds.FolderDelete(a),
             TimerAutomationIds.FolderSelect(b),
-            TimerAutomationIds.FolderMore(b),
-            TimerAutomationIds.HistoryMore(a),
-            TimerAutomationIds.HistoryMore(b),
+            TimerAutomationIds.HistoryItem(a),
+            TimerAutomationIds.HistoryMenu(a),
+            TimerAutomationIds.HistoryMove(a),
+            TimerAutomationIds.HistoryDelete(a),
+            TimerAutomationIds.HistoryItem(b),
         ];
         bool automation = ids.Distinct(StringComparer.Ordinal).Count() == ids.Length
             && Array.TrueForAll(ids, static id => id.StartsWith(TimerAutomationIds.Prefix, StringComparison.Ordinal));
@@ -243,7 +245,7 @@ internal static class SelfTest
         bool iconChrome = chromed.Appearance.Padding == new Thickness(0f)
             && chromed.Appearance.CornerRadius == new CornerRadius(TimerVisuals.Radius.Control);
 
-        return breakpoints && shell && mutualExclusion && format && automation && readyContract && compactContract && iconNames && languageApply && rowProjection && iconChrome;
+        return responsiveLayout && format && automation && readyContract && compactContract && iconNames && languageApply && rowProjection && iconChrome;
     }
 
     private sealed class LanguageApplyProbe : ILanguageApplyTarget
@@ -346,14 +348,12 @@ internal static class SelfTest
         }
 
         SemanticsNode root = Node(SemanticsRole.Window, "Rodel Timer", automationId: null, interactive: false);
-        SemanticsNode foldersSplit = Node(SemanticsRole.Group, "Folders", TimerAutomationIds.FoldersSplit, interactive: false);
-        SemanticsNode historySplit = Node(SemanticsRole.Group, "History", TimerAutomationIds.HistorySplit, interactive: false);
-        _ = root.Add(foldersSplit);
-        _ = root.Add(historySplit);
 
-        // The extended title bar band hosts the brand's two commands (settings + compact) as its own Group, so each has
+        // The extended title bar hosts Folders/History plus settings + compact as its own Group, so each has
         // its own hit bounds; the compact presenter collapses the whole band (When(!IsCompact)), tearing both out.
         SemanticsNode titleBar = Node(SemanticsRole.Group, "Rodel Timer", automationId: null, interactive: false);
+        _ = titleBar.Add(Node(SemanticsRole.Button, "Folders", TimerAutomationIds.FoldersToggle, interactive: true));
+        _ = titleBar.Add(Node(SemanticsRole.Button, "History", TimerAutomationIds.HistoryToggle, interactive: true));
         _ = titleBar.Add(Node(SemanticsRole.Button, "Compact overlay", TimerAutomationIds.Compact, interactive: true));
         _ = titleBar.Add(Node(SemanticsRole.Button, "Settings", TimerAutomationIds.Settings, interactive: true));
         _ = root.Add(titleBar);
@@ -361,29 +361,12 @@ internal static class SelfTest
         _ = root.Add(Node(SemanticsRole.Button, "Start timer", TimerAutomationIds.StartStop, interactive: true));
         _ = root.Add(Node(SemanticsRole.Edit, "Session title", TimerAutomationIds.Title, interactive: true));
 
-        SemanticsNode foldersToggle = Node(SemanticsRole.Button, "Folders", TimerAutomationIds.FoldersToggle, interactive: true);
-        foldersToggle.ControlledPeers = [TimerAutomationIds.FoldersSplit];
-        _ = root.Add(foldersToggle);
-
-        SemanticsNode historyToggle = Node(SemanticsRole.Button, "History", TimerAutomationIds.HistoryToggle, interactive: true);
-        historyToggle.ControlledPeers = [TimerAutomationIds.HistorySplit];
-        _ = root.Add(historyToggle);
-
-        _ = foldersSplit.Add(Node(SemanticsRole.Button, "Add folder", TimerAutomationIds.AddFolder, interactive: true));
-        Guid folder = Guid.ParseExact("11111111111111111111111111111111", "N");
-        _ = foldersSplit.Add(Node(SemanticsRole.Button, "Focus", TimerAutomationIds.FolderSelect(folder), interactive: true));
-        _ = foldersSplit.Add(Node(SemanticsRole.Button, "More actions for Focus", TimerAutomationIds.FolderMore(folder), interactive: true));
-
-        Guid entry = Guid.ParseExact("22222222222222222222222222222222", "N");
-        _ = historySplit.Add(Node(SemanticsRole.Button, "More actions for session", TimerAutomationIds.HistoryMore(entry), interactive: true));
-
         return root;
     }
 
     // Hand-authored compact-state accessibility CONTRACT MIRROR (not the live mounted MainView tree): the compact
-    // presenter tears the title bar (Settings), the session-title editor (Title), and both footer toggles (FoldersToggle /
-    // HistoryToggle) out of the tree, leaving only the clock, the start/stop button, and the compact-exit button. The
-    // structural split-view groups remain, but the four torn-down ids must be absent.
+    // presenter tears the normal title bar and session-title editor out of the tree, leaving only the clock,
+    // start/stop button, and compact-exit button.
     private static SemanticsNode BuildCompactContractTree()
     {
         Rect bounds = Rect.FromXywh(0f, 0f, 120f, 44f);

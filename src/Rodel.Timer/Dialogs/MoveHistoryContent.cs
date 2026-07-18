@@ -60,9 +60,6 @@ public sealed partial class MoveHistoryContent : Control
         }
     }
 
-    /// <summary>The live persisted UI font family (reactive through the owning view).</summary>
-    private string FontFamily => _main.FontFamily;
-
     /// <summary>The selected target-folder index into the current folders.</summary>
     public partial int SelectedIndex { get; private set; }
 
@@ -75,7 +72,7 @@ public sealed partial class MoveHistoryContent : Control
         Stack(
             Text(
                 Resources.MoveToFolder,
-                new TextFormat(FontFamily, 13f, TextFormat.SemiBoldWeight),
+                new TextFormat(TextFormat.DefaultFontFamily, 13f, TextFormat.SemiBoldWeight),
                 Colors.TextFillColorSecondary),
             ComboBox(_folders.Select(f => f.Name))
                 .SelectedIndex(SelectedIndex)

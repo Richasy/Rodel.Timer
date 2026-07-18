@@ -7,9 +7,9 @@ namespace Rodel.Timer.Presentation;
 public static class TimerLinks
 {
     /// <summary>
-    /// The public, archived Work-Timer source repository on GitHub. Rodel Timer is a from-scratch successor whose own
-    /// source is not published; the settings "open source" link therefore points at the archived Work-Timer code (the
-    /// only public repository), and its label makes that explicit so it does not claim the private source is public.
+    /// The Rodel Timer source repository on GitHub. The project is open source, so the settings "open source" link
+    /// points at the app's own public repository. Kept here (rather than as an app-private constant) so a test can pin
+    /// the exact URL — a wrong link ships a 404 to store users.
     /// </summary>
-    public const string OpenSourceUri = "https://github.com/Richasy/Work-Timer";
+    public const string OpenSourceUri = "https://github.com/Richasy/Rodel.Timer";
 }

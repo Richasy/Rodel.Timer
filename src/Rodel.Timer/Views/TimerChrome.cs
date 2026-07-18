@@ -3,6 +3,7 @@ using Rodel.Timer.Core.History;
 using Rodel.Timer.Presentation;
 
 using Sprout;
+using Sprout.Controls;
 using Sprout.Theming;
 
 namespace Rodel.Timer;
@@ -31,27 +32,29 @@ public sealed class TimerChrome
         ShowSettings = main.ShowSettings;
         StartOrStop = main.StartOrStop;
         ToggleCompact = main.ToggleCompact;
-        ToggleFolderPane = main.ToggleFolderPane;
-        ToggleHistoryPane = main.ToggleHistoryPane;
         ShowAddFolderDialog = main.ShowAddFolderDialog;
         Retry = main.Retry;
         SetSessionTitle = main.SetSessionTitle;
         SelectFolder = main.SelectFolder;
-        ShowFolderMenu = main.ShowFolderMenu;
-        ShowHistoryMenu = main.ShowHistoryMenu;
+        BuildFolderContextMenu = main.BuildFolderContextMenu;
+        BuildHistoryContextMenu = main.BuildHistoryContextMenu;
+        ShowHistoryDetails = main.ShowHistoryDetailsDialog;
     }
 
     /// <summary>The live theme colours resolved from the hosting window's current theme.</summary>
     public ThemeColors Colors => _window.Theme.Colors;
-
-    /// <summary>The persisted UI font family applied to primary text (reactive).</summary>
-    public string FontFamily => _main.FontFamily;
 
     /// <summary>A monotonic stamp bumped on every theme or language change so slot controls re-resolve (reactive).</summary>
     public int ThemeStamp => _main.ThemeStamp;
 
     /// <summary>Whether the window is in the compact overlay presenter (reactive).</summary>
     public bool IsCompact => _main.IsCompactPresenter;
+
+    /// <summary>The current client width in effective pixels (reactive).</summary>
+    public double ViewportWidth => _main.ViewportWidth;
+
+    /// <summary>The current client height in effective pixels (reactive).</summary>
+    public double ViewportHeight => _main.ViewportHeight;
 
     /// <summary>The in-progress session title being edited (reactive, UI-only until a session stops).</summary>
     public string SessionTitle => _main.SessionTitle;
@@ -67,6 +70,18 @@ public sealed class TimerChrome
 
     /// <summary>The footer "today's total / target" summary line (reactive, culture-formatted).</summary>
     public string SummaryText => _main.SummaryText;
+
+    /// <summary>The footer's completed/target focus value (reactive, culture-formatted).</summary>
+    public string FocusSummaryText => _main.FocusSummaryText;
+
+    /// <summary>The requested window background and its active/fallback state (reactive).</summary>
+    public string BackgroundStatusText => _main.BackgroundStatusText;
+
+    /// <summary>Whether the requested window material is currently in its opaque policy fallback (reactive).</summary>
+    public bool IsBackgroundFallback => _main.IsBackgroundFallback;
+
+    /// <summary>Whether the hosting window's effective theme is dark — used to pick a dark/light material recipe.</summary>
+    public bool IsDarkTheme => _window.ActualTheme == ThemeMode.Dark;
 
     /// <summary>The current folders (reactive; a fresh reference on every store revision).</summary>
     public IReadOnlyList<TimerFolder> Folders => _main.Folders;
@@ -110,12 +125,6 @@ public sealed class TimerChrome
     /// <summary>Toggles the compact overlay presenter.</summary>
     public Action ToggleCompact { get; }
 
-    /// <summary>Toggles the folder pane.</summary>
-    public Action ToggleFolderPane { get; }
-
-    /// <summary>Toggles the history pane.</summary>
-    public Action ToggleHistoryPane { get; }
-
     /// <summary>Opens the add-folder dialog.</summary>
     public Action ShowAddFolderDialog { get; }
 
@@ -128,9 +137,12 @@ public sealed class TimerChrome
     /// <summary>Selects the folder with the given id.</summary>
     public Action<Guid> SelectFolder { get; }
 
-    /// <summary>Opens the command menu for the folder with the given id.</summary>
-    public Action<Guid> ShowFolderMenu { get; }
+    /// <summary>Builds a fresh context menu for a folder row.</summary>
+    public Func<Guid, MenuFlyout> BuildFolderContextMenu { get; }
 
-    /// <summary>Opens the command menu for the history entry with the given id.</summary>
-    public Action<Guid> ShowHistoryMenu { get; }
+    /// <summary>Builds a fresh context menu for a history row.</summary>
+    public Func<Guid, MenuFlyout> BuildHistoryContextMenu { get; }
+
+    /// <summary>Opens the session-details dialog for a history entry (a row left-click / invoke).</summary>
+    public Action<Guid> ShowHistoryDetails { get; }
 }

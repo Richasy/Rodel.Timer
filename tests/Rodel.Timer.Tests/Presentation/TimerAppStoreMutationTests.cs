@@ -21,6 +21,7 @@ public sealed class TimerAppStoreMutationTests
         AssertBumpsRevisionByOne(harness, store => store.AddFolder("Reading", TimerFolderIcon.Book));
         AssertBumpsRevisionByOne(harness, store => store.UpdateFolder(TimerStoreHarness.FolderAId, "Work!", TimerFolderIcon.Briefcase));
         AssertBumpsRevisionByOne(harness, store => store.UpdateTheme(TimerThemeMode.Dark));
+        AssertBumpsRevisionByOne(harness, store => store.UpdateBackground(TimerBackgroundMode.AcrylicThin));
         AssertBumpsRevisionByOne(harness, store => store.UpdateLanguage("zh-CN"));
         AssertBumpsRevisionByOne(harness, store => store.UpdateFontFamily("Consolas"));
         AssertBumpsRevisionByOne(harness, store => store.UpdateDailyTarget(120));
@@ -155,6 +156,7 @@ public sealed class TimerAppStoreMutationTests
         harness.LoadToReady();
 
         harness.Store.UpdateLanguage("zh-CN");
+        harness.Store.UpdateBackground(TimerBackgroundMode.AcrylicThin);
         harness.Store.UpdateFontFamily("Consolas");
         harness.Store.UpdateDailyTarget(120);
         harness.Store.UpdateLastSeenVersion("2.0.0");
@@ -162,6 +164,7 @@ public sealed class TimerAppStoreMutationTests
 
         TimerPreferences preferences = harness.Store.Preferences;
         Assert.AreEqual(TimerThemeMode.Dark, preferences.Theme);
+        Assert.AreEqual(TimerBackgroundMode.AcrylicThin, preferences.Background);
         Assert.AreEqual("zh-CN", preferences.Language);
         Assert.AreEqual("Consolas", preferences.FontFamily);
         Assert.AreEqual(120, preferences.DailyTargetMinutes);

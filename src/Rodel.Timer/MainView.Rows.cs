@@ -9,7 +9,6 @@ using Rodel.Timer.Styling;
 using Sprout;
 using Sprout.Graphics;
 using Sprout.Reconcile;
-using Sprout.Semantics;
 using Sprout.Theming;
 
 namespace Rodel.Timer;
@@ -33,36 +32,17 @@ public sealed partial class MainView
         TimerChrome chrome = _chrome;
         ThemeColors colors = chrome.Colors;
         TimerFolder folder = data.Folder;
-        bool selected = data.IsSelected;
-        Guid id = folder.Id;
         string created = folder.CreatedAt.LocalDateTime.ToString("d", CultureInfo.CurrentCulture);
         return new FolderRowView(
             folder.Name,
             created,
             FolderIconCatalog.Resolve(folder.Icon),
-            Brush.CreateSolid(colors.TextFillColorPrimary),
-            Brush.CreateSolid(colors.SubtleFillColorSecondary),
-            Brush.CreateSolid(selected ? colors.AccentFillColorDefault : colors.SubtleFillColorTransparent),
-            Brush.CreateSolid(selected ? colors.SubtleFillColorSecondary : colors.SubtleFillColorTransparent),
+            Brush.CreateSolid(colors.AccentTextFillColorPrimary),
+            Brush.CreateSolid(colors.AccentFillColorDefault.MultiplyAlpha(0.14f)),
             colors.TextFillColorPrimary,
             colors.TextFillColorSecondary,
-            new TextFormat(FontFamily, 14f, TextFormat.SemiBoldWeight),
-            new TextFormat(FontFamily, 12f, TextFormat.NormalWeight),
-            TimerVisuals.Ghost(colors),
-            TimerVisuals.Ghost(colors),
-            () => chrome.SelectFolder(id),
-            () => chrome.ShowFolderMenu(id),
-            new AutomationInfo
-            {
-                Name = folder.Name,
-                AutomationId = TimerAutomationIds.FolderSelect(id),
-                ItemStatus = selected ? Resources.CurrentFolder : null,
-            },
-            new AutomationInfo
-            {
-                Name = string.Format(CultureInfo.CurrentCulture, Resources.MoreActions, folder.Name),
-                AutomationId = TimerAutomationIds.FolderMore(id),
-            });
+            new TextFormat(TextFormat.DefaultFontFamily, 13f, TextFormat.SemiBoldWeight),
+            new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.NormalWeight));
     }
 
     /// <summary>Builds one history card from the projected row data + live theme state (the history list's row template).</summary>
@@ -79,30 +59,14 @@ public sealed partial class MainView
         TimerEntry entry = data.Entry;
         string duration = TimerFormat.Clock(TimeSpan.FromSeconds(entry.DurationSeconds));
         string created = entry.CreatedAt.LocalDateTime.ToString("g", CultureInfo.CurrentCulture);
-        Guid id = entry.Id;
-        string accessibleDescription = string.Format(
-            CultureInfo.CurrentCulture,
-            Resources.HistoryItemAccessibleDescription,
-            entry.Title,
-            duration,
-            created);
         return new HistoryRowView(
             entry.Title,
             $"{duration}  \u00B7  {created}",
             colors.TextFillColorPrimary,
             colors.TextFillColorSecondary,
-            new TextFormat(FontFamily, 14f, TextFormat.SemiBoldWeight),
-            new TextFormat(FontFamily, 12f, TextFormat.NormalWeight),
-            Brush.CreateSolid(colors.TextFillColorSecondary),
-            Brush.CreateSolid(colors.SubtleFillColorSecondary),
-            TimerVisuals.Ghost(colors),
-            () => chrome.ShowHistoryMenu(id),
-            new AutomationInfo
-            {
-                Name = string.Format(CultureInfo.CurrentCulture, Resources.MoreActions, entry.Title),
-                HelpText = accessibleDescription,
-                FullDescription = accessibleDescription,
-                AutomationId = TimerAutomationIds.HistoryMore(id),
-            });
+            new TextFormat(TextFormat.DefaultFontFamily, 13f, TextFormat.SemiBoldWeight),
+            new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.NormalWeight),
+            Brush.CreateSolid(colors.AccentTextFillColorPrimary),
+            Brush.CreateSolid(colors.AccentFillColorDefault.MultiplyAlpha(0.14f)));
     }
 }

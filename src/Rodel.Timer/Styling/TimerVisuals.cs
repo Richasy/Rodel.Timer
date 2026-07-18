@@ -56,8 +56,6 @@ internal static class TimerVisuals
         /// <summary>28 epx — a perfect circle for the 56 epx start / stop button (half its diameter).</summary>
         internal const float Circle = 28f;
 
-        /// <summary>25 epx — a perfect circle for the 50 epx compact start / stop button.</summary>
-        internal const float CompactCircle = 25f;
     }
 
     /// <summary>The standard control heights: 40 default, 36 icon / compact, 56 hero.</summary>
@@ -72,8 +70,9 @@ internal static class TimerVisuals
         /// <summary>56 epx — the hero start / stop circle diameter and the clock band.</summary>
         internal const float Hero = 56f;
 
-        /// <summary>50 epx — the compact-overlay start / stop circle diameter.</summary>
-        internal const float CompactStart = 50f;
+        /// <summary>64 epx — the open-stage primary start / stop action diameter (the prototype's roomier hero button).</summary>
+        internal const float PrimaryAction = 64f;
+
     }
 
     /// <summary>The icon glyph sizes: 16 small, 20 medium, 24 large, plus the 40 epx square row tile.</summary>
@@ -88,8 +87,8 @@ internal static class TimerVisuals
         /// <summary>24 epx — the primary action glyph (start / stop).</summary>
         internal const float Large = 24f;
 
-        /// <summary>40 epx — the square glyph tile that leads a folder / history row.</summary>
-        internal const float Tile = 40f;
+        /// <summary>36 epx — the square glyph tile that leads a folder / history row.</summary>
+        internal const float Tile = 36f;
     }
 
     /// <summary>The rolling-clock font sizes: 56 in the hero, 40 in the compact overlay.</summary>
@@ -111,6 +110,9 @@ internal static class TimerVisuals
         /// <summary>420 epx — the session-title input and the hero's inner content column.</summary>
         internal const float HeroColumn = 420f;
 
+        /// <summary>500 epx — the open-stage session-title field's maximum width (the prototype's <c>min(500, 100%)</c>).</summary>
+        internal const float SessionField = 500f;
+
         /// <summary>500 epx — the settings dialog content column.</summary>
         internal const float Dialog = 500f;
 
@@ -120,18 +122,16 @@ internal static class TimerVisuals
         /// <summary>360 epx — a wrapping caption (empty-state, message detail).</summary>
         internal const float Caption = 360f;
 
-        /// <summary>320 epx — the open pane width for both nested split views.</summary>
-        internal const float Pane = 320f;
     }
 
     /// <summary>The row geometry: fixed row extents and the selected-folder accent indicator size.</summary>
     internal static class Row
     {
-        /// <summary>72 epx — a folder row's extent.</summary>
-        internal const float Folder = 72f;
+        /// <summary>50 epx — a folder row's extent (36 tile + 2×7 padding, matching the prototype's <c>.folder-row</c>).</summary>
+        internal const float Folder = 50f;
 
-        /// <summary>76 epx — a history card's extent.</summary>
-        internal const float History = 76f;
+        /// <summary>50 epx — a history card's extent (36 tile + 2×7 padding, matching the prototype's <c>.history-row</c>).</summary>
+        internal const float History = 50f;
 
         /// <summary>The selected-folder left accent indicator width (3 epx).</summary>
         internal const float IndicatorWidth = 3f;
@@ -172,7 +172,5 @@ internal static class TimerVisuals
         /// <summary>The circular hero start / stop action — zero padding + the 28 epx radius (a perfect 56 epx pill).</summary>
         internal static readonly ButtonStyle CircularAction = default(ButtonStyle).Padding(0f).CornerRadius(Radius.Circle);
 
-        /// <summary>The circular compact-overlay start / stop action — zero padding + the 25 epx radius (a perfect 50 epx pill).</summary>
-        internal static readonly ButtonStyle CompactCircularAction = default(ButtonStyle).Padding(0f).CornerRadius(Radius.CompactCircle);
     }
 }

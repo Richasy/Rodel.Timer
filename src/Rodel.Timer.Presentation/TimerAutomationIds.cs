@@ -24,17 +24,23 @@ public static class TimerAutomationIds
     /// <summary>The enter/exit compact overlay button.</summary>
     public const string Compact = "RodelTimer.Main.Compact";
 
-    /// <summary>The footer folder-pane toggle.</summary>
+    /// <summary>The title-bar Folders drop-down button.</summary>
     public const string FoldersToggle = "RodelTimer.Main.FoldersToggle";
 
-    /// <summary>The footer history-pane toggle.</summary>
+    /// <summary>The title-bar History drop-down button.</summary>
     public const string HistoryToggle = "RodelTimer.Main.HistoryToggle";
 
-    /// <summary>The outer (folder) split view group.</summary>
-    public const string FoldersSplit = "RodelTimer.Main.FoldersSplit";
+    /// <summary>The Folders flyout Pane.</summary>
+    public const string FoldersFlyout = "RodelTimer.Folders.Flyout";
 
-    /// <summary>The inner (history) split view group.</summary>
-    public const string HistorySplit = "RodelTimer.Main.HistorySplit";
+    /// <summary>The Folders flyout content Group.</summary>
+    public const string FoldersFlyoutContent = "RodelTimer.Folders.Content";
+
+    /// <summary>The History flyout Pane.</summary>
+    public const string HistoryFlyout = "RodelTimer.History.Flyout";
+
+    /// <summary>The History flyout content Group.</summary>
+    public const string HistoryFlyoutContent = "RodelTimer.History.Content";
 
     /// <summary>The add-folder button in the folder pane.</summary>
     public const string AddFolder = "RodelTimer.Main.AddFolder";
@@ -47,6 +53,9 @@ public static class TimerAutomationIds
 
     /// <summary>The settings theme combo box.</summary>
     public const string SettingsTheme = "RodelTimer.Settings.Theme";
+
+    /// <summary>The settings window-background combo box.</summary>
+    public const string SettingsBackground = "RodelTimer.Settings.Background";
 
     /// <summary>The settings language combo box.</summary>
     public const string SettingsLanguage = "RodelTimer.Settings.Language";
@@ -72,11 +81,19 @@ public static class TimerAutomationIds
     public static string FolderSelect(Guid folderId) =>
         string.Create(CultureInfo.InvariantCulture, $"RodelTimer.Folder.{folderId:N}.Select");
 
-    /// <summary>Builds the id for a folder row's overflow ("more") button.</summary>
+    /// <summary>Builds the id for a folder row's context menu.</summary>
     /// <param name="folderId">The folder's identifier.</param>
     /// <returns>The unique automation id.</returns>
-    public static string FolderMore(Guid folderId) =>
-        string.Create(CultureInfo.InvariantCulture, $"RodelTimer.Folder.{folderId:N}.More");
+    public static string FolderMenu(Guid folderId) =>
+        string.Create(CultureInfo.InvariantCulture, $"RodelTimer.Folder.{folderId:N}.Menu");
+
+    /// <summary>Builds the id for a folder context menu's Edit command.</summary>
+    public static string FolderEdit(Guid folderId) =>
+        string.Create(CultureInfo.InvariantCulture, $"RodelTimer.Folder.{folderId:N}.Edit");
+
+    /// <summary>Builds the id for a folder context menu's Delete command.</summary>
+    public static string FolderDelete(Guid folderId) =>
+        string.Create(CultureInfo.InvariantCulture, $"RodelTimer.Folder.{folderId:N}.Delete");
 
     /// <summary>Builds the id for a history row's container.</summary>
     /// <param name="entryId">The history entry's identifier.</param>
@@ -84,9 +101,21 @@ public static class TimerAutomationIds
     public static string HistoryItem(Guid entryId) =>
         string.Create(CultureInfo.InvariantCulture, $"RodelTimer.History.{entryId:N}.Item");
 
-    /// <summary>Builds the id for a history row's overflow ("more") button.</summary>
+    /// <summary>Builds the id for a history row's context menu.</summary>
     /// <param name="entryId">The history entry's identifier.</param>
     /// <returns>The unique automation id.</returns>
-    public static string HistoryMore(Guid entryId) =>
-        string.Create(CultureInfo.InvariantCulture, $"RodelTimer.History.{entryId:N}.More");
+    public static string HistoryMenu(Guid entryId) =>
+        string.Create(CultureInfo.InvariantCulture, $"RodelTimer.History.{entryId:N}.Menu");
+
+    /// <summary>Builds the id for a history context menu's Move command.</summary>
+    public static string HistoryMove(Guid entryId) =>
+        string.Create(CultureInfo.InvariantCulture, $"RodelTimer.History.{entryId:N}.Move");
+
+    /// <summary>Builds the id for a history context menu's Edit command.</summary>
+    public static string HistoryEdit(Guid entryId) =>
+        string.Create(CultureInfo.InvariantCulture, $"RodelTimer.History.{entryId:N}.Edit");
+
+    /// <summary>Builds the id for a history context menu's Delete command.</summary>
+    public static string HistoryDelete(Guid entryId) =>
+        string.Create(CultureInfo.InvariantCulture, $"RodelTimer.History.{entryId:N}.Delete");
 }

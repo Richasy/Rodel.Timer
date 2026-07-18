@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <data name="AppName" xml:space="preserve"><value>工作計時器</value></data>
+  <data name="AppDescription" xml:space="preserve"><value>專注、簡潔的 Windows 正向計時器</value></data>
+  <data name="PreparingData" xml:space="preserve"><value>正在準備計時資料…</value></data>
+  <data name="DataLoadErrorTitle" xml:space="preserve"><value>工作計時器無法載入資料</value></data>
+  <data name="Folders" xml:space="preserve"><value>分組</value></data>
+  <data name="FoldersHelp" xml:space="preserve"><value>開啟計時器分組</value></data>
+  <data name="FoldersFlyoutSubtitle" xml:space="preserve"><value>選擇本次計時所屬的分組</value></data>
+  <data name="History" xml:space="preserve"><value>歷史記錄</value></data>
+  <data name="HistoryHelp" xml:space="preserve"><value>開啟當前分組的計時歷史</value></data>
+  <data name="HistoryFlyoutSubtitle" xml:space="preserve"><value>{0} · {1} 次會話</value></data>
+  <data name="HistoryFlyoutSubtitleOne" xml:space="preserve"><value>{0} · {1} 次會話</value></data>
+  <data name="Settings" xml:space="preserve"><value>設定</value></data>
+  <data name="SettingsHelp" xml:space="preserve"><value>主題、視窗背景、字型、語言和每日目標</value></data>
+  <data name="SessionTitle" xml:space="preserve"><value>計時標題</value></data>
+  <data name="SessionTitlePlaceholder" xml:space="preserve"><value>你正在做什麼？</value></data>
+  <data name="SessionTitleHelp" xml:space="preserve"><value>與本次計時一起儲存的標題</value></data>
+  <data name="UntitledSession" xml:space="preserve"><value>未命名</value></data>
+  <data name="StartTimer" xml:space="preserve"><value>開始計時</value></data>
+  <data name="StartTimerHelp" xml:space="preserve"><value>開始記錄當前任務的用時</value></data>
+  <data name="StopTimer" xml:space="preserve"><value>停止計時</value></data>
+  <data name="StopTimerHelp" xml:space="preserve"><value>停止計時並將完成的記錄新增到歷史</value></data>
+  <data name="TimerReady" xml:space="preserve"><value>準備就緒</value></data>
+  <data name="TimerRunning" xml:space="preserve"><value>計時中</value></data>
+  <data name="TimerStartedAnnouncement" xml:space="preserve"><value>已開始計時。</value></data>
+  <data name="TimerStoppedAnnouncement" xml:space="preserve"><value>已在 {0} 停止計時。</value></data>
+  <data name="HistoryAddedAnnouncement" xml:space="preserve"><value>已新增到歷史記錄。</value></data>
+  <data name="CurrentFolder" xml:space="preserve"><value>當前分組</value></data>
+  <data name="Today" xml:space="preserve"><value>今天</value></data>
+  <data name="DailyTarget" xml:space="preserve"><value>每日目標</value></data>
+  <data name="TodayTotal" xml:space="preserve"><value>今日累計</value></data>
+  <data name="TodaysFocus" xml:space="preserve"><value>今日專注</value></data>
+  <data name="MinutesUnit" xml:space="preserve"><value>分鐘</value></data>
+  <data name="CompactOverlay" xml:space="preserve"><value>緊湊懸浮窗</value></data>
+  <data name="ExitCompactOverlay" xml:space="preserve"><value>退出緊湊懸浮窗</value></data>
+  <data name="CompactOverlayHelp" xml:space="preserve"><value>在始終置頂的小視窗中僅顯示必要的計時控制元件</value></data>
+  <data name="AddFolder" xml:space="preserve"><value>新增分組</value></data>
+  <data name="AddFolderHelp" xml:space="preserve"><value>建立用於整理計時記錄的分組</value></data>
+  <data name="EditFolder" xml:space="preserve"><value>編輯分組</value></data>
+  <data name="EditHistory" xml:space="preserve"><value>編輯</value></data>
+  <data name="HistoryDetails" xml:space="preserve"><value>會話詳情</value></data>
+  <data name="RecordedAt" xml:space="preserve"><value>計時時間</value></data>
+  <data name="Comment" xml:space="preserve"><value>備註</value></data>
+  <data name="CommentPlaceholder" xml:space="preserve"><value>新增備註（可選）</value></data>
+  <data name="DeleteFolder" xml:space="preserve"><value>刪除分組</value></data>
+  <data name="FolderName" xml:space="preserve"><value>分組名稱</value></data>
+  <data name="FolderNamePlaceholder" xml:space="preserve"><value>為分組命名</value></data>
+  <data name="ChooseIcon" xml:space="preserve"><value>選擇圖示</value></data>
+  <data name="DefaultFolder" xml:space="preserve"><value>預設</value></data>
+  <data name="DeleteFolderTitle" xml:space="preserve"><value>刪除分組？</value></data>
+  <data name="DeleteFolderMessage" xml:space="preserve"><value>該分組中的所有計時歷史也會被刪除，此操作無法撤銷。</value></data>
+  <data name="LastFolderError" xml:space="preserve"><value>至少需要保留一個計時器分組。</value></data>
+  <data name="FolderAddedAnnouncement" xml:space="preserve"><value>已新增分組。</value></data>
+  <data name="FolderUpdatedAnnouncement" xml:space="preserve"><value>已更新分組。</value></data>
+  <data name="FolderDeletedAnnouncement" xml:space="preserve"><value>已刪除分組。</value></data>
+  <data name="NoHistory" xml:space="preserve"><value>這個分組還沒有計時記錄。</value></data>
+  <data name="MoveHistory" xml:space="preserve"><value>移動記錄</value></data>
+  <data name="MoveToFolder" xml:space="preserve"><value>移動到分組</value></data>
+  <data name="DeleteHistory" xml:space="preserve"><value>刪除記錄</value></data>
+  <data name="DeleteHistoryTitle" xml:space="preserve"><value>刪除這條記錄？</value></data>
+  <data name="DeleteHistoryMessage" xml:space="preserve"><value>這條計時歷史將被永久刪除。</value></data>
+  <data name="HistoryMovedAnnouncement" xml:space="preserve"><value>已移動記錄。</value></data>
+  <data name="HistoryUpdatedAnnouncement" xml:space="preserve"><value>已更新記錄。</value></data>
+  <data name="HistoryDeletedAnnouncement" xml:space="preserve"><value>已刪除記錄。</value></data>
+  <data name="Duration" xml:space="preserve"><value>用時</value></data>
+  <data name="Created" xml:space="preserve"><value>建立時間</value></data>
+  <data name="MoreActions" xml:space="preserve"><value>{0} 的更多操作</value></data>
+  <data name="FolderRowHelp" xml:space="preserve"><value>選擇此分組；透過上下文選單編輯或刪除</value></data>
+  <data name="HistoryRowHelp" xml:space="preserve"><value>透過上下文選單移動或刪除</value></data>
+  <data name="Theme" xml:space="preserve"><value>主題</value></data>
+  <data name="ThemeSystem" xml:space="preserve"><value>跟隨系統</value></data>
+  <data name="ThemeLight" xml:space="preserve"><value>淺色</value></data>
+  <data name="ThemeDark" xml:space="preserve"><value>深色</value></data>
+  <data name="Appearance" xml:space="preserve"><value>外觀</value></data>
+  <data name="Focus" xml:space="preserve"><value>專注</value></data>
+  <data name="Regional" xml:space="preserve"><value>區域</value></data>
+  <data name="About" xml:space="preserve"><value>關於</value></data>
+  <data name="WindowBackground" xml:space="preserve"><value>視窗背景</value></data>
+  <data name="WindowBackgroundDescription" xml:space="preserve"><value>選擇視窗畫布材質；效果不可用時顯示不透明的主題背景</value></data>
+  <data name="BackgroundMica" xml:space="preserve"><value>雲母</value></data>
+  <data name="BackgroundMicaAlt" xml:space="preserve"><value>雲母 Alt</value></data>
+  <data name="BackgroundAcrylic" xml:space="preserve"><value>亞克力</value></data>
+  <data name="BackgroundAcrylicThin" xml:space="preserve"><value>亞克力（Thin）</value></data>
+  <data name="BackgroundStatusMica" xml:space="preserve"><value>雲母</value></data>
+  <data name="BackgroundStatusMicaAlt" xml:space="preserve"><value>雲母 Alt</value></data>
+  <data name="BackgroundStatusAcrylic" xml:space="preserve"><value>亞克力</value></data>
+  <data name="BackgroundStatusAcrylicThin" xml:space="preserve"><value>亞克力（Thin）</value></data>
+  <data name="BackgroundStatusActive" xml:space="preserve"><value>已啟用</value></data>
+  <data name="BackgroundStatusFallback" xml:space="preserve"><value>回退</value></data>
+  <data name="Font" xml:space="preserve"><value>字型</value></data>
+  <data name="Language" xml:space="preserve"><value>語言</value></data>
+  <data name="LanguageEnglish" xml:space="preserve"><value>英語</value></data>
+  <data name="LanguageChinese" xml:space="preserve"><value>簡體中文</value></data>
+  <data name="LanguageTraditionalChinese" xml:space="preserve"><value>繁體中文</value></data>
+  <data name="DailyTargetMinutes" xml:space="preserve"><value>每日目標分鐘數</value></data>
+  <data name="OpenSourceHelp" xml:space="preserve"><value>在 GitHub 上開啟 Rodel Timer 的原始碼</value></data>
+  <data name="ThemeDescription" xml:space="preserve"><value>選擇應用的外觀</value></data>
+  <data name="LanguageDescription" xml:space="preserve"><value>設定顯示語言</value></data>
+  <data name="FontDescription" xml:space="preserve"><value>選擇應用使用的字型</value></data>
+  <data name="DailyTargetDescription" xml:space="preserve"><value>每天的專注目標（分鐘）</value></data>
+  <data name="OpenOnGitHub" xml:space="preserve"><value>在 GitHub 上開啟</value></data>
+  <data name="WhatsNewTitle" xml:space="preserve"><value>新版內容</value></data>
+  <data name="WhatsNewBody" xml:space="preserve"><value>工作計時器現已基於 Sprout 完整重寫，採用 Fluent Design，支援實時語言和主題切換、無障礙控制元件，並可安全遷移你現有的資料。</value></data>
+  <data name="Save" xml:space="preserve"><value>儲存</value></data>
+  <data name="Cancel" xml:space="preserve"><value>取消</value></data>
+  <data name="Delete" xml:space="preserve"><value>刪除</value></data>
+  <data name="Done" xml:space="preserve"><value>完成</value></data>
+  <data name="Retry" xml:space="preserve"><value>重試</value></data>
+  <data name="SaveFailed" xml:space="preserve"><value>無法儲存你的更改。</value></data>
+  <data name="MigrationWarnings" xml:space="preserve"><value>有 {0} 條遷移警告需要檢查。</value></data>
+  <data name="MigrationWarningsTitle" xml:space="preserve"><value>遷移警告</value></data>
+  <data name="HistoryItemAccessibleDescription" xml:space="preserve"><value>{0}，時長 {1}，記錄於 {2}</value></data>
+  <data name="SelectedIconStatus" xml:space="preserve"><value>已選圖示</value></data>
+  <data name="FolderIconActivity" xml:space="preserve"><value>活動</value></data>
+  <data name="FolderIconAirplay" xml:space="preserve"><value>隔空播放</value></data>
+  <data name="FolderIconAlertTriangle" xml:space="preserve"><value>警告</value></data>
+  <data name="FolderIconAnchor" xml:space="preserve"><value>錨點</value></data>
+  <data name="FolderIconAperture" xml:space="preserve"><value>光圈</value></data>
+  <data name="FolderIconArchive" xml:space="preserve"><value>歸檔</value></data>
+  <data name="FolderIconAward" xml:space="preserve"><value>獎盃</value></data>
+  <data name="FolderIconBarChart" xml:space="preserve"><value>柱狀圖</value></data>
+  <data name="FolderIconBarChart2" xml:space="preserve"><value>條形圖</value></data>
+  <data name="FolderIconBattery" xml:space="preserve"><value>電池</value></data>
+  <data name="FolderIconBluetooth" xml:space="preserve"><value>藍芽</value></data>
+  <data name="FolderIconBook" xml:space="preserve"><value>書籍</value></data>
+  <data name="FolderIconBookmark" xml:space="preserve"><value>書籤</value></data>
+  <data name="FolderIconBox" xml:space="preserve"><value>盒子</value></data>
+  <data name="FolderIconBriefcase" xml:space="preserve"><value>公文包</value></data>
+  <data name="FolderIconCalendar" xml:space="preserve"><value>日曆</value></data>
+  <data name="FolderIconCamera" xml:space="preserve"><value>相機</value></data>
+  <data name="FolderIconCast" xml:space="preserve"><value>投屏</value></data>
+  <data name="FolderIconChrome" xml:space="preserve"><value>瀏覽器</value></data>
+  <data name="FolderIconClipboard" xml:space="preserve"><value>剪貼簿</value></data>
+  <data name="FolderIconClock" xml:space="preserve"><value>時鐘</value></data>
+  <data name="FolderIconCloud" xml:space="preserve"><value>雲朵</value></data>
+  <data name="FolderIconCode" xml:space="preserve"><value>程式碼</value></data>
+  <data name="FolderIconCoffee" xml:space="preserve"><value>咖啡</value></data>
+  <data name="FolderIconCpu" xml:space="preserve"><value>處理器</value></data>
+  <data name="FolderIconCreditCard" xml:space="preserve"><value>信用卡</value></data>
+  <data name="FolderIconDisc" xml:space="preserve"><value>光碟</value></data>
+  <data name="FolderIconEdit" xml:space="preserve"><value>編輯</value></data>
+  <data name="FolderIconEye" xml:space="preserve"><value>眼睛</value></data>
+  <data name="FolderIconFacebook" xml:space="preserve"><value>社群</value></data>
+  <data name="FolderIconFeather" xml:space="preserve"><value>羽毛</value></data>
+  <data name="FolderIconFigma" xml:space="preserve"><value>設計</value></data>
+  <data name="FolderIconFile" xml:space="preserve"><value>檔案</value></data>
+  <data name="FolderIconFolder" xml:space="preserve"><value>資料夾</value></data>
+  <data name="FolderIconFramer" xml:space="preserve"><value>邊框</value></data>
+  <data name="FolderIconGift" xml:space="preserve"><value>禮物</value></data>
+  <data name="FolderIconHome" xml:space="preserve"><value>主頁</value></data>
+  <data name="FolderIconImage" xml:space="preserve"><value>圖片</value></data>
+  <data name="FolderIconInbox" xml:space="preserve"><value>收件箱</value></data>
+  <data name="FolderIconInfo" xml:space="preserve"><value>資訊</value></data>
+</root>

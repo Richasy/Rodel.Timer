@@ -5,8 +5,8 @@ using static Sprout.Markup;
 namespace Rodel.Timer;
 
 /// <summary>
-/// The central timer content hosted in the inner split view's content slot. It resolves every reactive input (the
-/// elapsed clock, the running / compact flags, the title, the summary, the folder name, the font, and the theme) from
+/// The resident timer content. It resolves every reactive input (viewport, elapsed clock, running / compact flags,
+/// title, footer state, folder name, and theme) from
 /// its stable <see cref="TimerChrome"/> surface, then branches on the compact-overlay flag: the full
 /// <see cref="NormalTimerView"/> (hero card + footer command dock) or the reduced <see cref="CompactTimerView"/> (only
 /// the clock, the start/stop circle, and an exit chip). The branch is a <c>When(IsCompact, …)</c> switch, so toggling
@@ -14,14 +14,7 @@ namespace Rodel.Timer;
 /// title and footer nodes are gone while compact, and return on exit. The brand / settings / compact command lives in
 /// the extended title bar (<see cref="TimerTitleBarControl"/>), not this content.
 /// </summary>
-/// <remarks>
-/// It is a <see cref="Control"/> (not a render-only value view) so the split view's <c>(Control, Control)</c> overload
-/// wires its interaction and semantics trees — every timer button is clickable, focusable, and screen-reader reachable.
-/// Because the normal branch carries several interactive children, each control gets its own hit bounds rather than
-/// inheriting a container's. Reading each reactive value here (rather than inside the branch views) subscribes this
-/// control's reactive effect, so a tick, a theme switch, or a title edit re-renders it in place and threads the fresh
-/// field values into the retained branch view.
-/// </remarks>
+/// <remarks>Reading every live value here subscribes this control and threads updates into the retained branch.</remarks>
 public sealed partial class TimerContentControl : Control
 {
     private readonly TimerChrome _chrome;
@@ -41,18 +34,27 @@ public sealed partial class TimerContentControl : Control
             new CompactTimerView(
                 _chrome,
                 Colors,
-                _chrome.FontFamily,
+                Rodel.Timer.Presentation.TimerCompactLayoutResolver.Resolve(
+                    _chrome.ViewportWidth,
+                    _chrome.ViewportHeight),
+                _chrome.SelectedFolderName,
                 _chrome.Elapsed,
                 _chrome.IsRunning),
             new NormalTimerView(
                 _chrome,
                 Colors,
-                _chrome.FontFamily,
+                Rodel.Timer.Presentation.TimerNormalLayoutResolver.Resolve(
+                    _chrome.ViewportWidth,
+                    _chrome.ViewportHeight),
                 _chrome.SelectedFolderName,
                 _chrome.Elapsed,
                 _chrome.IsRunning,
                 _chrome.SessionTitle,
-                _chrome.SummaryText)));
+                _chrome.FocusSummaryText,
+                _chrome.IsBackgroundFallback,
+                _chrome.BackgroundStatusText,
+                Resources.CurrentFolder,
+                Resources.TodaysFocus)));
 
     private Sprout.Theming.ThemeColors Colors
     {

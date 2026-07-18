@@ -1,0 +1,78 @@
+{
+  "schema": "sprout.devtools.orchestration.result.v1",
+  "run": {
+    "id": "20260716-162305-eefed9",
+    "status": "passed",
+    "startedUtc": "2026-07-16T16:23:05.3826397+00:00",
+    "durationMs": 511,
+    "toolVersion": "0.1.0",
+    "host": {
+      "os": "Windows 11",
+      "build": "26200",
+      "dpiAwareness": "PerMonitorV2",
+      "isolation": "none",
+      "developerMode": true
+    },
+    "app": {
+      "path": "C:\\Users\\zrich\\source\\repos\\Rodel.Timer-design-rework\\artifacts\\bin\\Rodel.Timer\\Debug\\net10.0-windows10.0.19041.0\\win-x64\\Rodel.Timer.exe",
+      "arguments": [
+        "--selftest"
+      ]
+    }
+  },
+  "tests": [
+    {
+      "id": "selftest",
+      "title": "App --selftest reports PASS with leaked=0",
+      "status": "passed",
+      "durationMs": 511,
+      "steps": [
+        {
+          "name": "launch",
+          "status": "passed"
+        },
+        {
+          "name": "runSelftest",
+          "status": "passed"
+        },
+        {
+          "name": "assert",
+          "status": "passed"
+        }
+      ],
+      "assertions": [
+        {
+          "kind": "stdoutToken",
+          "status": "passed",
+          "expected": "=\u003E PASS",
+          "actual": "=\u003E PASS"
+        },
+        {
+          "kind": "leak",
+          "status": "passed",
+          "expected": "leaked=0",
+          "actual": "leaked=0"
+        },
+        {
+          "kind": "exitCode",
+          "status": "passed",
+          "expected": "0",
+          "actual": "0"
+        }
+      ],
+      "artifacts": [
+        {
+          "kind": "stdout",
+          "path": "selftest-stdout.txt",
+          "sha256": "eaa9849e3e1f881ec4cb3e91930ff0e92cb6a257aa0577e564f24d56cfa6e51d"
+        },
+        {
+          "kind": "stderr",
+          "path": "selftest-stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    }
+  ],
+  "artifactsRoot": "C:\\Users\\zrich\\source\\repos\\Rodel.Timer-design-rework\\.sprout-devtools\\20260716-162305-eefed9"
+}

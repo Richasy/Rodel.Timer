@@ -346,6 +346,21 @@ public sealed partial class TimerAppStore
         CommitMutation();
     }
 
+    /// <summary>Replaces the title and comment of the history entry identified by <paramref name="entryId"/>.</summary>
+    /// <param name="entryId">The entry to update.</param>
+    /// <param name="title">The new title. Must not be null, empty, or whitespace-only.</param>
+    /// <param name="comment">The new comment, or <see langword="null"/>/whitespace to clear it.</param>
+    /// <exception cref="KeyNotFoundException"><paramref name="entryId"/> does not exist.</exception>
+    /// <exception cref="ArgumentException"><paramref name="title"/> is null, empty, or whitespace-only.</exception>
+    /// <exception cref="InvalidOperationException">The workspace has not been loaded, or the store is closing.</exception>
+    /// <exception cref="ObjectDisposedException">The store has been disposed.</exception>
+    public void UpdateEntry(Guid entryId, string title, string? comment)
+    {
+        EnsureMutable();
+        Workspace.UpdateEntry(entryId, title, comment);
+        CommitMutation();
+    }
+
     /// <summary>Removes the history entry identified by <paramref name="entryId"/>.</summary>
     /// <param name="entryId">The entry to remove.</param>
     /// <exception cref="KeyNotFoundException"><paramref name="entryId"/> does not exist.</exception>
@@ -368,6 +383,25 @@ public sealed partial class TimerAppStore
         TimerPreferences current = Workspace.Preferences;
         Workspace.UpdatePreferences(new TimerPreferences(
             theme,
+            current.Background,
+            current.Language,
+            current.FontFamily,
+            current.DailyTargetMinutes,
+            current.LastSeenVersion));
+        CommitMutation();
+    }
+
+    /// <summary>Sets the preferred window background/material, preserving every other preference.</summary>
+    /// <param name="background">The new background mode.</param>
+    /// <exception cref="InvalidOperationException">The workspace has not been loaded, or the store is closing.</exception>
+    /// <exception cref="ObjectDisposedException">The store has been disposed.</exception>
+    public void UpdateBackground(TimerBackgroundMode background)
+    {
+        EnsureMutable();
+        TimerPreferences current = Workspace.Preferences;
+        Workspace.UpdatePreferences(new TimerPreferences(
+            current.Theme,
+            background,
             current.Language,
             current.FontFamily,
             current.DailyTargetMinutes,
@@ -387,6 +421,7 @@ public sealed partial class TimerAppStore
         TimerPreferences current = Workspace.Preferences;
         Workspace.UpdatePreferences(new TimerPreferences(
             current.Theme,
+            current.Background,
             language,
             current.FontFamily,
             current.DailyTargetMinutes,
@@ -406,6 +441,7 @@ public sealed partial class TimerAppStore
         TimerPreferences current = Workspace.Preferences;
         Workspace.UpdatePreferences(new TimerPreferences(
             current.Theme,
+            current.Background,
             current.Language,
             fontFamily,
             current.DailyTargetMinutes,
@@ -424,6 +460,7 @@ public sealed partial class TimerAppStore
         TimerPreferences current = Workspace.Preferences;
         Workspace.UpdatePreferences(new TimerPreferences(
             current.Theme,
+            current.Background,
             current.Language,
             current.FontFamily,
             dailyTargetMinutes,
@@ -441,6 +478,7 @@ public sealed partial class TimerAppStore
         TimerPreferences current = Workspace.Preferences;
         Workspace.UpdatePreferences(new TimerPreferences(
             current.Theme,
+            current.Background,
             current.Language,
             current.FontFamily,
             current.DailyTargetMinutes,

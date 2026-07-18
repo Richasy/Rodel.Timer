@@ -202,6 +202,19 @@ public sealed class TimerWorkspace
         }
     }
 
+    /// <summary>Replaces the title and comment of the history entry identified by <paramref name="entryId"/>.</summary>
+    /// <param name="entryId">The entry to update.</param>
+    /// <param name="title">The new title. Must not be null, empty, or whitespace-only.</param>
+    /// <param name="comment">The new comment, or <see langword="null"/>/whitespace to clear it.</param>
+    /// <exception cref="KeyNotFoundException"><paramref name="entryId"/> does not exist.</exception>
+    /// <exception cref="ArgumentException"><paramref name="title"/> is null, empty, or whitespace-only.</exception>
+    public void UpdateEntry(Guid entryId, string title, string? comment)
+    {
+        int index = FindEntryIndex(entryId);
+        TimerEntry entry = _entries[index];
+        _entries[index] = new TimerEntry(entry.Id, entry.FolderId, title, entry.DurationSeconds, entry.CreatedAt, comment);
+    }
+
     /// <summary>Returns every history entry belonging to <paramref name="folderId"/>.</summary>
     /// <param name="folderId">The folder whose entries to return. Must already exist.</param>
     /// <returns>The entries belonging to the folder, in no particular order.</returns>

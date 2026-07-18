@@ -8,6 +8,7 @@ using Rodel.Timer.Presentation;
 
 using Sprout.Controls;
 using Sprout.Graphics;
+using Sprout.Popups;
 using Sprout.Semantics;
 using Sprout.Widgets;
 
@@ -19,26 +20,87 @@ namespace Rodel.Timer;
 public sealed partial class MainView
 {
     /// <summary>The current product version, compared against the persisted last-seen version for the what's-new dialog.</summary>
-    private const string CurrentVersion = "2.0.0";
+    internal const string CurrentVersion = "2.0.0";
 
-    /// <summary>Opens the per-folder command menu (edit / delete) anchored at the invoking control.</summary>
-    /// <param name="folderId">The folder the menu acts on.</param>
-    public void ShowFolderMenu(Guid folderId)
+    /// <summary>
+    /// The version shown on the About surface. When the app is packaged this is the installed <b>package identity</b>
+    /// version (the full four-part <c>Major.Minor.Build.Revision</c>, straight from <c>Package.appxmanifest</c> via
+    /// <c>Package.Current.Id.Version</c>), so it can never drift from the shipped package; an unpackaged developer build
+    /// has no package identity and falls back to <see cref="CurrentVersion"/> normalized to four parts. Resolved once —
+    /// the package version does not change while the app runs.
+    /// </summary>
+    internal static string DisplayVersion { get; } = ResolveDisplayVersion();
+
+    private static string ResolveDisplayVersion()
     {
-        var menu = new MenuFlyout(
-            new MenuFlyoutItem(Resources.EditFolder, () => ShowEditFolderDialog(folderId)),
-            new MenuFlyoutItem(Resources.DeleteFolder, () => ConfirmDeleteFolder(folderId)));
-        menu.ShowAt(_window);
+        if (Sprout.PackageIdentity.IsPackaged)
+        {
+            Windows.ApplicationModel.PackageVersion version = Windows.ApplicationModel.Package.Current.Id.Version;
+            return $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
+        }
+
+        // An unpackaged developer build has no package identity — normalize the product const to four parts so the
+        // displayed shape matches the packaged app (which reads the four-part manifest version).
+        System.Version parsed = System.Version.Parse(CurrentVersion);
+        return $"{parsed.Major}.{parsed.Minor}.{(parsed.Build < 0 ? 0 : parsed.Build)}.{(parsed.Revision < 0 ? 0 : parsed.Revision)}";
     }
 
-    /// <summary>Opens the per-session command menu (move / delete) anchored at the invoking control.</summary>
-    /// <param name="entryId">The history entry the menu acts on.</param>
-    public void ShowHistoryMenu(Guid entryId)
+    /// <summary>Builds a fresh per-folder context menu from the latest store state.</summary>
+    /// <param name="folderId">The folder the menu acts on.</param>
+    /// <returns>The owned child menu for the row context gesture.</returns>
+    public MenuFlyout BuildFolderContextMenu(Guid folderId)
     {
-        var menu = new MenuFlyout(
-            new MenuFlyoutItem(Resources.MoveHistory, () => ShowMoveHistoryDialog(entryId)),
-            new MenuFlyoutItem(Resources.DeleteHistory, () => ConfirmDeleteHistory(entryId)));
-        menu.ShowAt(_window);
+        TimerFolder folder = _store.Folders.FirstOrDefault(candidate => candidate.Id == folderId)
+            ?? throw new KeyNotFoundException($"Folder '{folderId}' does not exist.");
+        var edit = new MenuFlyoutItem(Resources.EditFolder, () => ShowEditFolderDialog(folderId))
+        {
+            Automation = new AutomationInfo { AutomationId = TimerAutomationIds.FolderEdit(folderId) },
+        };
+        var delete = new MenuFlyoutItem(Resources.DeleteFolder, () => ConfirmDeleteFolder(folderId))
+        {
+            IsEnabled = _store.Folders.Count > 1,
+            Automation = new AutomationInfo { AutomationId = TimerAutomationIds.FolderDelete(folderId) },
+        };
+        return new MenuFlyout(edit, delete)
+        {
+            Placement = PopupPlacement.RightEdgeAlignedTop,
+        }
+            .Automation(new AutomationInfo
+            {
+                Name = FormatOne(Resources.MoreActions, folder.Name),
+                AutomationId = TimerAutomationIds.FolderMenu(folderId),
+            });
+    }
+
+    /// <summary>Builds a fresh per-session context menu from the latest store state.</summary>
+    /// <param name="entryId">The history entry the menu acts on.</param>
+    /// <returns>The owned child menu for the row context gesture.</returns>
+    public MenuFlyout BuildHistoryContextMenu(Guid entryId)
+    {
+        TimerEntry entry = _store.Entries.FirstOrDefault(candidate => candidate.Id == entryId)
+            ?? throw new KeyNotFoundException($"History entry '{entryId}' does not exist.");
+        var edit = new MenuFlyoutItem(Resources.EditHistory, () => ShowHistoryDetailsDialog(entryId))
+        {
+            Automation = new AutomationInfo { AutomationId = TimerAutomationIds.HistoryEdit(entryId) },
+        };
+        var move = new MenuFlyoutItem(Resources.MoveHistory, () => ShowMoveHistoryDialog(entryId))
+        {
+            IsEnabled = _store.Folders.Count > 1,
+            Automation = new AutomationInfo { AutomationId = TimerAutomationIds.HistoryMove(entryId) },
+        };
+        var delete = new MenuFlyoutItem(Resources.DeleteHistory, () => ConfirmDeleteHistory(entryId))
+        {
+            Automation = new AutomationInfo { AutomationId = TimerAutomationIds.HistoryDelete(entryId) },
+        };
+        return new MenuFlyout(edit, move, delete)
+        {
+            Placement = PopupPlacement.RightEdgeAlignedTop,
+        }
+            .Automation(new AutomationInfo
+            {
+                Name = FormatOne(Resources.MoreActions, entry.Title),
+                AutomationId = TimerAutomationIds.HistoryMenu(entryId),
+            });
     }
 
     /// <summary>Opens the add-folder dialog and adds the folder on commit.</summary>
@@ -59,7 +121,9 @@ public sealed partial class MainView
                 PrimaryButtonText = Resources.Save,
                 CloseButtonText = Resources.Cancel,
                 DefaultButton = ContentDialogButton.Primary,
+                IsPrimaryButtonEnabled = false,
             };
+            content.NameChanged += name => dialog.IsPrimaryButtonEnabled = !string.IsNullOrWhiteSpace(name);
             dialog.PrimaryButtonClick += args =>
             {
                 if (string.IsNullOrWhiteSpace(content.FolderName))
@@ -99,7 +163,9 @@ public sealed partial class MainView
                 PrimaryButtonText = Resources.Save,
                 CloseButtonText = Resources.Cancel,
                 DefaultButton = ContentDialogButton.Primary,
+                IsPrimaryButtonEnabled = !string.IsNullOrWhiteSpace(folder.Name),
             };
+            content.NameChanged += name => dialog.IsPrimaryButtonEnabled = !string.IsNullOrWhiteSpace(name);
             dialog.PrimaryButtonClick += args =>
             {
                 if (string.IsNullOrWhiteSpace(content.FolderName))
@@ -192,6 +258,49 @@ public sealed partial class MainView
             {
                 _store.MoveEntry(entryId, content.SelectedFolderId);
                 Announce(Resources.HistoryMovedAnnouncement);
+            }
+        }
+        catch (Exception exception) when (IsDataException(exception))
+        {
+            ShowSaveError(exception.Message);
+        }
+    }
+
+    /// <summary>Opens the session-details dialog and applies the edited title/comment on commit.</summary>
+    /// <param name="entryId">The history entry to show and edit.</param>
+    public async void ShowHistoryDetailsDialog(Guid entryId)
+    {
+        if (!_store.Bootstrap.IsSuccess || !TryGetEntry(entryId, out TimerEntry entry))
+        {
+            return;
+        }
+
+        try
+        {
+            string folderName = TryGetFolder(entry.FolderId, out TimerFolder folder) ? folder.Name : string.Empty;
+            var content = new HistoryDetailsContent(this, entry, folderName);
+            var dialog = new ContentDialog
+            {
+                Title = Resources.HistoryDetails,
+                ContentComponent = () => content,
+                PrimaryButtonText = Resources.Save,
+                CloseButtonText = Resources.Cancel,
+                DefaultButton = ContentDialogButton.Primary,
+                IsPrimaryButtonEnabled = !string.IsNullOrWhiteSpace(entry.Title),
+            }.Automation(new AutomationInfo { AutomationId = "RodelTimer.HistoryDetails.Dialog" });
+            content.TitleChanged += title => dialog.IsPrimaryButtonEnabled = !string.IsNullOrWhiteSpace(title);
+            dialog.PrimaryButtonClick += args =>
+            {
+                if (string.IsNullOrWhiteSpace(content.Title))
+                {
+                    args.Cancel = true;
+                }
+            };
+
+            if (await dialog.ShowAsync(_window).ConfigureAwait(true) == ContentDialogResult.Primary)
+            {
+                _store.UpdateEntry(entryId, content.Title.Trim(), content.Comment);
+                Announce(Resources.HistoryUpdatedAnnouncement);
             }
         }
         catch (Exception exception) when (IsDataException(exception))
@@ -352,8 +461,8 @@ public sealed partial class MainView
     private static bool IsDataException(Exception exception) =>
         exception is TimerDataException or IOException or UnauthorizedAccessException;
 
-    private TextFormat BodyStyle =>
-        new(FontFamily, 14f, TextFormat.NormalWeight, TextAlignment.Leading, TextWrapping.Wrap);
+    private static TextFormat BodyStyle =>
+        new(TextFormat.DefaultFontFamily, 14f, TextFormat.NormalWeight, TextAlignment.Leading, TextWrapping.Wrap);
 
     private bool TryGetFolder(Guid folderId, out TimerFolder folder)
     {

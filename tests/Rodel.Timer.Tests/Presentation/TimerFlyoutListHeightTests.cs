@@ -1,0 +1,87 @@
+using Rodel.Timer.Presentation;
+
+namespace Rodel.Timer.Tests.Presentation;
+
+/// <summary>
+/// The folder/history flyout list is given a DEFINITE height equal to its EXACT content while it fits, then capped.
+/// The inner ScrollView is a viewport window that fills the height it is given, so the exact-content height makes the
+/// viewport equal the content and the scroll offset (content − viewport, in epx) exactly zero — the list hugs with no
+/// empty tail (round-10) and the conscious scrollbar never reveals on hover for a list that fits (round-11). Past the
+/// cap the height stays pinned so the viewport is smaller than the content and the list scrolls internally (round-7).
+/// </summary>
+[TestClass]
+public sealed class TimerFlyoutListHeightTests
+{
+    private const float Delta = 0.01f;
+
+    [TestMethod]
+    public void EmptyList_UsesTheEmptyStateMinimum()
+    {
+        // 0 rows (content 12) sits below the 80 minimum that holds the centered empty-state text.
+        Assert.AreEqual(
+            TimerAnchoredSurfaceLayoutResolver.MinimumListHeight,
+            TimerAnchoredSurfaceLayoutResolver.ListHeight(0),
+            Delta);
+    }
+
+    [TestMethod]
+    public void OneRow_HugsItsContent_NotTheEmptyStateMinimum()
+    {
+        // A single row hugs its own content (54 + 12 = 66) rather than padding out to the empty-state minimum — the
+        // round-10 complaint that a one-folder flyout showed a big empty bottom margin inconsistent with the other edges.
+        float height = TimerAnchoredSurfaceLayoutResolver.ListHeight(1);
+
+        Assert.AreEqual(66f, height, Delta);
+        Assert.IsLessThan(TimerAnchoredSurfaceLayoutResolver.MinimumListHeight, height);
+    }
+
+    [TestMethod]
+    public void MidList_HugsItsContentExactly()
+    {
+        // 4 rows = 4*54 + 12 = 228, strictly between the min and the cap → the exact content height (a hug, no tail).
+        // Because the viewport then equals the content, the scroll offset is exactly zero, so no scrollbar reveals.
+        float height = TimerAnchoredSurfaceLayoutResolver.ListHeight(4);
+
+        Assert.AreEqual(228f, height, Delta);
+        Assert.IsGreaterThan(TimerAnchoredSurfaceLayoutResolver.MinimumListHeight, height);
+        Assert.IsLessThan(TimerAnchoredSurfaceLayoutResolver.MaximumListHeight, height);
+    }
+
+    [TestMethod]
+    [DataRow(6)]
+    [DataRow(12)]
+    [DataRow(35)]
+    public void LongList_CapsAtTheMaximumSoItScrolls(int rowCount)
+    {
+        // From 6 rows (336) upward the content exceeds the cap, so the list caps and the ItemsView scrolls internally.
+        Assert.AreEqual(
+            TimerAnchoredSurfaceLayoutResolver.MaximumListHeight,
+            TimerAnchoredSurfaceLayoutResolver.ListHeight(rowCount),
+            Delta);
+    }
+
+    [TestMethod]
+    public void ListHeight_IsMonotonicFromOneRowUntilTheCap()
+    {
+        // A hug means each extra row (from the first, until the cap) makes the surface taller — never shorter. (0 rows
+        // is the empty-state minimum, a separate case that can sit above a tight one-row list.)
+        float previous = TimerAnchoredSurfaceLayoutResolver.ListHeight(1);
+        for (int rowCount = 2; rowCount <= 40; rowCount++)
+        {
+            float height = TimerAnchoredSurfaceLayoutResolver.ListHeight(rowCount);
+            Assert.IsGreaterThanOrEqualTo(previous, height, $"height regressed at {rowCount} rows: {height} < {previous}");
+            previous = height;
+        }
+    }
+
+    [TestMethod]
+    public void MaximumList_LeavesRoomForTheHeaderUnderTheSurfaceCap()
+    {
+        // The list cap must leave room for the flyout header + divider under the surface maximum, so the surface never
+        // itself clips the list — the list scrolls internally instead of the whole flyout being cut off.
+        Assert.IsLessThan(
+            TimerAnchoredSurfaceLayoutResolver.MaximumHeight,
+            TimerAnchoredSurfaceLayoutResolver.MaximumListHeight,
+            "the list cap must sit below the surface cap so the header fits above the list");
+    }
+}

@@ -6,16 +6,19 @@
   <resheader name="version">
     <value>2.0</value>
   </resheader>
-  <data name="AppName" xml:space="preserve"><value>Rodel Timer</value></data>
+  <data name="AppName" xml:space="preserve"><value>Working Timer</value></data>
   <data name="AppDescription" xml:space="preserve"><value>A focused forward timer for Windows</value></data>
   <data name="PreparingData" xml:space="preserve"><value>Preparing your timer data…</value></data>
-  <data name="DataLoadErrorTitle" xml:space="preserve"><value>Rodel Timer could not load its data</value></data>
+  <data name="DataLoadErrorTitle" xml:space="preserve"><value>Working Timer could not load its data</value></data>
   <data name="Folders" xml:space="preserve"><value>Folders</value></data>
-  <data name="FoldersHelp" xml:space="preserve"><value>Show or hide the timer folders</value></data>
+  <data name="FoldersHelp" xml:space="preserve"><value>Open the timer folders</value></data>
+  <data name="FoldersFlyoutSubtitle" xml:space="preserve"><value>Choose where this session belongs</value></data>
   <data name="History" xml:space="preserve"><value>History</value></data>
-  <data name="HistoryHelp" xml:space="preserve"><value>Show or hide the current folder's timer history</value></data>
+  <data name="HistoryHelp" xml:space="preserve"><value>Open the current folder's timer history</value></data>
+  <data name="HistoryFlyoutSubtitle" xml:space="preserve"><value>{0} · {1} sessions</value></data>
+  <data name="HistoryFlyoutSubtitleOne" xml:space="preserve"><value>{0} · {1} session</value></data>
   <data name="Settings" xml:space="preserve"><value>Settings</value></data>
-  <data name="SettingsHelp" xml:space="preserve"><value>Theme, language, font, and daily target</value></data>
+  <data name="SettingsHelp" xml:space="preserve"><value>Theme, background, font, language, and daily target</value></data>
   <data name="SessionTitle" xml:space="preserve"><value>Session title</value></data>
   <data name="SessionTitlePlaceholder" xml:space="preserve"><value>What are you working on?</value></data>
   <data name="SessionTitleHelp" xml:space="preserve"><value>The title saved with this timer session</value></data>
@@ -33,6 +36,7 @@
   <data name="Today" xml:space="preserve"><value>Today</value></data>
   <data name="DailyTarget" xml:space="preserve"><value>Daily target</value></data>
   <data name="TodayTotal" xml:space="preserve"><value>Today's total</value></data>
+  <data name="TodaysFocus" xml:space="preserve"><value>Today's focus</value></data>
   <data name="MinutesUnit" xml:space="preserve"><value>min</value></data>
   <data name="CompactOverlay" xml:space="preserve"><value>Compact overlay</value></data>
   <data name="ExitCompactOverlay" xml:space="preserve"><value>Exit compact overlay</value></data>
@@ -40,6 +44,11 @@
   <data name="AddFolder" xml:space="preserve"><value>Add folder</value></data>
   <data name="AddFolderHelp" xml:space="preserve"><value>Create a folder for organizing timer sessions</value></data>
   <data name="EditFolder" xml:space="preserve"><value>Edit folder</value></data>
+  <data name="EditHistory" xml:space="preserve"><value>Edit</value></data>
+  <data name="HistoryDetails" xml:space="preserve"><value>Session details</value></data>
+  <data name="RecordedAt" xml:space="preserve"><value>Recorded</value></data>
+  <data name="Comment" xml:space="preserve"><value>Comment</value></data>
+  <data name="CommentPlaceholder" xml:space="preserve"><value>Add a note (optional)</value></data>
   <data name="DeleteFolder" xml:space="preserve"><value>Delete folder</value></data>
   <data name="FolderName" xml:space="preserve"><value>Folder name</value></data>
   <data name="FolderNamePlaceholder" xml:space="preserve"><value>Name this folder</value></data>
@@ -58,28 +67,47 @@
   <data name="DeleteHistoryTitle" xml:space="preserve"><value>Delete this session?</value></data>
   <data name="DeleteHistoryMessage" xml:space="preserve"><value>This timer history entry will be permanently deleted.</value></data>
   <data name="HistoryMovedAnnouncement" xml:space="preserve"><value>Session moved.</value></data>
+  <data name="HistoryUpdatedAnnouncement" xml:space="preserve"><value>Session updated.</value></data>
   <data name="HistoryDeletedAnnouncement" xml:space="preserve"><value>Session deleted.</value></data>
   <data name="Duration" xml:space="preserve"><value>Duration</value></data>
   <data name="Created" xml:space="preserve"><value>Created</value></data>
   <data name="MoreActions" xml:space="preserve"><value>More actions for {0}</value></data>
+  <data name="FolderRowHelp" xml:space="preserve"><value>Select this folder; open its context menu for Edit and Delete</value></data>
+  <data name="HistoryRowHelp" xml:space="preserve"><value>Open the context menu for Move and Delete</value></data>
   <data name="Theme" xml:space="preserve"><value>Theme</value></data>
   <data name="ThemeSystem" xml:space="preserve"><value>Use system setting</value></data>
   <data name="ThemeLight" xml:space="preserve"><value>Light</value></data>
   <data name="ThemeDark" xml:space="preserve"><value>Dark</value></data>
+  <data name="Appearance" xml:space="preserve"><value>Appearance</value></data>
+  <data name="Focus" xml:space="preserve"><value>Focus</value></data>
+  <data name="Regional" xml:space="preserve"><value>Regional</value></data>
+  <data name="About" xml:space="preserve"><value>About</value></data>
+  <data name="WindowBackground" xml:space="preserve"><value>Window background</value></data>
+  <data name="WindowBackgroundDescription" xml:space="preserve"><value>Choose the window canvas material; unavailable effects use an opaque theme surface</value></data>
+  <data name="BackgroundMica" xml:space="preserve"><value>Mica</value></data>
+  <data name="BackgroundMicaAlt" xml:space="preserve"><value>Mica Alt</value></data>
+  <data name="BackgroundAcrylic" xml:space="preserve"><value>Acrylic</value></data>
+  <data name="BackgroundAcrylicThin" xml:space="preserve"><value>Acrylic Thin</value></data>
+  <data name="BackgroundStatusMica" xml:space="preserve"><value>Mica</value></data>
+  <data name="BackgroundStatusMicaAlt" xml:space="preserve"><value>Mica Alt</value></data>
+  <data name="BackgroundStatusAcrylic" xml:space="preserve"><value>Acrylic</value></data>
+  <data name="BackgroundStatusAcrylicThin" xml:space="preserve"><value>Acrylic Thin</value></data>
+  <data name="BackgroundStatusActive" xml:space="preserve"><value>Active</value></data>
+  <data name="BackgroundStatusFallback" xml:space="preserve"><value>Fallback</value></data>
   <data name="Font" xml:space="preserve"><value>Font</value></data>
   <data name="Language" xml:space="preserve"><value>Language</value></data>
   <data name="LanguageEnglish" xml:space="preserve"><value>English</value></data>
   <data name="LanguageChinese" xml:space="preserve"><value>Simplified Chinese</value></data>
+  <data name="LanguageTraditionalChinese" xml:space="preserve"><value>Traditional Chinese</value></data>
   <data name="DailyTargetMinutes" xml:space="preserve"><value>Daily target in minutes</value></data>
-  <data name="OpenSource" xml:space="preserve"><value>Archived Work-Timer source</value></data>
-  <data name="OpenSourceHelp" xml:space="preserve"><value>Open the archived Work-Timer source code on GitHub</value></data>
+  <data name="OpenSourceHelp" xml:space="preserve"><value>Open the Rodel Timer source code on GitHub</value></data>
   <data name="ThemeDescription" xml:space="preserve"><value>Choose how the app looks</value></data>
   <data name="LanguageDescription" xml:space="preserve"><value>Set the display language</value></data>
   <data name="FontDescription" xml:space="preserve"><value>Pick the font used across the app</value></data>
   <data name="DailyTargetDescription" xml:space="preserve"><value>Your daily focus goal in minutes</value></data>
   <data name="OpenOnGitHub" xml:space="preserve"><value>Open on GitHub</value></data>
   <data name="WhatsNewTitle" xml:space="preserve"><value>What's new</value></data>
-  <data name="WhatsNewBody" xml:space="preserve"><value>Rodel Timer is a complete Sprout-based rewrite with Fluent Design, live language and theme switching, accessible controls, and safe migration of your existing Work-Timer data.</value></data>
+  <data name="WhatsNewBody" xml:space="preserve"><value>Working Timer is a complete Sprout-based rewrite with Fluent Design, live language and theme switching, accessible controls, and safe migration of your existing data.</value></data>
   <data name="Save" xml:space="preserve"><value>Save</value></data>
   <data name="Cancel" xml:space="preserve"><value>Cancel</value></data>
   <data name="Delete" xml:space="preserve"><value>Delete</value></data>

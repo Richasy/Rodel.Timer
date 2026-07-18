@@ -5,8 +5,10 @@ using Sprout;
 using Sprout.Controls;
 using Sprout.Graphics;
 using Sprout.Layout;
+using Sprout.Popups;
 using Sprout.Reconcile;
 using Sprout.Semantics;
+using Sprout.Styling;
 using Sprout.Theming;
 using Sprout.Widgets;
 
@@ -15,44 +17,69 @@ using static Sprout.Markup;
 namespace Rodel.Timer;
 
 /// <summary>
-/// The window title-bar band content — hosted with <see cref="Window.SetTitleBarContent(Control)"/> so it draws in the
-/// extended caption band (left of the system caption buttons) and its two command buttons are carved out of the drag
-/// region automatically. It resolves the live theme and language from the shared <see cref="TimerChrome"/> surface, then
-/// branches on the compact-overlay flag: while normal it shows the reactive <see cref="TimerTitleBarView"/> (brand glyph
-/// + app name + compact + settings buttons); while compact the whole band is torn out of all three trees by a
-/// <c>When(!IsCompact, …)</c> switch, so the compact presenter's collapsed 32 epx band exposes no interactive node.
+/// Owns the extended-title-bar band and the two stable anchored Flyouts. The content factories build a fresh surface per
+/// open, while each DropDownButton and Flyout controller keeps identity across responsive label changes.
 /// </summary>
-/// <remarks>
-/// A dedicated <see cref="Control"/> is the correct shape here (not a superfluous composite): it is the
-/// <see cref="Window.SetTitleBarContent(Control)"/> three-tree / drag carve-out boundary, and it owns the reactive
-/// theme-resolve effect. Reading each reactive value here (rather than inside the branch view) subscribes this control's
-/// effect, so a theme switch, a language change, or entering / leaving compact re-renders the band in place. The band
-/// carries <b>two</b> interactive children (compact + settings), so the projected Group gives each button its own hit
-/// bounds — the "single settings node inherits the whole caption band" bug cannot recur.
-/// </remarks>
 public sealed partial class TimerTitleBarControl : Control
 {
-    private readonly TimerChrome _chrome;
+    private static readonly FlyoutStyle AnchoredSurfaceStyle = default(FlyoutStyle)
+        .Padding(0f)
+        .MinWidth(TimerAnchoredSurfaceLayoutResolver.Width)
+        .MaxWidth(TimerAnchoredSurfaceLayoutResolver.Width)
+        .MaxHeight(TimerAnchoredSurfaceLayoutResolver.MaximumHeight);
 
-    /// <summary>Creates the title-bar band over its command-and-read surface.</summary>
-    /// <param name="chrome">The plain command-and-read surface (callbacks + live state + colours).</param>
-    /// <exception cref="ArgumentNullException"><paramref name="chrome"/> is <see langword="null"/>.</exception>
+    private readonly TimerChrome _chrome;
+    private readonly Flyout _foldersFlyout;
+    private readonly Flyout _historyFlyout;
+
+    /// <summary>Creates the title-bar band and its stable anchored surfaces.</summary>
+    /// <param name="chrome">The live read-and-command surface.</param>
     public TimerTitleBarControl(TimerChrome chrome)
     {
         _chrome = chrome ?? throw new ArgumentNullException(nameof(chrome));
+
+        _foldersFlyout = new Flyout(close =>
+            new FolderPaneControl(_chrome, close).Automation(FoldersContentAutomation))
+        {
+            Placement = PopupPlacement.BottomEdgeAlignedLeft,
+            ShouldConstrainToRootBounds = true,
+        }
+            .Style(AnchoredSurfaceStyle)
+            .Automation(FoldersFlyoutAutomation);
+
+        _historyFlyout = new Flyout(_ =>
+            new HistoryPaneControl(_chrome).Automation(HistoryContentAutomation))
+        {
+            Placement = PopupPlacement.BottomEdgeAlignedLeft,
+            ShouldConstrainToRootBounds = true,
+        }
+            .Style(AnchoredSurfaceStyle)
+            .Automation(HistoryFlyoutAutomation);
     }
 
-    /// <summary>The brand + command band while normal; nothing while the compact overlay is active.</summary>
+    /// <summary>The normal title-bar band, removed entirely while the compact-overlay presenter is active.</summary>
     public Ui Body => Overlay(
         When(
-            !_chrome.IsCompact,
+            Layout.IsVisible,
             new TimerTitleBarView(
                 _chrome,
+                Relabel(_foldersFlyout, FoldersFlyoutAutomation),
+                Relabel(_historyFlyout, HistoryFlyoutAutomation),
                 Colors,
-                _chrome.FontFamily,
-                Resources.AppName)));
+                Layout.ShowBrandLabel,
+                Layout.ShowCommandLabels,
+                Resources.AppName),
+            new CompactTimerTitleBarView(_chrome, Colors)));
 
-    private Sprout.Theming.ThemeColors Colors
+    // Re-apply a stable anchored flyout's UIA pane Name (read fresh from the current language) each time this body is
+    // evaluated, so a language switch — which re-runs the body — relabels the flyout on its next open. Flyout.Automation
+    // just stores the info that is read at open time, and the flyout instances themselves are constructed once as fields.
+    private static Flyout Relabel(Flyout flyout, AutomationInfo automation) => flyout.Automation(automation);
+
+    private TimerTitleBarLayout Layout =>
+        TimerTitleBarLayoutResolver.Resolve(_chrome.ViewportWidth, _chrome.IsCompact);
+
+    private ThemeColors Colors
     {
         get
         {
@@ -60,51 +87,171 @@ public sealed partial class TimerTitleBarControl : Control
             return _chrome.Colors;
         }
     }
+
+    private static AutomationInfo FoldersFlyoutAutomation => new()
+    {
+        Name = Resources.Folders,
+        AutomationId = TimerAutomationIds.FoldersFlyout,
+    };
+
+    private static AutomationInfo FoldersContentAutomation => new()
+    {
+        Name = Resources.Folders,
+        AutomationId = TimerAutomationIds.FoldersFlyoutContent,
+    };
+
+    private static AutomationInfo HistoryFlyoutAutomation => new()
+    {
+        Name = Resources.History,
+        AutomationId = TimerAutomationIds.HistoryFlyout,
+    };
+
+    private static AutomationInfo HistoryContentAutomation => new()
+    {
+        Name = Resources.History,
+        AutomationId = TimerAutomationIds.HistoryFlyoutContent,
+    };
+}
+
+/// <summary>The compact title-bar's fixed leading Exit command; the remaining band stays draggable.</summary>
+[Composite]
+public readonly partial record struct CompactTimerTitleBarView(
+    TimerChrome Chrome,
+    ThemeColors Colors)
+{
+    /// <summary>Exit at the leading edge; the native compact presenter owns Close at the far edge.</summary>
+    public Ui Body => Stack(
+        Button(
+            Icon.Fluent(
+                FluentSymbol.ContractDownLeft,
+                FluentIconVariant.Regular,
+                TimerVisuals.IconSize.Small,
+                Brush.CreateSolid(Colors.TextFillColorPrimary)),
+            Chrome.ToggleCompact,
+            TimerVisuals.Ghost(Colors))
+            .Style(TimerVisuals.Buttons.Icon)
+            .Width(28f)
+            .Height(28f)
+            .VAlign(VerticalAlignment.Center)
+            .ToolTip(Resources.ExitCompactOverlay)
+            .Automation(ExitAutomation))
+        .Orientation(Orientation.Horizontal)
+        .Padding(TimerVisuals.Spacing.XSmall, 0f);
+
+    internal static AutomationInfo ExitAutomation => new()
+    {
+        Name = Resources.ExitCompactOverlay,
+        HelpText = Resources.CompactOverlayHelp,
+        AutomationId = TimerAutomationIds.Compact,
+    };
+}
+
+/// <summary>The stable icon-plus-collapsible-label content of a title-bar DropDownButton.</summary>
+[Composite]
+public readonly partial record struct TimerTitleBarDropDownContentView(
+    FluentSymbol Symbol,
+    string Label,
+    Brush IconBrush,
+    Color LabelInk,
+    bool ShowLabel)
+{
+    /// <summary>The glyph and optional label; the DropDownButton owns its decorative chevron.</summary>
+    public Ui Body => Stack(
+        Icon.Fluent(Symbol, FluentIconVariant.Regular, TimerVisuals.IconSize.Medium, IconBrush)
+            .VAlign(VerticalAlignment.Center),
+        Text(
+            Label,
+            new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.NormalWeight),
+            LabelInk)
+            .VAlign(VerticalAlignment.Center)
+            .Visible(ShowLabel))
+        .Orientation(Orientation.Horizontal)
+        .Spacing(6f);
 }
 
 /// <summary>
-/// The extended title-bar row — a leading brand glyph, the product name, a weighted drag spacer, and the trailing
-/// compact + settings icon buttons (each 36×36, radius 8, ghost palette), laid out left of the system caption buttons.
-/// It is a render-only <c>[Composite]</c> value view whose reactive inputs are supplied by the host
-/// <see cref="TimerTitleBarControl"/> as record fields, so a theme switch or a language change reconciles it in place.
+/// The extended title-bar row: brand and anchored Folders/History commands at the leading edge, an untouched drag
+/// region, then compact/settings commands before the system caption buttons.
 /// </summary>
-/// <remarks>
-/// The empty band area (the brand glyph, the app-name label, and the weighted gap) carries no interaction node, so it
-/// stays part of the window drag region; only the two buttons carve out interaction leaves. The row paints no
-/// background so the window's Mica / theme band shows through.
-/// </remarks>
-/// <param name="Chrome">The command surface (settings + compact toggle).</param>
-/// <param name="Colors">The live theme palette resolved by the host.</param>
-/// <param name="FontFamily">The UI font family applied to the app name.</param>
-/// <param name="AppName">The product name shown beside the brand glyph.</param>
 [Composite]
 public readonly partial record struct TimerTitleBarView(
     TimerChrome Chrome,
+    Flyout FoldersFlyout,
+    Flyout HistoryFlyout,
     ThemeColors Colors,
-    string FontFamily,
+    bool ShowBrandLabel,
+    bool ShowCommandLabels,
     string AppName)
 {
-    /// <summary>The brand glyph, the app name, a weighted drag spacer, and the compact + settings buttons.</summary>
+    /// <summary>The responsive extended-title-bar content.</summary>
     public Ui Body => Stack(
-        Icon.Fluent(FluentSymbol.Timer, FluentIconVariant.Regular, TimerVisuals.IconSize.Medium, Brush.CreateSolid(Colors.AccentTextFillColorPrimary))
-            .VAlign(VerticalAlignment.Center),
-        Text(
-            AppName,
-            new TextFormat(FontFamily, 14f, TextFormat.SemiBoldWeight),
-            Colors.TextFillColorPrimary)
+        Stack(
+            Icon.Image(TimerAssets.AppLogoHandle())
+                .Width(TimerVisuals.IconSize.Medium)
+                .Height(TimerVisuals.IconSize.Medium)
+                .VAlign(VerticalAlignment.Center),
+            Text(
+                AppName,
+                new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight),
+                Colors.TextFillColorPrimary)
+                .VAlign(VerticalAlignment.Center)
+                .Visible(ShowBrandLabel),
+            DropDownButton(
+                new TimerTitleBarDropDownContentView(
+                    FluentSymbol.FolderList,
+                    Resources.Folders,
+                    Brush.CreateSolid(Colors.TextFillColorPrimary),
+                    Colors.TextFillColorPrimary,
+                    ShowCommandLabels),
+                FoldersFlyout)
+                .Style(CommandStyle)
+                .Palette(TimerVisuals.Ghost(Colors))
+                .MinWidth(TimerVisuals.Height.Icon)
+                .Height(TimerVisuals.Height.Icon)
+                .VAlign(VerticalAlignment.Center)
+                .AccessKey("F")
+                .ToolTip(ShowCommandLabels ? null : Resources.Folders)
+                .Automation(FoldersAutomation),
+            DropDownButton(
+                new TimerTitleBarDropDownContentView(
+                    FluentSymbol.History,
+                    Resources.History,
+                    Brush.CreateSolid(Colors.TextFillColorPrimary),
+                    Colors.TextFillColorPrimary,
+                    ShowCommandLabels),
+                HistoryFlyout)
+                .Style(CommandStyle)
+                .Palette(TimerVisuals.Ghost(Colors))
+                .MinWidth(TimerVisuals.Height.Icon)
+                .Height(TimerVisuals.Height.Icon)
+                .VAlign(VerticalAlignment.Center)
+                .AccessKey("H")
+                .ToolTip(ShowCommandLabels ? null : Resources.History)
+                .Automation(HistoryAutomation))
+            .Orientation(Orientation.Horizontal)
+            .Spacing(TimerVisuals.Spacing.Small)
             .VAlign(VerticalAlignment.Center)
             .Weight(1f),
         Button(
-            Icon.Fluent(FluentSymbol.PictureInPictureEnter, FluentIconVariant.Regular, TimerVisuals.IconSize.Medium, Brush.CreateSolid(Colors.TextFillColorPrimary)),
+            Icon.Fluent(
+                FluentSymbol.ContractUpRight,
+                FluentIconVariant.Regular,
+                TimerVisuals.IconSize.Medium,
+                Brush.CreateSolid(Colors.TextFillColorPrimary)),
             Chrome.ToggleCompact,
             TimerVisuals.Ghost(Colors))
             .Style(TimerVisuals.Buttons.Icon)
             .Width(TimerVisuals.Height.Icon)
             .Height(TimerVisuals.Height.Icon)
             .VAlign(VerticalAlignment.Center)
+            .ToolTip(Resources.CompactOverlay)
             .Automation(CompactAutomation),
         Button(
-            Icon.Fluent(FluentSymbol.Settings, FluentIconVariant.Regular, TimerVisuals.IconSize.Medium, Brush.CreateSolid(Colors.TextFillColorPrimary)),
+            Icon.Fluent(
+                FluentSymbol.Settings,
+                FluentIconVariant.Regular,
+                TimerVisuals.IconSize.Medium,
+                Brush.CreateSolid(Colors.TextFillColorPrimary)),
             Chrome.ShowSettings,
             TimerVisuals.Ghost(Colors))
             .Style(TimerVisuals.Buttons.Icon)
@@ -112,10 +259,39 @@ public readonly partial record struct TimerTitleBarView(
             .Height(TimerVisuals.Height.Icon)
             .VAlign(VerticalAlignment.Center)
             .AccessKey("S")
+            .ToolTip(Resources.Settings)
             .Automation(SettingsAutomation))
         .Orientation(Orientation.Horizontal)
         .Spacing(TimerVisuals.Spacing.Small)
         .Padding(TimerVisuals.Spacing.Medium, 0f, TimerVisuals.Spacing.Small, 0f);
+
+    /// <summary>
+    /// The title-bar command drop-down style. WinUI DropDownButtons size to their content, so the buttons carry only a
+    /// <see cref="TimerVisuals.Height.Icon"/> minimum width (a fixed width clipped the icon + label + chevron), the native
+    /// 4 epx control corner, and the control's own decorative chevron (shown only with the label). The zero horizontal
+    /// padding in icon-only mode centres the lone glyph in the minimum-width square.
+    /// </summary>
+    internal DropDownButtonStyle CommandStyle =>
+        default(DropDownButtonStyle)
+            .Padding(ShowCommandLabels ? 11f : 0f, 5f)
+            .CornerRadius(TimerVisuals.Radius.App)
+            .ChevronVisible(ShowCommandLabels);
+
+    internal static AutomationInfo FoldersAutomation => new()
+    {
+        Name = Resources.Folders,
+        HelpText = Resources.FoldersHelp,
+        AutomationId = TimerAutomationIds.FoldersToggle,
+        AccessKey = "F",
+    };
+
+    internal static AutomationInfo HistoryAutomation => new()
+    {
+        Name = Resources.History,
+        HelpText = Resources.HistoryHelp,
+        AutomationId = TimerAutomationIds.HistoryToggle,
+        AccessKey = "H",
+    };
 
     internal static AutomationInfo SettingsAutomation => new()
     {
