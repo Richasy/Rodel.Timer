@@ -10,6 +10,7 @@
 [![.NET](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white)](#-build--run)
 [![NativeAOT](https://img.shields.io/badge/NativeAOT-single%20binary-2ea44f)](#-build--run)
 [![UI](https://img.shields.io/badge/UI-Sprout-1f6feb)](https://github.com/Richasy/Sprout)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 [![Get it from the Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download-0078D6?logo=microsoftstore&logoColor=white)](https://apps.microsoft.com/detail/9N71W9G714RK)
 
@@ -141,6 +142,12 @@ dotnet publish src\Rodel.Timer\Rodel.Timer.csproj -c Release -r win-x64
 
 `dotnet publish` emits the NativeAOT executable and a signed MSIX package under
 `artifacts/bin/Rodel.Timer/Release/.../publish`.
+
+---
+
+## 📄 License
+
+Working Timer is open source under the [MIT License](LICENSE).
 
 ---
 

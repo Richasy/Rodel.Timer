@@ -10,6 +10,7 @@
 [![.NET](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white)](#-构建与运行)
 [![NativeAOT](https://img.shields.io/badge/NativeAOT-single%20binary-2ea44f)](#-构建与运行)
 [![UI](https://img.shields.io/badge/UI-Sprout-1f6feb)](https://github.com/Richasy/Sprout)
+[![许可证](https://img.shields.io/badge/许可证-MIT-yellow.svg)](LICENSE)
 
 [![从 Microsoft Store 获取](https://img.shields.io/badge/Microsoft%20Store-下载-0078D6?logo=microsoftstore&logoColor=white)](https://apps.microsoft.com/detail/9N71W9G714RK)
 
@@ -132,6 +133,12 @@ dotnet publish src\Rodel.Timer\Rodel.Timer.csproj -c Release -r win-x64
 ```
 
 `dotnet publish` 会在 `artifacts/bin/Rodel.Timer/Release/.../publish` 下产出 NativeAOT 可执行文件与已签名的 MSIX 包。
+
+---
+
+## 📄 许可证
+
+Working Timer 基于 [MIT 许可证](LICENSE) 开源。
 
 ---
 
