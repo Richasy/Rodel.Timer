@@ -113,11 +113,49 @@ public sealed partial class MainView
 
     /// <summary>
     /// Applies the language everywhere <b>except</b> persistence — the shared core of the runtime switch and the
-    /// persisted-load path. Routing both through <see cref="LanguageApply.Apply"/> guarantees the theme-revision bump
-    /// (which re-values the already-mounted, same-key rows into the new language) can never be dropped from one path.
+    /// persisted-load path. The stored preference may be a concrete tag or the follow-system sentinel; it is resolved
+    /// to the effective concrete language here (against the OS preferred language) before applying. Routing both paths
+    /// through <see cref="LanguageApply.Apply"/> guarantees the theme-revision bump can never be dropped from one path.
     /// </summary>
-    /// <param name="language">The BCP-47 language tag to apply.</param>
-    private void ApplyLanguageCore(string language) => LanguageApply.Apply(this, language);
+    /// <param name="preferenceLanguage">The stored language preference (a concrete tag or the follow-system sentinel).</param>
+    private void ApplyLanguageCore(string preferenceLanguage) =>
+        LanguageApply.Apply(this, LanguageResolver.ResolveEffective(preferenceLanguage, OsCulture()));
+
+    /// <summary>
+    /// Re-resolves and re-applies the language when the OS preferred UI language changes at runtime — but only while the
+    /// user's preference is "follow system"; a pinned concrete language is left untouched. The OS value is read from
+    /// <see cref="Application.SystemLanguage"/> (authoritative), so it is correct even though the app has pinned the
+    /// thread culture to the previously-applied language.
+    /// </summary>
+    public void OnSystemLanguageChanged()
+    {
+        if (LanguageResolver.IsFollowSystem(_store.Preferences.Language))
+        {
+            ApplyLanguageCore(TimerPreferences.SystemLanguage);
+        }
+    }
+
+    // The OS preferred UI language as a culture, read from the framework's authoritative, uncached SystemLanguage
+    // (not CultureInfo.CurrentUICulture, which the app pins to the applied language). Falls back to CurrentUICulture if
+    // the framework value is unavailable (e.g. a headless test with no running Application).
+    private static System.Globalization.CultureInfo OsCulture()
+    {
+        try
+        {
+            string tag = Application.Current.SystemLanguage;
+            if (!string.IsNullOrWhiteSpace(tag))
+            {
+                return System.Globalization.CultureInfo.GetCultureInfo(tag);
+            }
+        }
+        catch (Exception exception)
+            when (exception is InvalidOperationException or System.Globalization.CultureNotFoundException)
+        {
+            // No running Application (headless test) or an unrecognized tag — fall back below.
+        }
+
+        return System.Globalization.CultureInfo.CurrentUICulture;
+    }
 
     /// <summary>Applies all persisted presentation preferences once the workspace has loaded, then announces readiness.</summary>
     public void OnDataLoaded()

@@ -24,6 +24,13 @@ public sealed record TimerPreferences
     /// <summary>The supported Traditional Chinese language tag.</summary>
     public const string TraditionalChineseLanguage = "zh-Hant";
 
+    /// <summary>
+    /// The sentinel <see cref="Language"/> value meaning "follow the OS preferred UI language" — the language twin of
+    /// <see cref="TimerThemeMode.System"/>. Not a BCP-47 tag: the app resolves it to a supported concrete language at
+    /// apply time (and re-resolves live when the OS language changes), so the localizer never sees this value.
+    /// </summary>
+    public const string SystemLanguage = "system";
+
     /// <summary>Creates a preferences record, normalizing <paramref name="language"/> and <paramref name="fontFamily"/>.</summary>
     /// <param name="theme">The preferred theme.</param>
     /// <param name="background">The preferred window background/material.</param>
@@ -97,6 +104,11 @@ public sealed record TimerPreferences
     private static string NormalizeLanguage(string language)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(language);
+
+        if (string.Equals(language, SystemLanguage, StringComparison.OrdinalIgnoreCase))
+        {
+            return SystemLanguage;
+        }
 
         if (string.Equals(language, EnglishLanguage, StringComparison.OrdinalIgnoreCase))
         {

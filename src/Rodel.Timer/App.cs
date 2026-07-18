@@ -1,3 +1,4 @@
+using Rodel.Timer.AppData;
 using Rodel.Timer.Core.Bootstrap;
 using Rodel.Timer.Core.Migration;
 using Rodel.Timer.Core.Persistence;
@@ -37,6 +38,7 @@ public sealed class App : Application, IDisposable
     /// <inheritdoc/>
     protected override void OnLaunched(LaunchEventArgs e)
     {
+        string? savedPlacement = WindowPlacementStore.Load();
         _window = OpenWindow(new WindowSpec
         {
             Title = Resources.AppName,
@@ -44,6 +46,7 @@ public sealed class App : Application, IDisposable
             MinSize = new Size(480f, 460f),
             TitleBarHeight = TitleBarHeight.Tall,
             SystemBackdrop = SystemBackdrop.Mica,
+            Placement = WindowPlacement.TryParse(savedPlacement, out WindowPlacement restored) ? restored : null,
         });
 
         TimerDataBootstrapper bootstrapper = Services.GetRequiredService<TimerDataBootstrapper>();
@@ -64,6 +67,7 @@ public sealed class App : Application, IDisposable
         _window.ActualThemeChanged += OnActualThemeChanged;
         _window.Closing += OnClosing;
         _window.Closed += OnClosed;
+        SystemLanguageChanged += OnSystemLanguageChanged;
 
         SyncBackground();
         _window.SetContent(_mainView);
@@ -118,8 +122,19 @@ public sealed class App : Application, IDisposable
         _mainView.NotifyThemeChanged();
     }
 
+    // The OS preferred UI language changed at runtime — let the view re-resolve + re-apply, but only while the user's
+    // language preference is "follow system" (it no-ops for a pinned concrete language), mirroring the theme's
+    // ActualThemeChanged flow.
+    private void OnSystemLanguageChanged(object? sender, SystemLanguageChangedEventArgs e) =>
+        _mainView.OnSystemLanguageChanged();
+
     private async void OnClosing(object? sender, WindowClosingEventArgs e)
     {
+        // Capture the window placement while the HWND still exists (the Closing event fires before teardown), so the
+        // window reopens where the user left it. Saved on every pass — a deferred close that stays open on a save error
+        // simply re-captures the latest placement on the next attempt.
+        WindowPlacementStore.Save(_window.SavePlacement().Serialize());
+
         if (_forceClose)
         {
             return;

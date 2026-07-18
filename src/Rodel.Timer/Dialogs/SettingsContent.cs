@@ -124,7 +124,7 @@ public sealed partial class SettingsSectionsControl : Control
             .WrapThreshold(SettingsContent.CardWrapThreshold),
         SettingsCard(
             Resources.Language,
-            ComboBox([Resources.LanguageEnglish, Resources.LanguageChinese, Resources.LanguageTraditionalChinese])
+            ComboBox([Resources.LanguageSystem, Resources.LanguageEnglish, Resources.LanguageChinese, Resources.LanguageTraditionalChinese])
                 .SelectedIndex(_chrome.LanguageIndex)
                 .OnSelectionChanged(_chrome.LanguageChanged)
                 .FaceplateSizing(ComboBoxFaceplateSizing.SelectedItem)
@@ -217,8 +217,9 @@ public sealed partial class SettingsContent : Control
         BackgroundIndex = (int)preferences.Background;
         LanguageIndex = preferences.Language switch
         {
-            TimerPreferences.ChineseLanguage => 1,
-            TimerPreferences.TraditionalChineseLanguage => 2,
+            TimerPreferences.EnglishLanguage => 1,
+            TimerPreferences.ChineseLanguage => 2,
+            TimerPreferences.TraditionalChineseLanguage => 3,
             _ => 0,
         };
         FontIndex = ResolveFontIndex(preferences.FontFamily);
@@ -328,9 +329,10 @@ public sealed partial class SettingsContent : Control
         LanguageIndex = index;
         string language = index switch
         {
-            1 => TimerPreferences.ChineseLanguage,
-            2 => TimerPreferences.TraditionalChineseLanguage,
-            _ => TimerPreferences.EnglishLanguage,
+            1 => TimerPreferences.EnglishLanguage,
+            2 => TimerPreferences.ChineseLanguage,
+            3 => TimerPreferences.TraditionalChineseLanguage,
+            _ => TimerPreferences.SystemLanguage,
         };
         _main.ApplyLanguage(language);
         _onLanguageChanged?.Invoke();
