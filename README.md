@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/assets/logo.png" width="104" alt="Working Timer logo" />
+<img src="docs/assets/logo.png" width="96" alt="Working Timer logo" />
 
 # Working Timer
 
@@ -10,6 +10,8 @@
 [![.NET](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white)](#-build--run)
 [![NativeAOT](https://img.shields.io/badge/NativeAOT-single%20binary-2ea44f)](#-build--run)
 [![UI](https://img.shields.io/badge/UI-Sprout-1f6feb)](https://github.com/Richasy/Sprout)
+
+**English** · [简体中文](README.zh-CN.md)
 
 </div>
 
