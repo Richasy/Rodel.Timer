@@ -15,7 +15,8 @@
   <data name="FoldersFlyoutSubtitle" xml:space="preserve"><value>Choose where this session belongs</value></data>
   <data name="History" xml:space="preserve"><value>History</value></data>
   <data name="HistoryHelp" xml:space="preserve"><value>Open the current folder's timer history</value></data>
-  <data name="HistoryFlyoutSubtitle" xml:space="preserve"><value>{0} · Today</value></data>
+  <data name="HistoryFlyoutSubtitle" xml:space="preserve"><value>{0} · {1} sessions</value></data>
+  <data name="HistoryFlyoutSubtitleOne" xml:space="preserve"><value>{0} · {1} session</value></data>
   <data name="Settings" xml:space="preserve"><value>Settings</value></data>
   <data name="SettingsHelp" xml:space="preserve"><value>Theme, background, font, language, and daily target</value></data>
   <data name="SessionTitle" xml:space="preserve"><value>Session title</value></data>

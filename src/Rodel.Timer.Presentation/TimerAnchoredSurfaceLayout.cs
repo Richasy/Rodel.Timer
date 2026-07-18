@@ -26,11 +26,13 @@ public static class TimerAnchoredSurfaceLayoutResolver
     public const float MaximumListHeight = 320f;
 
     /// <summary>
-    /// The definite height for a folder/history list of <paramref name="rowCount"/> rows. It HUGS the content (no
-    /// empty tail) until the content would exceed <see cref="MaximumListHeight"/>, then caps there so the ItemsView
-    /// scroller activates: a definite height makes the composite measure TIGHT, and the OverlayPanel measures its
-    /// child loosely against that maximum, so the inner ScrollView sees a bounded viewport &lt; content and scrolls.
-    /// A bare MaxHeight cap does not achieve this — an unbounded measure leaves the viewport equal to the content.
+    /// The DEFINITE list height for a folder/history list of <paramref name="rowCount"/> rows. The inner ScrollView is a
+    /// viewport window that FILLS the height it is given, so this must be the EXACT content height while the list fits:
+    /// the viewport then equals the content and <see cref="MaximumListHeight"/> scroll offset (content − viewport, in
+    /// epx) is exactly zero, so the conscious scrollbar never reveals on hover for a list that fits (the round-11
+    /// complaint) and there is no empty tail (the round-10 complaint — a bare MaxHeight cap fills to the cap instead).
+    /// Past the cap the height stays pinned at <see cref="MaximumListHeight"/> so the viewport is smaller than the
+    /// content and the list scrolls internally (the round-7 requirement).
     /// </summary>
     /// <param name="rowCount">The number of rows in the list (0 yields the empty-state minimum).</param>
     /// <returns>The definite list height in epx.</returns>

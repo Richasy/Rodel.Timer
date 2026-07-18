@@ -148,8 +148,15 @@ public sealed partial class HistoryPaneControl : Control
         "Performance",
         "CA1863:Use 'CompositeFormat'",
         Justification = "The format string is live-localized and must not be cached across a language switch.")]
-    internal string HistorySubtitle =>
-        string.Format(CultureInfo.CurrentCulture, Resources.HistoryFlyoutSubtitle, _chrome.SelectedFolderName);
+    internal string HistorySubtitle
+    {
+        get
+        {
+            int count = _chrome.HistoryRows.Count;
+            string format = count == 1 ? Resources.HistoryFlyoutSubtitleOne : Resources.HistoryFlyoutSubtitle;
+            return string.Format(CultureInfo.CurrentCulture, format, _chrome.SelectedFolderName, count);
+        }
+    }
 
     private ThemeColors Colors
     {

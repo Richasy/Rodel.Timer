@@ -8,6 +8,7 @@ using Rodel.Timer.Styling;
 using Sprout;
 using Sprout.Controls;
 using Sprout.Graphics;
+using Sprout.Localization;
 using Sprout.Reconcile;
 using Sprout.Semantics;
 using Sprout.Theming;
@@ -132,15 +133,17 @@ public sealed partial class SettingsSectionsControl : Control
             .Description(Resources.LanguageDescription)
             .Icon(new FluentIcon(FluentSymbol.LocalLanguage))
             .WrapThreshold(SettingsContent.CardWrapThreshold),
-        Keyed(_chrome.LanguageIndex, new AboutSettingsView(_chrome.Colors)))
+        Keyed(Localizer.CurrentLanguage, new AboutSettingsView(_chrome.Colors)))
         .Spacing(TimerVisuals.Spacing.Small);
 }
 
 /// <summary>
 /// The About settings section: an expander (app icon + name, version at the tail) whose expanded row carries the app
 /// description and a "open on GitHub" link. It is hosted through a language-keyed remount (see its call site) because a
-/// a <c>SettingsExpander</c> does not thread its items on reconcile, so a remount is what re-localizes the expanded
-/// description and link text on a live language switch.
+/// <c>SettingsExpander</c> does not thread its items on reconcile, so a remount is what re-localizes the expanded
+/// description and link text on a live language switch. The key is the language STRING (not the index) so the remount
+/// is driven by the very signal that carries the localized text — at remount the new language is already active,
+/// regardless of the order in which the index and the localizer are updated.
 /// </summary>
 [Composite]
 public readonly partial record struct AboutSettingsView(ThemeColors Colors)

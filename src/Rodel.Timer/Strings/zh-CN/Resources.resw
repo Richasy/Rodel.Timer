@@ -15,7 +15,8 @@
   <data name="FoldersFlyoutSubtitle" xml:space="preserve"><value>选择本次计时所属的分组</value></data>
   <data name="History" xml:space="preserve"><value>历史记录</value></data>
   <data name="HistoryHelp" xml:space="preserve"><value>打开当前分组的计时历史</value></data>
-  <data name="HistoryFlyoutSubtitle" xml:space="preserve"><value>{0} · 今天</value></data>
+  <data name="HistoryFlyoutSubtitle" xml:space="preserve"><value>{0} · {1} 次会话</value></data>
+  <data name="HistoryFlyoutSubtitleOne" xml:space="preserve"><value>{0} · {1} 次会话</value></data>
   <data name="Settings" xml:space="preserve"><value>设置</value></data>
   <data name="SettingsHelp" xml:space="preserve"><value>主题、窗口背景、字体、语言和每日目标</value></data>
   <data name="SessionTitle" xml:space="preserve"><value>计时标题</value></data>

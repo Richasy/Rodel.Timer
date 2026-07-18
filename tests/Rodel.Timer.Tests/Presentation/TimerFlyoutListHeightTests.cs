@@ -3,13 +3,11 @@ using Rodel.Timer.Presentation;
 namespace Rodel.Timer.Tests.Presentation;
 
 /// <summary>
-/// The folder/history flyout list is given a DEFINITE height (not a bare max cap) so the ItemsView scroller
-/// activates: a definite height makes the composite measure tight, and the OverlayPanel measures its child loosely
-/// against that maximum, so the inner ScrollView sees a bounded viewport &lt; content and scrolls. This pins the
-/// hug-then-cap contract the height resolver encodes: an EMPTY list holds the empty-state minimum, a one-or-more-row
-/// list hugs its content exactly (no empty tail — the round-4 / round-10 complaint), and a long list caps at the
-/// maximum (beyond which it scrolls internally — the round-7 complaint), all without re-hard-coding the row-stride
-/// arithmetic here.
+/// The folder/history flyout list is given a DEFINITE height equal to its EXACT content while it fits, then capped.
+/// The inner ScrollView is a viewport window that fills the height it is given, so the exact-content height makes the
+/// viewport equal the content and the scroll offset (content − viewport, in epx) exactly zero — the list hugs with no
+/// empty tail (round-10) and the conscious scrollbar never reveals on hover for a list that fits (round-11). Past the
+/// cap the height stays pinned so the viewport is smaller than the content and the list scrolls internally (round-7).
 /// </summary>
 [TestClass]
 public sealed class TimerFlyoutListHeightTests
@@ -41,6 +39,7 @@ public sealed class TimerFlyoutListHeightTests
     public void MidList_HugsItsContentExactly()
     {
         // 4 rows = 4*54 + 12 = 228, strictly between the min and the cap → the exact content height (a hug, no tail).
+        // Because the viewport then equals the content, the scroll offset is exactly zero, so no scrollbar reveals.
         float height = TimerAnchoredSurfaceLayoutResolver.ListHeight(4);
 
         Assert.AreEqual(228f, height, Delta);
