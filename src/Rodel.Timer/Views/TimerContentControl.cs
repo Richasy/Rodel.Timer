@@ -39,7 +39,8 @@ public sealed partial class TimerContentControl : Control
                     _chrome.ViewportHeight),
                 _chrome.SelectedFolderName,
                 _chrome.Elapsed,
-                _chrome.IsRunning),
+                _chrome.IsRunning,
+                _chrome.IsRunning ? Resources.TimerRunning : Resources.TimerReady),
             new NormalTimerView(
                 _chrome,
                 Colors,
@@ -54,7 +55,9 @@ public sealed partial class TimerContentControl : Control
                 _chrome.IsBackgroundFallback,
                 _chrome.BackgroundStatusText,
                 Resources.CurrentFolder,
-                Resources.TodaysFocus)));
+                Resources.TodaysFocus,
+                _chrome.IsRunning ? Resources.TimerRunning : Resources.TimerReady,
+                _chrome.IsRunning ? Resources.StopTimer : Resources.StartTimer)));
 
     private Sprout.Theming.ThemeColors Colors
     {

@@ -38,7 +38,9 @@ public readonly partial record struct NormalTimerStageView(
     TimerNormalLayout Layout,
     TimeSpan Elapsed,
     bool IsRunning,
-    string SessionTitle)
+    string SessionTitle,
+    string StatusCaption,
+    string ActionLabel)
 {
     /// <summary>The centred stage with no enclosing card or opaque surface: a heavy clock over a fading axis, the caption below it, then the centred title editor and the primary action, the whole block vertically centred.</summary>
     public Ui Body => Overlay(
@@ -63,7 +65,7 @@ public readonly partial record struct NormalTimerStageView(
                     .VAlign(VerticalAlignment.Center))
                 .Padding(0f, -(Layout.GlowHeight - (Layout.ClockSize * 1.5f)) / 2f),
             Text(
-                IsRunning ? Resources.TimerRunning : Resources.TimerReady,
+                StatusCaption,
                 new TextFormat(TextFormat.DefaultFontFamily, 13f, TextFormat.NormalWeight, TextAlignment.Center),
                 Colors.TextFillColorSecondary)
                 .HAlign(HorizontalAlignment.Center),
@@ -92,7 +94,7 @@ public readonly partial record struct NormalTimerStageView(
                     .HAlign(HorizontalAlignment.Center)
                     .Automation(StartStopAutomation),
                 Text(
-                    IsRunning ? Resources.StopTimer : Resources.StartTimer,
+                    ActionLabel,
                     new TextFormat(TextFormat.DefaultFontFamily, 12f, TextFormat.SemiBoldWeight),
                     Colors.TextFillColorSecondary)
                     .HAlign(HorizontalAlignment.Center))
@@ -241,11 +243,13 @@ public readonly partial record struct NormalTimerView(
     bool IsBackgroundFallback,
     string BackgroundStatus,
     string CurrentFolderLabel,
-    string TodaysFocusLabel)
+    string TodaysFocusLabel,
+    string StatusCaption,
+    string ActionLabel)
 {
     /// <summary>The open timer stage and full-width footer, with no enclosing hero card.</summary>
     public Ui Body => Stack(
-        new NormalTimerStageView(Chrome, Colors, Layout, Elapsed, IsRunning, SessionTitle)
+        new NormalTimerStageView(Chrome, Colors, Layout, Elapsed, IsRunning, SessionTitle, StatusCaption, ActionLabel)
             .Weight(1f),
         new NormalTimerFooterView(
             Colors,
@@ -262,7 +266,7 @@ public readonly partial record struct NormalTimerView(
 [Composite]
 public readonly partial record struct CompactContextView(
     string FolderName,
-    bool IsRunning,
+    string StatusCaption,
     ThemeColors Colors,
     float ClockSize)
 {
@@ -273,7 +277,7 @@ public readonly partial record struct CompactContextView(
             new TextFormat(TextFormat.DefaultFontFamily, 9f, TextFormat.SemiBoldWeight),
             Colors.TextFillColorSecondary),
         Text(
-            IsRunning ? Resources.TimerRunning : Resources.TimerReady,
+            StatusCaption,
             new TextFormat(TextFormat.DefaultFontFamily, MathF.Max(11f, ClockSize * 0.3f), TextFormat.SemiBoldWeight),
             Colors.TextFillColorPrimary))
         .Spacing(2f);
@@ -290,7 +294,8 @@ public readonly partial record struct CompactAdaptiveView(
     TimerCompactLayout Layout,
     string FolderName,
     TimeSpan Elapsed,
-    bool IsRunning)
+    bool IsRunning,
+    string StatusCaption)
 {
     internal static readonly GridLength[] Columns = [GridLength.Star(1f), GridLength.Auto];
     internal static readonly GridLength[] TightRows = [GridLength.Auto];
@@ -302,7 +307,7 @@ public readonly partial record struct CompactAdaptiveView(
         RowTracks,
         When(
             Layout.ShowContext,
-            new CompactContextView(FolderName, IsRunning, Colors, Layout.ClockSize))
+            new CompactContextView(FolderName, StatusCaption, Colors, Layout.ClockSize))
             .Cell(0, 0),
         AnimatedText(
             TimerFormat.Clock(Elapsed),
@@ -362,11 +367,12 @@ public readonly partial record struct CompactTimerView(
     TimerCompactLayout Layout,
     string FolderName,
     TimeSpan Elapsed,
-    bool IsRunning)
+    bool IsRunning,
+    string StatusCaption)
 {
     /// <summary>The capped content band; the 32 epx title bar owns Exit and the native Close button.</summary>
     public Ui Body => Overlay(
-        new CompactAdaptiveView(Chrome, Colors, Layout, FolderName, Elapsed, IsRunning)
+        new CompactAdaptiveView(Chrome, Colors, Layout, FolderName, Elapsed, IsRunning, StatusCaption)
             .VAlign(VerticalAlignment.Center))
         .Padding(Layout.OuterHorizontalPadding, 8f);
 }
