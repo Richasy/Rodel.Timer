@@ -2,11 +2,13 @@ using Rodel.Timer.AppData;
 using Rodel.Timer.Core.Bootstrap;
 using Rodel.Timer.Core.Migration;
 using Rodel.Timer.Core.Persistence;
+using Rodel.Timer.Core.Settings;
 using Rodel.Timer.Presentation;
 
 using Sprout;
 using Sprout.Backend.D2D;
 using Sprout.Graphics;
+using Sprout.Localization;
 
 namespace Rodel.Timer;
 
@@ -38,6 +40,12 @@ public sealed class App : Application, IDisposable
     /// <inheritdoc/>
     protected override void OnLaunched(LaunchEventArgs e)
     {
+        // Resolve and apply the startup UI language before the first window/frame mounts, so the title and content
+        // mount in the correct language with no flash. This is the natural point to do it: the framework has already
+        // seeded Application.SystemLanguage (the OS preferred-languages list) before OnLaunched, whereas Program runs
+        // before the app exists and could only read CurrentUICulture (the Windows display language).
+        ApplyStartupLanguage();
+
         string? savedPlacement = WindowPlacementStore.Load();
         _window = OpenWindow(new WindowSpec
         {
@@ -81,6 +89,35 @@ public sealed class App : Application, IDisposable
     /// <inheritdoc/>
     protected override void OnActivated(AppActivationArguments args)
     {
+    }
+
+    // Resolves the startup UI language from the persisted preference and the OS preferred language, and applies it to
+    // the localizer + thread culture. A persisted concrete language wins; the follow-system sentinel or a fresh install
+    // (no persisted preference) resolves the OS preferred language (MainView.OsCulture reads the framework's
+    // Application.SystemLanguage). OnDataLoaded later re-applies the same value idempotently once the store has loaded.
+    private static void ApplyStartupLanguage()
+    {
+        string preference = ReadPersistedLanguagePreference() ?? TimerPreferences.SystemLanguage;
+        string effective = LanguageResolver.ResolveEffective(preference, MainView.OsCulture());
+        Localizer.CurrentLanguage = effective;
+        LanguageApply.PinThreadCulture(effective);
+    }
+
+    // Peeks the persisted language preference synchronously before the first frame mounts, so the UI mounts in the
+    // resolved language with no flash. A missing workspace (first run) or an unreadable/corrupt file yields null, so the
+    // caller follows the system; the store's own async load surfaces any real read failure later.
+    private static string? ReadPersistedLanguagePreference()
+    {
+        try
+        {
+            using var repository = new TimerDataRepository(AppDataPaths.TimerDataFile());
+            var workspace = repository.LoadAsync().GetAwaiter().GetResult();
+            return workspace?.Preferences.Language;
+        }
+        catch (TimerDataAccessException)
+        {
+            return null;
+        }
     }
 
     private async void LoadDataAsync()

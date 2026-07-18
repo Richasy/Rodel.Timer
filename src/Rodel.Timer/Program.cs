@@ -1,12 +1,9 @@
-using System.Globalization;
-
 using Rodel.Timer;
 using Rodel.Timer.AppData;
 using Rodel.Timer.Core.Bootstrap;
 using Rodel.Timer.Core.Migration;
 using Rodel.Timer.Core.Persistence;
 using Rodel.Timer.Core.Settings;
-using Rodel.Timer.Presentation;
 
 using Sprout;
 using Sprout.Backend.D2D;
@@ -16,11 +13,14 @@ if (args.Contains("--selftest", StringComparer.OrdinalIgnoreCase))
     return SelfTest.Run();
 }
 
-string language = ResolveStartupLanguage(TryReadPersistedLanguage(), CultureInfo.CurrentUICulture);
+// The default preference follows the OS preferred UI language (the "system" sentinel), mirroring the theme's System
+// default. The concrete startup language is resolved in App.OnLaunched from the framework's Application.SystemLanguage
+// (the OS preferred-languages list) — Program runs before the app exists and could only read CurrentUICulture (the
+// Windows *display* language), the wrong signal for following the preferred language.
 var defaultPreferences = new TimerPreferences(
     TimerThemeMode.System,
     TimerBackgroundMode.Mica,
-    language,
+    TimerPreferences.SystemLanguage,
     TimerPreferences.DefaultFontFamily,
     TimerPreferences.DefaultDailyTargetMinutes);
 
@@ -28,7 +28,6 @@ return SproutApp.CreateBuilder(args)
     .UseApp<App>()
     .UseD2DBackend()
     .UseSingleInstance()
-    .UseLanguage(language)
     .ConfigureServices(services =>
     {
         services.AddSingleton<TimeProvider>(TimeProvider.System);
@@ -48,33 +47,3 @@ return SproutApp.CreateBuilder(args)
     })
     .Build()
     .Run();
-
-static string ResolveStartupLanguage(string? persisted, CultureInfo culture)
-{
-    // A returning user's saved CONCRETE display language wins, so the UI mounts in it from the first frame. A
-    // follow-system preference (the sentinel) or a first run (no saved language) resolves the OS preferred language
-    // instead — and is then re-resolved live if the OS language changes (see App's SystemLanguageChanged handler).
-    if (!string.IsNullOrWhiteSpace(persisted) && !LanguageResolver.IsFollowSystem(persisted))
-    {
-        return persisted;
-    }
-
-    return LanguageResolver.ResolveSupported(culture);
-}
-
-// Peek the persisted display language synchronously before the app mounts, so the UI mounts in the saved language.
-// A missing workspace (first run) or an unreadable/corrupt file yields null — the caller then falls back to the OS
-// culture, and bootstrap surfaces any real read failure later.
-static string? TryReadPersistedLanguage()
-{
-    try
-    {
-        using var repository = new TimerDataRepository(AppDataPaths.TimerDataFile());
-        var workspace = repository.LoadAsync().GetAwaiter().GetResult();
-        return workspace?.Preferences.Language;
-    }
-    catch (TimerDataAccessException)
-    {
-        return null;
-    }
-}
