@@ -96,6 +96,7 @@
   <data name="BackgroundStatusFallback" xml:space="preserve"><value>Fallback</value></data>
   <data name="Font" xml:space="preserve"><value>Font</value></data>
   <data name="Language" xml:space="preserve"><value>Language</value></data>
+  <data name="LanguageSystem" xml:space="preserve"><value>Follow system</value></data>
   <data name="LanguageEnglish" xml:space="preserve"><value>English</value></data>
   <data name="LanguageChinese" xml:space="preserve"><value>Simplified Chinese</value></data>
   <data name="LanguageTraditionalChinese" xml:space="preserve"><value>Traditional Chinese</value></data>

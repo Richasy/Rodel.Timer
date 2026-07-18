@@ -96,6 +96,7 @@
   <data name="BackgroundStatusFallback" xml:space="preserve"><value>回退</value></data>
   <data name="Font" xml:space="preserve"><value>字型</value></data>
   <data name="Language" xml:space="preserve"><value>語言</value></data>
+  <data name="LanguageSystem" xml:space="preserve"><value>跟隨系統</value></data>
   <data name="LanguageEnglish" xml:space="preserve"><value>英語</value></data>
   <data name="LanguageChinese" xml:space="preserve"><value>簡體中文</value></data>
   <data name="LanguageTraditionalChinese" xml:space="preserve"><value>繁體中文</value></data>

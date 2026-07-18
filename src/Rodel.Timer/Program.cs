@@ -6,6 +6,7 @@ using Rodel.Timer.Core.Bootstrap;
 using Rodel.Timer.Core.Migration;
 using Rodel.Timer.Core.Persistence;
 using Rodel.Timer.Core.Settings;
+using Rodel.Timer.Presentation;
 
 using Sprout;
 using Sprout.Backend.D2D;
@@ -50,32 +51,15 @@ return SproutApp.CreateBuilder(args)
 
 static string ResolveStartupLanguage(string? persisted, CultureInfo culture)
 {
-    // A returning user's SAVED display language wins, so the UI mounts in it from the first frame. Otherwise the app
-    // mounts in the OS-culture language and only re-applies the saved language after the workspace loads, which leaves
-    // any hoisted (mount-time-constant) localized string — e.g. the stage caption / primary-action label read directly
-    // in a nested composite — stuck in the OS-culture language. First run (no saved workspace) falls through to the
-    // OS culture below.
-    if (!string.IsNullOrWhiteSpace(persisted))
+    // A returning user's saved CONCRETE display language wins, so the UI mounts in it from the first frame. A
+    // follow-system preference (the sentinel) or a first run (no saved language) resolves the OS preferred language
+    // instead — and is then re-resolved live if the OS language changes (see App's SystemLanguageChanged handler).
+    if (!string.IsNullOrWhiteSpace(persisted) && !LanguageResolver.IsFollowSystem(persisted))
     {
         return persisted;
     }
 
-    for (CultureInfo current = culture; !string.IsNullOrEmpty(current.Name); current = current.Parent)
-    {
-        if (current.Name.Equals("zh-Hant", StringComparison.OrdinalIgnoreCase))
-        {
-            return TimerPreferences.TraditionalChineseLanguage;
-        }
-
-        if (current.Name.Equals("zh-Hans", StringComparison.OrdinalIgnoreCase))
-        {
-            return TimerPreferences.ChineseLanguage;
-        }
-    }
-
-    return culture.TwoLetterISOLanguageName.Equals("zh", StringComparison.OrdinalIgnoreCase)
-        ? TimerPreferences.ChineseLanguage
-        : TimerPreferences.EnglishLanguage;
+    return LanguageResolver.ResolveSupported(culture);
 }
 
 // Peek the persisted display language synchronously before the app mounts, so the UI mounts in the saved language.
