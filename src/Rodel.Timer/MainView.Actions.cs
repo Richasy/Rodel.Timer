@@ -70,27 +70,7 @@ public sealed partial class MainView
     void ILanguageApplyTarget.SetCurrentLanguage(string language)
     {
         Localizer.CurrentLanguage = language;
-        ApplyThreadCulture(language);
-    }
-
-    // Track the selected language on the thread culture too, so CultureInfo.CurrentCulture-based date/number formatting
-    // (history timestamps, footer minute counts) follows the app language instead of staying on the OS culture.
-    private static void ApplyThreadCulture(string language)
-    {
-        System.Globalization.CultureInfo culture;
-        try
-        {
-            culture = System.Globalization.CultureInfo.GetCultureInfo(language);
-        }
-        catch (System.Globalization.CultureNotFoundException)
-        {
-            return;
-        }
-
-        System.Globalization.CultureInfo.CurrentCulture = culture;
-        System.Globalization.CultureInfo.CurrentUICulture = culture;
-        System.Globalization.CultureInfo.DefaultThreadCurrentCulture = culture;
-        System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = culture;
+        LanguageApply.PinThreadCulture(language);
     }
 
     /// <inheritdoc/>
@@ -136,9 +116,11 @@ public sealed partial class MainView
     }
 
     // The OS preferred UI language as a culture, read from the framework's authoritative, uncached SystemLanguage
-    // (not CultureInfo.CurrentUICulture, which the app pins to the applied language). Falls back to CurrentUICulture if
-    // the framework value is unavailable (e.g. a headless test with no running Application).
-    private static System.Globalization.CultureInfo OsCulture()
+    // (not CultureInfo.CurrentUICulture, which the app pins to the applied language and which is the Windows *display*
+    // language, not the preferred list). Falls back to CurrentUICulture if the framework value is unavailable (e.g. a
+    // headless test with no running Application). Internal so App.OnLaunched can resolve the startup language against
+    // the same source before any MainView instance exists.
+    internal static System.Globalization.CultureInfo OsCulture()
     {
         try
         {

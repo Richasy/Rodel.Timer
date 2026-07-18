@@ -57,6 +57,20 @@ public sealed class LanguageResolverTests
     }
 
     [TestMethod]
+    public void ResolveEffective_FollowSystem_EnglishPreferred_ResolvesEnglish()
+    {
+        // The regression this guards: "follow system" follows the OS *preferred* UI language (e.g. en-US on top of the
+        // preferred-languages list, which App.OnLaunched reads from Application.SystemLanguage), NOT the Windows
+        // display language. With English as the top preferred language, follow-system resolves to English even when the
+        // display language is Chinese.
+        string effective = LanguageResolver.ResolveEffective(
+            TimerPreferences.SystemLanguage,
+            CultureInfo.GetCultureInfo("en-US"));
+
+        Assert.AreEqual(TimerPreferences.EnglishLanguage, effective);
+    }
+
+    [TestMethod]
     public void ResolveEffective_ConcretePreference_IsReturnedUnchanged_IgnoringTheOsCulture()
     {
         string effective = LanguageResolver.ResolveEffective(

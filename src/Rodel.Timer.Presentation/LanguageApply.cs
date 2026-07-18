@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace Rodel.Timer.Presentation;
 
 /// <summary>
@@ -47,5 +49,30 @@ public static class LanguageApply
         target.SetCurrentLanguage(language);
         target.SyncWindowTitle();
         target.BumpThemeRevision();
+    }
+
+    /// <summary>
+    /// Pins the ambient thread culture (current + default-thread, both format and UI) to a language tag, so
+    /// <see cref="CultureInfo.CurrentCulture"/>-based date/number formatting (history timestamps, footer minute counts)
+    /// follows the app language instead of staying on the OS culture. A no-op for an unrecognized tag. Shared by the
+    /// runtime language switch (via the shell's <c>SetCurrentLanguage</c>) and the startup language application.
+    /// </summary>
+    /// <param name="language">The BCP-47 language tag to pin.</param>
+    public static void PinThreadCulture(string language)
+    {
+        CultureInfo culture;
+        try
+        {
+            culture = CultureInfo.GetCultureInfo(language);
+        }
+        catch (CultureNotFoundException)
+        {
+            return;
+        }
+
+        CultureInfo.CurrentCulture = culture;
+        CultureInfo.CurrentUICulture = culture;
+        CultureInfo.DefaultThreadCurrentCulture = culture;
+        CultureInfo.DefaultThreadCurrentUICulture = culture;
     }
 }
