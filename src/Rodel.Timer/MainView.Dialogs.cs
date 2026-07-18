@@ -22,6 +22,25 @@ public sealed partial class MainView
     /// <summary>The current product version, compared against the persisted last-seen version for the what's-new dialog.</summary>
     internal const string CurrentVersion = "2.0.0";
 
+    /// <summary>
+    /// The version shown on the About surface. When the app is packaged this is the installed <b>package identity</b>
+    /// version (<c>Major.Minor.Build</c>, straight from <c>Package.appxmanifest</c> via <c>Package.Current.Id.Version</c>),
+    /// so it can never drift from the shipped package; an unpackaged developer build has no package identity and falls
+    /// back to <see cref="CurrentVersion"/>. Resolved once — the package version does not change while the app runs.
+    /// </summary>
+    internal static string DisplayVersion { get; } = ResolveDisplayVersion();
+
+    private static string ResolveDisplayVersion()
+    {
+        if (!Sprout.PackageIdentity.IsPackaged)
+        {
+            return CurrentVersion;
+        }
+
+        Windows.ApplicationModel.PackageVersion version = Windows.ApplicationModel.Package.Current.Id.Version;
+        return $"{version.Major}.{version.Minor}.{version.Build}";
+    }
+
     /// <summary>Builds a fresh per-folder context menu from the latest store state.</summary>
     /// <param name="folderId">The folder the menu acts on.</param>
     /// <returns>The owned child menu for the row context gesture.</returns>

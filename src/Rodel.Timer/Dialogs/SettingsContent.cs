@@ -155,7 +155,7 @@ public readonly partial record struct AboutSettingsView(ThemeColors Colors)
             .Icon(new ImageIcon(TimerAssets.AppLogoHandle()) { Size = new Size(20f, 20f) })
             .WrapThreshold(SettingsContent.CardWrapThreshold)
             .Content(Text(
-                $"v{MainView.CurrentVersion}",
+                $"v{MainView.DisplayVersion}",
                 new TextFormat(TextFormat.DefaultFontFamily, 13f, TextFormat.NormalWeight),
                 Colors.TextFillColorSecondary))
             .Items(
