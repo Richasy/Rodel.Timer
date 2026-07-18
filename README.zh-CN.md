@@ -11,6 +11,8 @@
 [![NativeAOT](https://img.shields.io/badge/NativeAOT-single%20binary-2ea44f)](#-构建与运行)
 [![UI](https://img.shields.io/badge/UI-Sprout-1f6feb)](https://github.com/Richasy/Sprout)
 
+[![从 Microsoft Store 获取](https://img.shields.io/badge/Microsoft%20Store-下载-0078D6?logo=microsoftstore&logoColor=white)](https://apps.microsoft.com/detail/9N71W9G714RK)
+
 [English](README.md) · **简体中文**
 
 </div>
@@ -24,6 +26,20 @@
 计时数字、弹出层与紧凑悬浮窗都由 Sprout 在 Direct2D / DirectComposition 上绘制，并以单个 **NativeAOT** 二进制发布。
 
 > 本仓库（`Richasy/Rodel.Timer`）是代码库；**Working Timer** 是应用与商店中展示的产品名。
+
+---
+
+## ⬇️ 安装
+
+**Working Timer 已在 Microsoft Store 免费上架** —— 推荐从商店安装，可自动更新（支持 x64 与 Arm64，Windows 10 19041+）：
+
+<p align="center">
+  <a href="https://apps.microsoft.com/detail/9N71W9G714RK">
+    <img src="https://get.microsoft.com/images/zh-cn%20dark.svg" width="220" alt="从 Microsoft Store 下载 Working Timer" />
+  </a>
+</p>
+
+> **商店页面：** https://apps.microsoft.com/detail/9N71W9G714RK
 
 ---
 
@@ -103,6 +119,8 @@ tests/
 > **内部开发**、**尚未公开发行任何包**。`NuGet.config` 把 `Sprout*` 包解析到一个本地打包源
 > （`..\Sprout\artifacts\local-feed`），它依赖尚未公开的 Sprout 仓库，因此外部开发者在此 `dotnet restore` 会失败。
 > 待 Sprout 发布到 nuget.org 后，再补充公开的构建步骤。
+>
+> **只想使用应用？** 直接从 **[Microsoft Store](https://apps.microsoft.com/detail/9N71W9G714RK)** 免费安装，无需构建。
 
 作为参考，等 Sprout 包就绪后，本应用可用 **.NET 10 SDK** 在 Windows 10 (19041)+ 上构建（Sprout 版本固定在
 `Directory.Packages.props`）：
