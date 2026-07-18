@@ -11,6 +11,8 @@
 [![NativeAOT](https://img.shields.io/badge/NativeAOT-single%20binary-2ea44f)](#-build--run)
 [![UI](https://img.shields.io/badge/UI-Sprout-1f6feb)](https://github.com/Richasy/Sprout)
 
+[![Get it from the Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download-0078D6?logo=microsoftstore&logoColor=white)](https://apps.microsoft.com/detail/9N71W9G714RK)
+
 **English** · [简体中文](README.zh-CN.md)
 
 </div>
@@ -27,6 +29,21 @@ as a single **NativeAOT** binary.
 
 > This repository (`Richasy/Rodel.Timer`) is the codebase; **Working Timer** is the product name shown in the app and
 > on the Store.
+
+---
+
+## ⬇️ Install
+
+**Working Timer is free on the Microsoft Store** — the recommended way to install it and get automatic updates
+(x64 and Arm64, Windows 10 19041+):
+
+<p align="center">
+  <a href="https://apps.microsoft.com/detail/9N71W9G714RK">
+    <img src="https://get.microsoft.com/images/en-us%20dark.svg" width="220" alt="Download Working Timer from the Microsoft Store" />
+  </a>
+</p>
+
+> **Store listing:** https://apps.microsoft.com/detail/9N71W9G714RK
 
 ---
 
@@ -109,6 +126,9 @@ tests/
 > `Sprout*` packages from a local pack feed (`..\Sprout\artifacts\local-feed`) that requires the not‑yet‑public Sprout
 > repository, so `dotnet restore` will fail for external developers. Public build steps will follow once Sprout ships
 > to nuget.org.
+>
+> **Just want to use the app?** Install it free from the
+> **[Microsoft Store](https://apps.microsoft.com/detail/9N71W9G714RK)** — no build required.
 
 For reference, once the Sprout packages are available the app builds with the **.NET 10 SDK** on Windows 10 (19041)+
 (the Sprout versions are pinned in `Directory.Packages.props`):
