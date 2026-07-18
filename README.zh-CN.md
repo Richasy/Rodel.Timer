@@ -74,23 +74,6 @@
 
 ---
 
-## 🔄 从 Work‑Timer 升级
-
-Working Timer 使用与 Work‑Timer **相同的 Microsoft Store 应用标识**（`60520B029E250.WorkingTimer`），所以安装它是
-**就地升级**原有条目，并沿用**同一个本地数据目录**。
-
-首次启动时，它会执行**一次性、带兜底的迁移**：
-
-1. 读取原始的 `FolderList.json`、`HistoryList.json` 以及 `WorkTimer` 本地设置；
-2. 转换为新的带版本号格式，把可修复的问题（缺名字、未知图标、孤儿历史）作为非致命警告就地修复；
-3. 原子写入新工作区，之后不再触碰旧文件。
-
-万一遇到损坏数据导致迁移失败，应用会**显示错误、绝不覆盖任何数据**，并在下次启动重试 —— 你的原始数据不会被静默丢失。
-
-> 📖 完整的升级保证与导入内容见 **[docs/migration.md](docs/migration.md)**。
-
----
-
 ## 🏗️ 基于 Sprout 构建
 
 Working Timer 是 **[Sprout](https://github.com/Richasy/Sprout)** 的示范应用 —— 一个实验性的自绘、编译期 reconcile、
@@ -116,7 +99,13 @@ tests/
 
 ## 🚀 构建与运行
 
-需要 **.NET 10 SDK** 与 Windows 10 (19041)+。应用消费 `Directory.Packages.props` 中固定的 Sprout 包。
+> ⚠️ **外部暂时无法构建。** Working Timer 依赖 **[Sprout](https://github.com/Richasy/Sprout)**，而 Sprout 目前仍在
+> **内部开发**、**尚未公开发行任何包**。`NuGet.config` 把 `Sprout*` 包解析到一个本地打包源
+> （`..\Sprout\artifacts\local-feed`），它依赖尚未公开的 Sprout 仓库，因此外部开发者在此 `dotnet restore` 会失败。
+> 待 Sprout 发布到 nuget.org 后，再补充公开的构建步骤。
+
+作为参考，等 Sprout 包就绪后，本应用可用 **.NET 10 SDK** 在 Windows 10 (19041)+ 上构建（Sprout 版本固定在
+`Directory.Packages.props`）：
 
 ```pwsh
 dotnet build   Rodel.Timer.slnx

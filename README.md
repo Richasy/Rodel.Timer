@@ -79,25 +79,6 @@ as a single **NativeAOT** binary.
 
 ---
 
-## 🔄 Upgrading from Work‑Timer
-
-Working Timer ships under the **same Microsoft Store identity** as Work‑Timer (`60520B029E250.WorkingTimer`), so
-installing it **upgrades the existing listing in place** and inherits the very same local data folder.
-
-On its first launch it performs a **one‑time, fail‑safe migration**:
-
-1. reads the original `FolderList.json`, `HistoryList.json`, and the `WorkTimer` local settings;
-2. converts them to the new versioned format, repairing recoverable issues (missing names, unknown icons, orphaned
-   entries) as non‑fatal warnings;
-3. writes the new workspace atomically, then never touches the legacy files again.
-
-If migration ever fails on damaged data, the app **shows an error rather than overwriting anything**, and retries on
-the next launch — your original data is never silently lost.
-
-> 📖 See **[docs/migration.md](docs/migration.md)** for the full upgrade guarantees and exactly what gets imported.
-
----
-
 ## 🏗️ Built with Sprout
 
 Working Timer is a showcase app for **[Sprout](https://github.com/Richasy/Sprout)**, an experimental self‑drawn,
@@ -123,8 +104,14 @@ tests/
 
 ## 🚀 Build & run
 
-Requires the **.NET 10 SDK** and a Windows 10 (19041)+ machine. The app consumes the Sprout packages pinned in
-`Directory.Packages.props`.
+> ⚠️ **Not yet buildable outside Richasy.** Working Timer depends on **[Sprout](https://github.com/Richasy/Sprout)**,
+> which is still in **private development** with **no publicly released packages**. `NuGet.config` resolves the
+> `Sprout*` packages from a local pack feed (`..\Sprout\artifacts\local-feed`) that requires the not‑yet‑public Sprout
+> repository, so `dotnet restore` will fail for external developers. Public build steps will follow once Sprout ships
+> to nuget.org.
+
+For reference, once the Sprout packages are available the app builds with the **.NET 10 SDK** on Windows 10 (19041)+
+(the Sprout versions are pinned in `Directory.Packages.props`):
 
 ```pwsh
 dotnet build   Rodel.Timer.slnx
