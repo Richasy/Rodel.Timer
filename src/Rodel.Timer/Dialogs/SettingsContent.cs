@@ -44,6 +44,8 @@ public sealed class SettingsSectionsChrome
     /// <inheritdoc/>
     public ThemeColors Colors => _owner.Colors;
     /// <inheritdoc/>
+    public int ThemeStamp => _owner.ThemeStamp;
+    /// <inheritdoc/>
     public Action<int> ThemeChanged => _owner.OnThemeChanged;
     /// <inheritdoc/>
     public Action<int> BackgroundChanged => _owner.OnBackgroundChanged;
@@ -133,17 +135,19 @@ public sealed partial class SettingsSectionsControl : Control
             .Description(Resources.LanguageDescription)
             .Icon(new FluentIcon(FluentSymbol.LocalLanguage))
             .WrapThreshold(SettingsContent.CardWrapThreshold),
-        Keyed(Localizer.CurrentLanguage, new AboutSettingsView(_chrome.Colors)))
+        Keyed((Localizer.CurrentLanguage, _chrome.ThemeStamp), new AboutSettingsView(_chrome.Colors)))
         .Spacing(TimerVisuals.Spacing.Small);
 }
 
 /// <summary>
 /// The About settings section: an expander (app icon + name, version at the tail) whose expanded row carries the app
-/// description and a "open on GitHub" link. It is hosted through a language-keyed remount (see its call site) because a
-/// <c>SettingsExpander</c> does not thread its items on reconcile, so a remount is what re-localizes the expanded
-/// description and link text on a live language switch. The key is the language STRING (not the index) so the remount
-/// is driven by the very signal that carries the localized text — at remount the new language is already active,
-/// regardless of the order in which the index and the localizer are updated.
+/// description and a "open on GitHub" link. It is hosted through a <b>(language, theme-stamp)</b>-keyed remount (see its
+/// call site) because a <c>SettingsExpander</c> does not thread its content/items on reconcile — so a remount is what
+/// re-applies both the localized text (on a language switch) AND the live palette to the version text + link (on a
+/// theme switch, which reconcile alone would otherwise leave stuck at the mount-time colours). The language part is the
+/// language STRING (not the index) so the remount is driven by the very signal that carries the text; the theme-stamp
+/// part bumps on any theme/language/font switch, and both bumps land after the localizer is updated, so the new
+/// language + palette are already active at remount.
 /// </summary>
 [Composite]
 public readonly partial record struct AboutSettingsView(ThemeColors Colors)
@@ -237,6 +241,10 @@ public sealed partial class SettingsContent : Control
             return _main.Window.Theme.Colors;
         }
     }
+
+    /// <summary>The presentation revision — bumps on a theme / language / font switch; the About's remount key so the
+    /// expander (which does not re-thread its content/items on reconcile) re-mounts with the live colours AND language.</summary>
+    internal int ThemeStamp => _main.ThemeStamp;
 
     /// <summary>The selected theme index (0 = system, 1 = light, 2 = dark).</summary>
     public partial int ThemeIndex { get; private set; }
