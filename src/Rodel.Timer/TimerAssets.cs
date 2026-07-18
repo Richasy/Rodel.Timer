@@ -19,7 +19,7 @@ internal static class TimerAssets
     private static ImageHandle? _appLogoHandle;
 
     /// <summary>
-    /// The app logo (the Work Timer clock) as an <see cref="ImageSource"/>, read once from the embedded PNG and cached.
+    /// The app logo (the Working Timer clock) as an <see cref="ImageSource"/>, read once from the embedded PNG and cached.
     /// </summary>
     /// <returns>The shared logo source.</returns>
     /// <exception cref="InvalidOperationException">The embedded logo resource is missing (a build/packaging error).</exception>

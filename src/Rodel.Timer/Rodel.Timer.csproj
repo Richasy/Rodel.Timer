@@ -5,8 +5,8 @@
     <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ApplicationIcon>app.ico</ApplicationIcon>
-    <AssemblyTitle>Work Timer</AssemblyTitle>
-    <Product>Work Timer</Product>
+    <AssemblyTitle>Working Timer</AssemblyTitle>
+    <Product>Working Timer</Product>
     <Company>Richasy</Company>
     <Description>A focused, minimal Windows count-up timer.</Description>
     <PublishAot>true</PublishAot>

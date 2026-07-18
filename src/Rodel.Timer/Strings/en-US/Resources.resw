@@ -6,10 +6,10 @@
   <resheader name="version">
     <value>2.0</value>
   </resheader>
-  <data name="AppName" xml:space="preserve"><value>Work Timer</value></data>
+  <data name="AppName" xml:space="preserve"><value>Working Timer</value></data>
   <data name="AppDescription" xml:space="preserve"><value>A focused forward timer for Windows</value></data>
   <data name="PreparingData" xml:space="preserve"><value>Preparing your timer data…</value></data>
-  <data name="DataLoadErrorTitle" xml:space="preserve"><value>Work Timer could not load its data</value></data>
+  <data name="DataLoadErrorTitle" xml:space="preserve"><value>Working Timer could not load its data</value></data>
   <data name="Folders" xml:space="preserve"><value>Folders</value></data>
   <data name="FoldersHelp" xml:space="preserve"><value>Open the timer folders</value></data>
   <data name="FoldersFlyoutSubtitle" xml:space="preserve"><value>Choose where this session belongs</value></data>
@@ -107,7 +107,7 @@
   <data name="DailyTargetDescription" xml:space="preserve"><value>Your daily focus goal in minutes</value></data>
   <data name="OpenOnGitHub" xml:space="preserve"><value>Open on GitHub</value></data>
   <data name="WhatsNewTitle" xml:space="preserve"><value>What's new</value></data>
-  <data name="WhatsNewBody" xml:space="preserve"><value>Work Timer is a complete Sprout-based rewrite with Fluent Design, live language and theme switching, accessible controls, and safe migration of your existing data.</value></data>
+  <data name="WhatsNewBody" xml:space="preserve"><value>Working Timer is a complete Sprout-based rewrite with Fluent Design, live language and theme switching, accessible controls, and safe migration of your existing data.</value></data>
   <data name="Save" xml:space="preserve"><value>Save</value></data>
   <data name="Cancel" xml:space="preserve"><value>Cancel</value></data>
   <data name="Delete" xml:space="preserve"><value>Delete</value></data>
