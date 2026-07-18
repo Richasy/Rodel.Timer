@@ -42,7 +42,7 @@ public readonly partial record struct HistoryRowView(
                     .HAlign(HorizontalAlignment.Center)
                     .VAlign(VerticalAlignment.Center))
                 .Background(TileBrush)
-                .CornerRadius(TimerVisuals.Radius.Control)
+                .CornerRadius(TimerVisuals.Radius.App)
                 .Width(TimerVisuals.IconSize.Tile)
                 .Height(TimerVisuals.IconSize.Tile),
             Stack(
