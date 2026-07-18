@@ -151,7 +151,7 @@ public readonly partial record struct AboutSettingsView(ThemeColors Colors)
     /// <summary>The About expander.</summary>
     public Ui Body => Overlay(
         SettingsExpander(Resources.AppName)
-            .Icon(new ImageIcon(TimerAssets.AppLogo()) { Size = new Size(20f, 20f) })
+            .Icon(new ImageIcon(TimerAssets.AppLogoHandle()) { Size = new Size(20f, 20f) })
             .WrapThreshold(SettingsContent.CardWrapThreshold)
             .Content(Text(
                 $"v{MainView.CurrentVersion}",

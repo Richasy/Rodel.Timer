@@ -186,11 +186,9 @@ public readonly partial record struct TimerTitleBarView(
     /// <summary>The responsive extended-title-bar content.</summary>
     public Ui Body => Stack(
         Stack(
-            Icon.Fluent(
-                FluentSymbol.Timer,
-                FluentIconVariant.Regular,
-                TimerVisuals.IconSize.Medium,
-                Brush.CreateSolid(Colors.AccentTextFillColorPrimary))
+            Icon.Image(TimerAssets.AppLogoHandle())
+                .Width(TimerVisuals.IconSize.Medium)
+                .Height(TimerVisuals.IconSize.Medium)
                 .VAlign(VerticalAlignment.Center),
             Text(
                 AppName,
