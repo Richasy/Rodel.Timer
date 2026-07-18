@@ -24,21 +24,25 @@ public sealed partial class MainView
 
     /// <summary>
     /// The version shown on the About surface. When the app is packaged this is the installed <b>package identity</b>
-    /// version (<c>Major.Minor.Build</c>, straight from <c>Package.appxmanifest</c> via <c>Package.Current.Id.Version</c>),
-    /// so it can never drift from the shipped package; an unpackaged developer build has no package identity and falls
-    /// back to <see cref="CurrentVersion"/>. Resolved once — the package version does not change while the app runs.
+    /// version (the full four-part <c>Major.Minor.Build.Revision</c>, straight from <c>Package.appxmanifest</c> via
+    /// <c>Package.Current.Id.Version</c>), so it can never drift from the shipped package; an unpackaged developer build
+    /// has no package identity and falls back to <see cref="CurrentVersion"/> normalized to four parts. Resolved once —
+    /// the package version does not change while the app runs.
     /// </summary>
     internal static string DisplayVersion { get; } = ResolveDisplayVersion();
 
     private static string ResolveDisplayVersion()
     {
-        if (!Sprout.PackageIdentity.IsPackaged)
+        if (Sprout.PackageIdentity.IsPackaged)
         {
-            return CurrentVersion;
+            Windows.ApplicationModel.PackageVersion version = Windows.ApplicationModel.Package.Current.Id.Version;
+            return $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
         }
 
-        Windows.ApplicationModel.PackageVersion version = Windows.ApplicationModel.Package.Current.Id.Version;
-        return $"{version.Major}.{version.Minor}.{version.Build}";
+        // An unpackaged developer build has no package identity — normalize the product const to four parts so the
+        // displayed shape matches the packaged app (which reads the four-part manifest version).
+        System.Version parsed = System.Version.Parse(CurrentVersion);
+        return $"{parsed.Major}.{parsed.Minor}.{(parsed.Build < 0 ? 0 : parsed.Build)}.{(parsed.Revision < 0 ? 0 : parsed.Revision)}";
     }
 
     /// <summary>Builds a fresh per-folder context menu from the latest store state.</summary>
