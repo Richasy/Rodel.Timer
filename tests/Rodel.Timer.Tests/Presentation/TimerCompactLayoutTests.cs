@@ -89,8 +89,10 @@ public sealed class TimerCompactLayoutTests
     {
         Size min = TimerCompactLayoutResolver.MinimumClientSize;
         Size initial = TimerCompactLayoutResolver.DefaultInitialSize;
+        Size max = TimerCompactLayoutResolver.MaximumClientSize;
 
         Assert.IsTrue(initial.Width >= min.Width && initial.Height >= min.Height);
+        Assert.IsTrue(initial.Width <= max.Width && initial.Height <= max.Height);
     }
 
     [TestMethod]

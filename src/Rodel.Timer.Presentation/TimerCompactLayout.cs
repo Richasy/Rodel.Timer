@@ -79,6 +79,12 @@ public static class TimerCompactLayoutResolver
     /// <summary>The compact-overlay window's initial client size (epx) — the balanced design point.</summary>
     public static Size DefaultInitialSize { get; } = new(360f, 203f);
 
+    /// <summary>
+    /// The compact-overlay window's maximum client size (epx). Kept explicit so placement migration and the presenter
+    /// share one stable range even if the framework default changes.
+    /// </summary>
+    public static Size MaximumClientSize { get; } = new(960f, 540f);
+
     /// <summary>A conservative upper bound for the "HH:MM:SS" clock width at a given font size.</summary>
     /// <param name="clockFontSize">The clock font size in effective pixels.</param>
     /// <returns>The estimated maximum clock width in effective pixels.</returns>

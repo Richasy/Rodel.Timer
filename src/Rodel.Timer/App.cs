@@ -20,6 +20,9 @@ namespace Rodel.Timer;
 /// </summary>
 public sealed class App : Application, IDisposable
 {
+    private static readonly Size DefaultWindowSize = new(1100f, 720f);
+    private static readonly Size MinimumWindowSize = new(480f, 460f);
+
     private Window _window = null!;
     private TimerAppStore _store = null!;
     private MainView _mainView = null!;
@@ -46,15 +49,15 @@ public sealed class App : Application, IDisposable
         // before the app exists and could only read CurrentUICulture (the Windows display language).
         ApplyStartupLanguage();
 
-        string? savedPlacement = WindowPlacementStore.Load();
         _window = OpenWindow(new WindowSpec
         {
             Title = Resources.AppName,
-            Size = new Size(1100f, 720f),
-            MinSize = new Size(480f, 460f),
+            Size = DefaultWindowSize,
+            MinSize = MinimumWindowSize,
             TitleBarHeight = TitleBarHeight.Tall,
             SystemBackdrop = SystemBackdrop.Mica,
-            Placement = WindowPlacement.TryParse(savedPlacement, out WindowPlacement restored) ? restored : null,
+            Placement = WindowPlacementCoordinator.LoadOverlappedForStartup(
+                TimerCompactLayoutResolver.MaximumClientSize),
         });
 
         TimerDataBootstrapper bootstrapper = Services.GetRequiredService<TimerDataBootstrapper>();
@@ -167,10 +170,10 @@ public sealed class App : Application, IDisposable
 
     private async void OnClosing(object? sender, WindowClosingEventArgs e)
     {
-        // Capture the window placement while the HWND still exists (the Closing event fires before teardown), so the
-        // window reopens where the user left it. Saved on every pass — a deferred close that stays open on a save error
-        // simply re-captures the latest placement on the next attempt.
-        WindowPlacementStore.Save(_window.SavePlacement().Serialize());
+        // Capture the current presenter's placement while the HWND still exists (the Closing event fires before
+        // teardown). Overlapped bounds drive the next launch; compact bounds drive the next compact entry. Saved on
+        // every pass — a deferred close that stays open on a save error simply re-captures the latest placement.
+        WindowPlacementCoordinator.SaveCurrent(_window);
 
         if (_forceClose)
         {

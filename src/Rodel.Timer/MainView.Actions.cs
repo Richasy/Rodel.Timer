@@ -1,3 +1,4 @@
+using Rodel.Timer.AppData;
 using Rodel.Timer.Core.History;
 using Rodel.Timer.Core.Migration;
 using Rodel.Timer.Core.Persistence;
@@ -220,17 +221,21 @@ public sealed partial class MainView
     {
         if (IsCompactPresenter)
         {
+            WindowPlacementCoordinator.SaveCurrent(_window);
             _window.SetPresenter(WindowPresenterKind.Overlapped);
             return;
         }
 
+        WindowPlacementCoordinator.SaveCurrent(_window);
         CompactOverlayPresenter presenter = CompactOverlayPresenter.Create();
         presenter.InitialSize = TimerCompactLayoutResolver.DefaultInitialSize;
 
         // Enforce the overlay's own minimum size so the user cannot shrink the picture-in-picture window into the range
         // where the tight clock would collide with the primary action (the resolver owns that no-overlap contract).
         presenter.MinSize = TimerCompactLayoutResolver.MinimumClientSize;
+        presenter.MaxSize = TimerCompactLayoutResolver.MaximumClientSize;
         _window.SetPresenter(presenter);
+        WindowPlacementCoordinator.Restore(_window, TimerWindowPlacementMode.CompactOverlay);
     }
 
     /// <summary>Retries the blocking operation: re-saves after a save failure, or reloads after a bootstrap error.</summary>
