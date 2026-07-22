@@ -9,7 +9,7 @@ namespace Rodel.Timer.Styling;
 /// <summary>
 /// The app-local visual token table for Rodel Timer — a single source of truth for the spacing rhythm, the corner-radius
 /// hierarchy, the standard control heights, the icon sizes, the layout max-widths, and a pair of theme-aware button
-/// palettes (a transparent "ghost" and a subtle "navigation selected" fill). It is deliberately app-local: it does
+/// palettes (transparent command chrome plus selected states). It is deliberately app-local: it does
 /// <b>not</b> mutate any Sprout global default, so it styles only this product and leaves the framework's own defaults
 /// untouched. Every palette helper resolves from a live <see cref="ThemeColors"/> so a light / dark / high-contrast
 /// switch re-colours it through the normal theme-stamp re-render.
@@ -154,6 +154,21 @@ internal static class TimerVisuals
         new ButtonVisualState(colors.SubtleFillColorDisabled, colors.TextFillColorDisabled, colors.SubtleFillColorTransparent));
 
     /// <summary>
+    /// A title-bar toggle palette with the same transparent unchecked chrome as <see cref="Ghost"/> and the standard
+    /// accent checked state, so the pin command is flat at rest while its active state remains unambiguous.
+    /// </summary>
+    internal static ToggleButtonPalette GhostToggle(ThemeColors colors)
+    {
+        var uncheckedPalette = new ToggleButtonStatePalette(
+            new ToggleButtonVisualState(colors.SubtleFillColorTransparent, colors.TextFillColorPrimary, colors.SubtleFillColorTransparent),
+            new ToggleButtonVisualState(colors.SubtleFillColorSecondary, colors.TextFillColorPrimary, colors.SubtleFillColorTransparent),
+            new ToggleButtonVisualState(colors.SubtleFillColorTertiary, colors.TextFillColorSecondary, colors.SubtleFillColorTransparent),
+            new ToggleButtonVisualState(colors.SubtleFillColorDisabled, colors.TextFillColorDisabled, colors.SubtleFillColorTransparent));
+        ToggleButtonPalette palette = ToggleButtonPalette.FromTheme(colors);
+        return palette with { Unchecked = uncheckedPalette, Indeterminate = uncheckedPalette };
+    }
+
+    /// <summary>
     /// The named, immutable <see cref="ButtonStyle"/> values this product applies to its buttons through the canonical
     /// <c>.Style(...)</c> verb — a single app style vocabulary rather than a bespoke chrome extension. Each is a sparse
     /// overlay: it sets only the corner radius and — critically — <b>zero padding</b>, so a fixed-square icon button
@@ -172,5 +187,12 @@ internal static class TimerVisuals
         /// <summary>The circular hero start / stop action — zero padding + the 28 epx radius (a perfect 56 epx pill).</summary>
         internal static readonly ButtonStyle CircularAction = default(ButtonStyle).Padding(0f).CornerRadius(Radius.Circle);
 
+    }
+
+    /// <summary>Named toggle-button styles used by the product chrome.</summary>
+    internal static class ToggleButtons
+    {
+        /// <summary>A fixed-square icon toggle with zero padding and the standard control radius.</summary>
+        internal static readonly ToggleButtonStyle Icon = default(ToggleButtonStyle).Padding(0f).CornerRadius(Radius.Control);
     }
 }

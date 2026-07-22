@@ -85,17 +85,17 @@ public sealed partial class HistoryDetailsContent : Control
                 Stack(
                     Stack(
                         Text(Resources.Folders, LabelStyle, Colors.TextFillColorSecondary).Weight(1f),
-                        Text(_folderName, ValueStyle, Colors.TextFillColorPrimary))
+                        Text(_folderName, ValueStyle))
                         .Orientation(Orientation.Horizontal)
                         .Spacing(TimerVisuals.Spacing.Medium),
                     Stack(
                         Text(Resources.RecordedAt, LabelStyle, Colors.TextFillColorSecondary).Weight(1f),
-                        Text(_recordedAt, ValueStyle, Colors.TextFillColorPrimary))
+                        Text(_recordedAt, ValueStyle))
                         .Orientation(Orientation.Horizontal)
                         .Spacing(TimerVisuals.Spacing.Medium),
                     Stack(
                         Text(Resources.Duration, LabelStyle, Colors.TextFillColorSecondary).Weight(1f),
-                        Text(_duration, ValueStyle, Colors.TextFillColorPrimary))
+                        Text(_duration, ValueStyle))
                         .Orientation(Orientation.Horizontal)
                         .Spacing(TimerVisuals.Spacing.Medium))
                     .Spacing(TimerVisuals.Spacing.Small))

@@ -14,6 +14,7 @@ using Sprout.Localization;
 using Sprout.Reactive;
 using Sprout.Reconcile;
 using Sprout.Semantics;
+using Sprout.Theming;
 
 namespace Rodel.Timer;
 
@@ -141,7 +142,7 @@ internal static class SelfTest
     /// tree. They exist to pin the contract cheaply and headlessly; the real mounted tree is verified end-to-end by the
     /// Sprout.DevTools drive over the published exe (which enters compact, asserts the title-bar / title / toggle ids are
     /// gone, then exits and asserts they return). The ready mirror must carry every essential id; the compact mirror
-    /// must omit exactly the ids torn down by the compact presenter (Settings, Title, and the two footer toggles).
+    /// must omit exactly the normal title-bar commands and title editor torn down by the compact presenter.
     /// </remarks>
     private static bool RunUiChecks()
     {
@@ -162,6 +163,28 @@ internal static class SelfTest
             && balancedCompact is { Mode: TimerCompactMode.Balanced, ShowContext: true }
             && tightCompact is { Mode: TimerCompactMode.Tight, ShowContext: false }
             && wideCompact is { Mode: TimerCompactMode.Wide, ShowContext: true };
+
+        TimerWindowPinBehavior unpinned = TimerWindowPinPolicy.Resolve(isPinned: false, isMaximized: false);
+        TimerWindowPinBehavior pinned = TimerWindowPinPolicy.Resolve(isPinned: true, isMaximized: false);
+        TimerWindowPinBehavior maximized = TimerWindowPinPolicy.Resolve(isPinned: false, isMaximized: true);
+        bool pinPolicy =
+            unpinned is
+            {
+                IsAlwaysOnTop: false,
+                IsResizable: true,
+                IsMaximizable: true,
+                ShowCompactOverlayButton: true,
+                ShowPinButton: true,
+            }
+            && pinned is
+            {
+                IsAlwaysOnTop: true,
+                IsResizable: true,
+                IsMaximizable: false,
+                ShowCompactOverlayButton: false,
+                ShowPinButton: true,
+            }
+            && maximized is { ShowPinButton: false };
 
         // Clock formatting: zero-padded HH:mm:ss, hours can exceed 24, negatives clamp to zero.
         bool format =
@@ -188,13 +211,14 @@ internal static class SelfTest
         bool automation = ids.Distinct(StringComparer.Ordinal).Count() == ids.Length
             && Array.TrueForAll(ids, static id => id.StartsWith(TimerAutomationIds.Prefix, StringComparison.Ordinal));
 
-        // The ids the compact presenter tears down (title-bar settings, title editor, both footer toggles).
+        // The normal-title-bar and title-editor ids that the compact presenter tears down.
         string[] compactOmitted =
         [
             TimerAutomationIds.Settings,
             TimerAutomationIds.Title,
             TimerAutomationIds.FoldersToggle,
             TimerAutomationIds.HistoryToggle,
+            TimerAutomationIds.PinWindow,
         ];
 
         // Ready contract: audit clean, and every essential id present (including the ones compact omits).
@@ -235,17 +259,22 @@ internal static class SelfTest
         // rebind that re-themes rows in place), and the keys are unique and ordered.
         bool rowProjection = RunRowProjectionChecks();
 
-        // Icon-button style: the app icon-button ButtonStyle (TimerVisuals.Buttons.Icon), applied via the canonical
-        // .Style(...) verb, must zero the Sprout Button default inset (11,5,11,6) so a fixed square icon button (e.g. the
-        // 36 epx title-bar Settings / Compact, the 40 epx footer toggles, the 36 epx pane Add / More, the 44 epx picker
-        // cells) centres its glyph instead of cropping it — the clipped-glyph fix. A non-zero resolved padding would
-        // reserve 22 epx horizontally and crop a 20 epx glyph inside a 36 epx button. The style bakes into the button's
-        // canonical Appearance plane, so the padding + requested corner radius are asserted there.
+        // Icon-button styles: fixed-square buttons and the pin ToggleButton both zero the framework inset so their glyphs
+        // stay centred. The pin's unchecked row must also retain the transparent ghost resting surface.
         ButtonView chromed = Markup.Button("x", static () => { }).Style(TimerVisuals.Buttons.Icon);
+        ThemeColors colors = ThemeColors.ForLight(SystemColors.Default);
+        ToggleButtonPalette pinPalette = TimerVisuals.GhostToggle(colors);
+        ToggleButtonView pinToggle = Markup.ToggleButton("x", false, pinPalette).Style(TimerVisuals.ToggleButtons.Icon);
+        bool fluentIconInheritsForeground = FluentIcon.Inline(FluentSymbol.Pin).InheritsForeground;
         bool iconChrome = chromed.Appearance.Padding == new Thickness(0f)
-            && chromed.Appearance.CornerRadius == new CornerRadius(TimerVisuals.Radius.Control);
+            && chromed.Appearance.CornerRadius == new CornerRadius(TimerVisuals.Radius.Control)
+            && pinToggle.Appearance.Padding == new Thickness(0f)
+            && pinToggle.Appearance.CornerRadius == new CornerRadius(TimerVisuals.Radius.Control)
+            && pinPalette.Unchecked.Normal.Background == colors.SubtleFillColorTransparent
+            && pinPalette.Unchecked.Normal.Border == colors.SubtleFillColorTransparent
+            && fluentIconInheritsForeground;
 
-        return responsiveLayout && format && automation && readyContract && compactContract && iconNames && languageApply && rowProjection && iconChrome;
+        return responsiveLayout && pinPolicy && format && automation && readyContract && compactContract && iconNames && languageApply && rowProjection && iconChrome;
     }
 
     private sealed class LanguageApplyProbe : ILanguageApplyTarget
@@ -355,6 +384,7 @@ internal static class SelfTest
         _ = titleBar.Add(Node(SemanticsRole.Button, "Folders", TimerAutomationIds.FoldersToggle, interactive: true));
         _ = titleBar.Add(Node(SemanticsRole.Button, "History", TimerAutomationIds.HistoryToggle, interactive: true));
         _ = titleBar.Add(Node(SemanticsRole.Button, "Compact overlay", TimerAutomationIds.Compact, interactive: true));
+        _ = titleBar.Add(Node(SemanticsRole.Button, "Pin window", TimerAutomationIds.PinWindow, interactive: true));
         _ = titleBar.Add(Node(SemanticsRole.Button, "Settings", TimerAutomationIds.Settings, interactive: true));
         _ = root.Add(titleBar);
 

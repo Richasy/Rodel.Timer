@@ -27,7 +27,6 @@ public readonly partial record struct FolderRowView(
     FluentSymbol IconSymbol,
     Brush IconBrush,
     Brush TileBrush,
-    Color NameInk,
     Color DateInk,
     TextFormat NameStyle,
     TextFormat DateStyle)
@@ -44,7 +43,7 @@ public readonly partial record struct FolderRowView(
                 .Width(TimerVisuals.IconSize.Tile)
                 .Height(TimerVisuals.IconSize.Tile),
             Stack(
-                Text(Name, NameStyle, NameInk),
+                Text(Name, NameStyle),
                 Text(CreatedText, DateStyle, DateInk))
                 .Spacing(2f)
                 .VAlign(VerticalAlignment.Center)
@@ -114,8 +113,7 @@ public sealed partial class FolderPaneControl : Control
             Stack(
                 Text(
                     Resources.Folders,
-                    new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight),
-                    Colors.TextFillColorPrimary),
+                    new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight)),
                 Text(
                     Resources.FoldersFlyoutSubtitle,
                     new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.NormalWeight),
@@ -124,7 +122,7 @@ public sealed partial class FolderPaneControl : Control
                 .VAlign(VerticalAlignment.Center)
                 .Weight(1f),
             Button(
-                Icon.Fluent(FluentSymbol.Add, FluentIconVariant.Regular, TimerVisuals.IconSize.Medium, Brush.CreateSolid(Colors.TextFillColorPrimary)),
+                Icon.Fluent(FluentSymbol.Add, FluentIconVariant.Regular, TimerVisuals.IconSize.Medium),
                 _chrome.ShowAddFolderDialog,
                 TimerVisuals.Ghost(Colors))
                 .Style(TimerVisuals.Buttons.Icon)

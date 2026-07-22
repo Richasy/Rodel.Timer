@@ -68,6 +68,8 @@ public sealed partial class TimerTitleBarControl : Control
                 Colors,
                 Layout.ShowBrandLabel,
                 Layout.ShowCommandLabels,
+                _chrome.IsWindowPinned,
+                _chrome.IsWindowMaximized,
                 Resources.AppName),
             new CompactTimerTitleBarView(_chrome, Colors)));
 
@@ -125,8 +127,7 @@ public readonly partial record struct CompactTimerTitleBarView(
             Icon.Fluent(
                 FluentSymbol.ContractDownLeft,
                 FluentIconVariant.Regular,
-                TimerVisuals.IconSize.Small,
-                Brush.CreateSolid(Colors.TextFillColorPrimary)),
+                TimerVisuals.IconSize.Small),
             Chrome.ToggleCompact,
             TimerVisuals.Ghost(Colors))
             .Style(TimerVisuals.Buttons.Icon)
@@ -151,27 +152,88 @@ public readonly partial record struct CompactTimerTitleBarView(
 public readonly partial record struct TimerTitleBarDropDownContentView(
     FluentSymbol Symbol,
     string Label,
-    Brush IconBrush,
-    Color LabelInk,
     bool ShowLabel)
 {
     /// <summary>The glyph and optional label; the DropDownButton owns its decorative chevron.</summary>
     public Ui Body => Stack(
-        Icon.Fluent(Symbol, FluentIconVariant.Regular, TimerVisuals.IconSize.Medium, IconBrush)
+        Icon.Fluent(Symbol, FluentIconVariant.Regular, TimerVisuals.IconSize.Medium)
             .VAlign(VerticalAlignment.Center),
         Text(
             Label,
-            new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.NormalWeight),
-            LabelInk)
+            new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.NormalWeight))
             .VAlign(VerticalAlignment.Center)
             .Visible(ShowLabel))
         .Orientation(Orientation.Horizontal)
         .Spacing(6f);
 }
 
+/// <summary>The normal title bar's compact-overlay command, removed while the full window is pinned.</summary>
+[Composite]
+public readonly partial record struct NormalCompactOverlayButtonView(
+    TimerChrome Chrome,
+    ThemeColors Colors)
+{
+    /// <summary>The icon-only compact-overlay command.</summary>
+    public Ui Body => Overlay(
+        Button(
+            Icon.Fluent(
+                FluentSymbol.ContractUpRight,
+                FluentIconVariant.Regular,
+                TimerVisuals.IconSize.Medium),
+            Chrome.ToggleCompact,
+            TimerVisuals.Ghost(Colors))
+            .Style(TimerVisuals.Buttons.Icon)
+            .Width(TimerVisuals.Height.Icon)
+            .Height(TimerVisuals.Height.Icon)
+            .VAlign(VerticalAlignment.Center)
+            .ToolTip(Resources.CompactOverlay)
+            .Automation(CompactAutomation));
+
+    internal static AutomationInfo CompactAutomation => new()
+    {
+        Name = Resources.CompactOverlay,
+        HelpText = Resources.CompactOverlayHelp,
+        AutomationId = TimerAutomationIds.Compact,
+    };
+}
+
+/// <summary>The controlled title-bar toggle for full-window always-on-top mode.</summary>
+[Composite]
+public readonly partial record struct WindowPinButtonView(
+    TimerChrome Chrome,
+    ThemeColors Colors,
+    bool IsWindowPinned)
+{
+    /// <summary>The Pin/PinOff icon toggle with state-dependent tooltip and accessibility metadata.</summary>
+    public Ui Body => Overlay(
+        ToggleButton(
+            Icon.Fluent(
+                IsWindowPinned ? FluentSymbol.PinOff : FluentSymbol.Pin,
+                IsWindowPinned ? FluentIconVariant.Filled : FluentIconVariant.Regular,
+                TimerVisuals.IconSize.Medium),
+            IsWindowPinned,
+            TimerVisuals.GhostToggle(Colors))
+            .OnToggled(Chrome.SetWindowPinned)
+            .Style(TimerVisuals.ToggleButtons.Icon)
+            .Width(TimerVisuals.Height.Icon)
+            .Height(TimerVisuals.Height.Icon)
+            .VAlign(VerticalAlignment.Center)
+            .AccessKey("P")
+            .ToolTip(IsWindowPinned ? Resources.UnpinWindow : Resources.PinWindow)
+            .Automation(PinAutomation));
+
+    internal AutomationInfo PinAutomation => new()
+    {
+        Name = IsWindowPinned ? Resources.UnpinWindow : Resources.PinWindow,
+        HelpText = IsWindowPinned ? Resources.UnpinWindowHelp : Resources.PinWindowHelp,
+        AutomationId = TimerAutomationIds.PinWindow,
+        AccessKey = "P",
+    };
+}
+
 /// <summary>
 /// The extended title-bar row: brand and anchored Folders/History commands at the leading edge, an untouched drag
-/// region, then compact/settings commands before the system caption buttons.
+/// region, then compact/pin/settings commands before the system caption buttons.
 /// </summary>
 [Composite]
 public readonly partial record struct TimerTitleBarView(
@@ -181,6 +243,8 @@ public readonly partial record struct TimerTitleBarView(
     ThemeColors Colors,
     bool ShowBrandLabel,
     bool ShowCommandLabels,
+    bool IsWindowPinned,
+    bool IsWindowMaximized,
     string AppName)
 {
     /// <summary>The responsive extended-title-bar content.</summary>
@@ -192,16 +256,13 @@ public readonly partial record struct TimerTitleBarView(
                 .VAlign(VerticalAlignment.Center),
             Text(
                 AppName,
-                new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight),
-                Colors.TextFillColorPrimary)
+                new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight))
                 .VAlign(VerticalAlignment.Center)
                 .Visible(ShowBrandLabel),
             DropDownButton(
                 new TimerTitleBarDropDownContentView(
                     FluentSymbol.FolderList,
                     Resources.Folders,
-                    Brush.CreateSolid(Colors.TextFillColorPrimary),
-                    Colors.TextFillColorPrimary,
                     ShowCommandLabels),
                 FoldersFlyout)
                 .Style(CommandStyle)
@@ -216,8 +277,6 @@ public readonly partial record struct TimerTitleBarView(
                 new TimerTitleBarDropDownContentView(
                     FluentSymbol.History,
                     Resources.History,
-                    Brush.CreateSolid(Colors.TextFillColorPrimary),
-                    Colors.TextFillColorPrimary,
                     ShowCommandLabels),
                 HistoryFlyout)
                 .Style(CommandStyle)
@@ -232,26 +291,17 @@ public readonly partial record struct TimerTitleBarView(
             .Spacing(TimerVisuals.Spacing.Small)
             .VAlign(VerticalAlignment.Center)
             .Weight(1f),
-        Button(
-            Icon.Fluent(
-                FluentSymbol.ContractUpRight,
-                FluentIconVariant.Regular,
-                TimerVisuals.IconSize.Medium,
-                Brush.CreateSolid(Colors.TextFillColorPrimary)),
-            Chrome.ToggleCompact,
-            TimerVisuals.Ghost(Colors))
-            .Style(TimerVisuals.Buttons.Icon)
-            .Width(TimerVisuals.Height.Icon)
-            .Height(TimerVisuals.Height.Icon)
-            .VAlign(VerticalAlignment.Center)
-            .ToolTip(Resources.CompactOverlay)
-            .Automation(CompactAutomation),
+        When(
+            WindowPinBehavior.ShowCompactOverlayButton,
+            new NormalCompactOverlayButtonView(Chrome, Colors)),
+        When(
+            WindowPinBehavior.ShowPinButton,
+            new WindowPinButtonView(Chrome, Colors, IsWindowPinned)),
         Button(
             Icon.Fluent(
                 FluentSymbol.Settings,
                 FluentIconVariant.Regular,
-                TimerVisuals.IconSize.Medium,
-                Brush.CreateSolid(Colors.TextFillColorPrimary)),
+                TimerVisuals.IconSize.Medium),
             Chrome.ShowSettings,
             TimerVisuals.Ghost(Colors))
             .Style(TimerVisuals.Buttons.Icon)
@@ -301,10 +351,6 @@ public readonly partial record struct TimerTitleBarView(
         AccessKey = "S",
     };
 
-    internal static AutomationInfo CompactAutomation => new()
-    {
-        Name = Resources.CompactOverlay,
-        HelpText = Resources.CompactOverlayHelp,
-        AutomationId = TimerAutomationIds.Compact,
-    };
+    internal TimerWindowPinBehavior WindowPinBehavior =>
+        TimerWindowPinPolicy.Resolve(IsWindowPinned, IsWindowMaximized);
 }

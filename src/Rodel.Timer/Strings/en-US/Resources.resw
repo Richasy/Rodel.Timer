@@ -41,6 +41,10 @@
   <data name="CompactOverlay" xml:space="preserve"><value>Compact overlay</value></data>
   <data name="ExitCompactOverlay" xml:space="preserve"><value>Exit compact overlay</value></data>
   <data name="CompactOverlayHelp" xml:space="preserve"><value>Show only the essential timer controls in a small always-on-top window</value></data>
+  <data name="PinWindow" xml:space="preserve"><value>Pin window</value></data>
+  <data name="PinWindowHelp" xml:space="preserve"><value>Keep the full timer window above other windows while allowing it to be resized</value></data>
+  <data name="UnpinWindow" xml:space="preserve"><value>Unpin window</value></data>
+  <data name="UnpinWindowHelp" xml:space="preserve"><value>Stop keeping the window above others and restore compact overlay and maximize</value></data>
   <data name="AddFolder" xml:space="preserve"><value>Add folder</value></data>
   <data name="AddFolderHelp" xml:space="preserve"><value>Create a folder for organizing timer sessions</value></data>
   <data name="EditFolder" xml:space="preserve"><value>Edit folder</value></data>

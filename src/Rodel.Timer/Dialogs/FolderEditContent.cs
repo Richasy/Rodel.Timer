@@ -17,27 +17,25 @@ using static Sprout.Markup;
 namespace Rodel.Timer.Dialogs;
 
 /// <summary>
-/// One icon cell of the folder icon picker — a fixed-size glyph button that highlights (accent palette + text-on-accent
-/// glyph) when it is the selected icon. It is a multi-part composite so each cell projects its own interaction and
-/// accessibility nodes; the host supplies the resolved palette, glyph brush, pick callback, and accessibility info.
+/// One icon cell of the folder icon picker — a fixed-size glyph button that highlights when it is the selected icon.
+/// It is a multi-part composite so each cell projects its own interaction and accessibility nodes; the host supplies the
+/// resolved palette, pick callback, and accessibility info.
 /// </summary>
 /// <param name="Symbol">The Fluent glyph the cell paints.</param>
 /// <param name="Palette">The resolved button palette (accent when selected).</param>
-/// <param name="IconBrush">The resolved glyph brush.</param>
 /// <param name="OnPick">Selects this icon.</param>
 /// <param name="Info">The cell's accessibility info (name + id).</param>
 [Composite]
 public readonly partial record struct IconCellView(
     FluentSymbol Symbol,
     ButtonPalette Palette,
-    Brush IconBrush,
     Action OnPick,
     AutomationInfo Info)
 {
     /// <summary>A square glyph button sized for the picker grid, centred in its (stretched) grid cell.</summary>
     public Ui Body => Overlay(
         Button(
-            Icon.Fluent(Symbol, FluentIconVariant.Regular, TimerVisuals.IconSize.Medium, IconBrush),
+            Icon.Fluent(Symbol, FluentIconVariant.Regular, TimerVisuals.IconSize.Medium),
             OnPick,
             Palette)
             .Style(TimerVisuals.Buttons.Icon)
@@ -160,7 +158,6 @@ public sealed partial class FolderEditContent : Control
             choice.IsSelected
                 ? ButtonPalette.FromTheme(colors, ButtonColorScheme.Accent)
                 : ButtonPalette.FromTheme(colors, ButtonColorScheme.Standard),
-            Brush.CreateSolid(choice.IsSelected ? colors.TextOnAccentFillColorPrimary : colors.TextFillColorPrimary),
             () => SelectedIcon = choice.Icon,
             new AutomationInfo
             {

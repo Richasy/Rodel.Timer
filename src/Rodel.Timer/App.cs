@@ -74,6 +74,7 @@ public sealed class App : Application, IDisposable
         _mainView = new MainView(_window, _store, LoadFontChoices());
 
         _window.SizeChanged += OnSizeChanged;
+        _window.StateChanged += OnStateChanged;
         _window.PresenterChanged += OnPresenterChanged;
         _window.ActualThemeChanged += OnActualThemeChanged;
         _window.Closing += OnClosing;
@@ -152,6 +153,9 @@ public sealed class App : Application, IDisposable
 
     private void OnSizeChanged(object? sender, WindowSizeChangedEventArgs e) =>
         _mainView.SetViewportSize(e.Size.Width, e.Size.Height);
+
+    private void OnStateChanged(object? sender, EventArgs e) =>
+        _mainView.SetWindowMaximized(_window.State == WindowState.Maximized);
 
     private void OnPresenterChanged(object? sender, EventArgs e) =>
         _mainView.SetCompactPresenter(_window.Presenter.Kind == WindowPresenterKind.CompactOverlay);

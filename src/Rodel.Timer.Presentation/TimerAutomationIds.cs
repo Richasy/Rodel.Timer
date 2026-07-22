@@ -24,6 +24,9 @@ public static class TimerAutomationIds
     /// <summary>The enter/exit compact overlay button.</summary>
     public const string Compact = "RodelTimer.Main.Compact";
 
+    /// <summary>The pin/unpin full-window toggle.</summary>
+    public const string PinWindow = "RodelTimer.Main.PinWindow";
+
     /// <summary>The title-bar Folders drop-down button.</summary>
     public const string FoldersToggle = "RodelTimer.Main.FoldersToggle";
 

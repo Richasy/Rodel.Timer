@@ -32,6 +32,7 @@ public sealed class TimerChrome
         ShowSettings = main.ShowSettings;
         StartOrStop = main.StartOrStop;
         ToggleCompact = main.ToggleCompact;
+        SetWindowPinned = main.SetWindowPinned;
         ShowAddFolderDialog = main.ShowAddFolderDialog;
         Retry = main.Retry;
         SetSessionTitle = main.SetSessionTitle;
@@ -49,6 +50,12 @@ public sealed class TimerChrome
 
     /// <summary>Whether the window is in the compact overlay presenter (reactive).</summary>
     public bool IsCompact => _main.IsCompactPresenter;
+
+    /// <summary>Whether the full timer window is pinned above other windows (reactive).</summary>
+    public bool IsWindowPinned => _main.IsWindowPinned;
+
+    /// <summary>Whether the overlapped window is currently maximized (reactive).</summary>
+    public bool IsWindowMaximized => _main.IsWindowMaximized;
 
     /// <summary>The current client width in effective pixels (reactive).</summary>
     public double ViewportWidth => _main.ViewportWidth;
@@ -124,6 +131,9 @@ public sealed class TimerChrome
 
     /// <summary>Toggles the compact overlay presenter.</summary>
     public Action ToggleCompact { get; }
+
+    /// <summary>Applies the controlled full-window pinned state.</summary>
+    public Action<bool?> SetWindowPinned { get; }
 
     /// <summary>Opens the add-folder dialog.</summary>
     public Action ShowAddFolderDialog { get; }

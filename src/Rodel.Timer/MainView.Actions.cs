@@ -37,6 +37,27 @@ public sealed partial class MainView
         _window.TitleBarHeight = isCompact ? TitleBarHeight.Standard : TitleBarHeight.Tall;
     }
 
+    /// <summary>Records whether the overlapped window is currently maximized.</summary>
+    /// <param name="isMaximized">Whether the window is maximized.</param>
+    public void SetWindowMaximized(bool isMaximized) => IsWindowMaximized = isMaximized;
+
+    /// <summary>Applies or removes the full-window always-on-top mode.</summary>
+    /// <param name="isPinned">The controlled two-state value emitted by the title-bar toggle.</param>
+    public void SetWindowPinned(bool? isPinned)
+    {
+        bool pin = isPinned ?? throw new ArgumentNullException(nameof(isPinned));
+        if (_window.Presenter is not OverlappedPresenter presenter)
+        {
+            throw new InvalidOperationException("Window pinning is only available in the overlapped presenter.");
+        }
+
+        TimerWindowPinBehavior behavior = TimerWindowPinPolicy.Resolve(pin, IsWindowMaximized);
+        presenter.IsResizable = behavior.IsResizable;
+        presenter.IsMaximizable = behavior.IsMaximizable;
+        presenter.IsAlwaysOnTop = behavior.IsAlwaysOnTop;
+        IsWindowPinned = pin;
+    }
+
     /// <summary>Bumps <see cref="MainView.ThemeStamp"/> so descendant controls re-resolve their theme colors.</summary>
     public void NotifyThemeChanged() => ThemeStamp++;
 
