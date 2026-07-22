@@ -59,8 +59,7 @@ public readonly partial record struct NormalTimerStageView(
                         TextFormat.DefaultFontFamily,
                         Layout.ClockSize,
                         TextFormat.BoldWeight,
-                        TextAlignment.Center),
-                    Colors.TextFillColorPrimary)
+                        TextAlignment.Center))
                     .HAlign(HorizontalAlignment.Center)
                     .VAlign(VerticalAlignment.Center))
                 .Padding(0f, -(Layout.GlowHeight - (Layout.ClockSize * 1.5f)) / 2f),
@@ -84,8 +83,7 @@ public readonly partial record struct NormalTimerStageView(
                     Icon.Fluent(
                         IsRunning ? FluentSymbol.Stop : FluentSymbol.Play,
                         FluentIconVariant.Filled,
-                        TimerVisuals.IconSize.Large,
-                        Brush.CreateSolid(Colors.TextOnAccentFillColorPrimary)),
+                        TimerVisuals.IconSize.Large),
                     Chrome.StartOrStop,
                     ButtonPalette.FromTheme(Colors, ButtonColorScheme.Accent))
                     .Style(PrimaryActionStyle)
@@ -197,8 +195,7 @@ public readonly partial record struct NormalTimerFooterView(
                     Colors.TextFillColorSecondary),
                 Text(
                     FolderName,
-                    new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight),
-                    Colors.TextFillColorPrimary))
+                    new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight)))
                 .Spacing(2f)
                 .VAlign(VerticalAlignment.Center)
                 .Weight(1f),
@@ -213,8 +210,7 @@ public readonly partial record struct NormalTimerFooterView(
                     .HAlign(HorizontalAlignment.Right),
                 Text(
                     FocusSummary,
-                    new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight, TextAlignment.Trailing),
-                    Colors.TextFillColorPrimary)
+                    new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight, TextAlignment.Trailing))
                     .HAlign(HorizontalAlignment.Right))
                 .Spacing(2f)
                 .VAlign(VerticalAlignment.Center)
@@ -278,8 +274,7 @@ public readonly partial record struct CompactContextView(
             Colors.TextFillColorSecondary),
         Text(
             StatusCaption,
-            new TextFormat(TextFormat.DefaultFontFamily, MathF.Max(11f, ClockSize * 0.3f), TextFormat.SemiBoldWeight),
-            Colors.TextFillColorPrimary))
+            new TextFormat(TextFormat.DefaultFontFamily, MathF.Max(11f, ClockSize * 0.3f), TextFormat.SemiBoldWeight)))
         .Spacing(2f);
 }
 
@@ -315,8 +310,7 @@ public readonly partial record struct CompactAdaptiveView(
                 TextFormat.DefaultFontFamily,
                 Layout.ClockSize,
                 TextFormat.SemiBoldWeight,
-                TextAlignment.Leading),
-            Colors.TextFillColorPrimary)
+                TextAlignment.Leading))
             .HAlign(HorizontalAlignment.Left)
             .VAlign(VerticalAlignment.Center)
             .Cell(0, ClockRow),
@@ -324,8 +318,7 @@ public readonly partial record struct CompactAdaptiveView(
             Icon.Fluent(
                 IsRunning ? FluentSymbol.Stop : FluentSymbol.Play,
                 FluentIconVariant.Filled,
-                TimerVisuals.IconSize.Large,
-                Brush.CreateSolid(Colors.TextOnAccentFillColorPrimary)),
+                TimerVisuals.IconSize.Large),
             Chrome.StartOrStop,
             ButtonPalette.FromTheme(Colors, ButtonColorScheme.Accent))
             .Style(ActionStyle)

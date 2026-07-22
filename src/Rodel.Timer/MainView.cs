@@ -13,7 +13,7 @@ namespace Rodel.Timer;
 
 /// <summary>
 /// The single stateful root control for the Rodel Timer product UI. It owns every piece of UI-only reactive state
-/// (viewport size, compact-presenter flag, the in-progress session title, and transient status),
+/// (viewport size, window presenter/state flags, the in-progress session title, and transient status),
 /// hosts the central timer content, drives the
 /// one-second UI tick into the store, and orchestrates every dialog and menu. The reactive
 /// <see cref="TimerAppStore"/> is the data source it binds to; the store is owned and disposed by <see cref="App"/>.
@@ -40,6 +40,7 @@ public sealed partial class MainView : Control, ILanguageApplyTarget
         _windowBackground = new TimerWindowBackground(window);
         ViewportWidth = 1100d;
         ViewportHeight = 720d;
+        IsWindowMaximized = window.State == WindowState.Maximized;
         SessionTitle = string.Empty;
         SaveErrorMessage = string.Empty;
     }
@@ -52,6 +53,12 @@ public sealed partial class MainView : Control, ILanguageApplyTarget
 
     /// <summary>Whether the window is currently in the compact overlay presenter.</summary>
     public partial bool IsCompactPresenter { get; private set; }
+
+    /// <summary>Whether the full timer window is pinned above other windows.</summary>
+    public partial bool IsWindowPinned { get; private set; }
+
+    /// <summary>Whether the overlapped window is currently maximized.</summary>
+    public partial bool IsWindowMaximized { get; private set; }
 
     /// <summary>The in-progress session title being edited; UI-only until a session is stopped.</summary>
     public partial string SessionTitle { get; private set; }

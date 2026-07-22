@@ -47,14 +47,27 @@ public sealed class ReadyTreeAccessibilityAuditTests
         }
     }
 
-    private static SemanticsNode BuildClosedNormalTree(TreeBuilder? builder = null)
+    private static SemanticsNode BuildClosedNormalTree(
+        TreeBuilder? builder = null,
+        bool isPinned = false,
+        bool isMaximized = false)
     {
         builder ??= new TreeBuilder();
+        TimerWindowPinBehavior pinBehavior = TimerWindowPinPolicy.Resolve(isPinned, isMaximized);
         SemanticsNode root = builder.Node(SemanticsRole.Window, "Rodel Timer", automationId: null, interactive: false);
         _ = root.Add(builder.Node(SemanticsRole.Button, "Folders", TimerAutomationIds.FoldersToggle, interactive: true));
         _ = root.Add(builder.Node(SemanticsRole.Button, "History", TimerAutomationIds.HistoryToggle, interactive: true));
+        if (pinBehavior.ShowCompactOverlayButton)
+        {
+            _ = root.Add(builder.Node(SemanticsRole.Button, "Compact overlay", TimerAutomationIds.Compact, interactive: true));
+        }
+
+        if (pinBehavior.ShowPinButton)
+        {
+            _ = root.Add(builder.Node(SemanticsRole.Button, isPinned ? "Unpin window" : "Pin window", TimerAutomationIds.PinWindow, interactive: true));
+        }
+
         _ = root.Add(builder.Node(SemanticsRole.Button, "Settings", TimerAutomationIds.Settings, interactive: true));
-        _ = root.Add(builder.Node(SemanticsRole.Button, "Compact overlay", TimerAutomationIds.Compact, interactive: true));
         _ = root.Add(builder.Node(SemanticsRole.Button, "Start timer", TimerAutomationIds.StartStop, interactive: true));
         _ = root.Add(builder.Node(SemanticsRole.Edit, "Session title", TimerAutomationIds.Title, interactive: true));
         return root;
@@ -130,6 +143,7 @@ public sealed class ReadyTreeAccessibilityAuditTests
         TimerAutomationIds.Title,
         TimerAutomationIds.FoldersToggle,
         TimerAutomationIds.HistoryToggle,
+        TimerAutomationIds.PinWindow,
     ];
 
     [TestMethod]
@@ -142,6 +156,27 @@ public sealed class ReadyTreeAccessibilityAuditTests
         Assert.IsFalse(ContainsAutomationId(root, TimerAutomationIds.HistoryFlyout));
         Assert.IsFalse(ContainsAutomationId(root, TimerAutomationIds.FolderSelect(Folders[0])));
         Assert.IsFalse(ContainsAutomationId(root, TimerAutomationIds.HistoryItem(Entries[0])));
+        Assert.IsTrue(ContainsAutomationId(root, TimerAutomationIds.PinWindow));
+    }
+
+    [TestMethod]
+    public void PinnedNormalTree_KeepsPinToggleAndOmitsCompactOverlay()
+    {
+        SemanticsNode root = BuildClosedNormalTree(isPinned: true);
+
+        AssertAuditClean(root);
+        Assert.IsTrue(ContainsAutomationId(root, TimerAutomationIds.PinWindow));
+        Assert.IsFalse(ContainsAutomationId(root, TimerAutomationIds.Compact));
+    }
+
+    [TestMethod]
+    public void MaximizedNormalTree_OmitsPinToggle()
+    {
+        SemanticsNode root = BuildClosedNormalTree(isMaximized: true);
+
+        AssertAuditClean(root);
+        Assert.IsFalse(ContainsAutomationId(root, TimerAutomationIds.PinWindow));
+        Assert.IsTrue(ContainsAutomationId(root, TimerAutomationIds.Compact));
     }
 
     [TestMethod]

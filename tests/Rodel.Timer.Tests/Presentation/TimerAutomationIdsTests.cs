@@ -29,6 +29,7 @@ public sealed class TimerAutomationIdsTests
         TimerAutomationIds.StartStop,
         TimerAutomationIds.Title,
         TimerAutomationIds.Compact,
+        TimerAutomationIds.PinWindow,
         TimerAutomationIds.FoldersToggle,
         TimerAutomationIds.HistoryToggle,
         TimerAutomationIds.FoldersFlyout,

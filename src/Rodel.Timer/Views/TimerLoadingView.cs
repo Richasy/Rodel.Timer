@@ -26,8 +26,7 @@ public readonly partial record struct TimerLoadingView(TimerChrome Chrome, int T
         Stack(
             ProgressRing(new Size(48f, 48f))
                 .Indeterminate()
-                .Active()
-                .Foreground(Brush.Theme(ThemeColorToken.AccentFillColorDefault)),
+                .Active(),
             Text(
                 Resources.PreparingData,
                 new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.NormalWeight),

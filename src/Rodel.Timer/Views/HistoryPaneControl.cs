@@ -27,7 +27,6 @@ namespace Rodel.Timer;
 public readonly partial record struct HistoryRowView(
     string Title,
     string Secondary,
-    Color TitleInk,
     Color SecondaryInk,
     TextFormat TitleStyle,
     TextFormat SecondaryStyle,
@@ -46,7 +45,7 @@ public readonly partial record struct HistoryRowView(
                 .Width(TimerVisuals.IconSize.Tile)
                 .Height(TimerVisuals.IconSize.Tile),
             Stack(
-                Text(Title, TitleStyle, TitleInk),
+                Text(Title, TitleStyle),
                 Text(Secondary, SecondaryStyle, SecondaryInk))
                 .Spacing(2f)
                 .VAlign(VerticalAlignment.Center)
@@ -125,8 +124,7 @@ public sealed partial class HistoryPaneControl : Control
         Stack(
             Text(
                 Resources.History,
-                new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight),
-                Colors.TextFillColorPrimary),
+                new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight)),
             Text(
                 HistorySubtitle,
                 new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.NormalWeight),

@@ -40,8 +40,7 @@ public readonly partial record struct TimerMessageView(
                     20f,
                     TextFormat.SemiBoldWeight,
                     TextAlignment.Center,
-                    TextWrapping.Wrap),
-                Colors.TextFillColorPrimary)
+                    TextWrapping.Wrap))
                 .MaxWidth(460f)
                 .HAlign(HorizontalAlignment.Center),
             Text(

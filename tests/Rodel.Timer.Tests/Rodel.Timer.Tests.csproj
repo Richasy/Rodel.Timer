@@ -20,5 +20,6 @@
   <ItemGroup>
     <None Include="..\..\src\Rodel.Timer\Strings\en-US\Resources.resw" Link="Strings\en-US\Resources.resw" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\..\src\Rodel.Timer\Strings\zh-CN\Resources.resw" Link="Strings\zh-CN\Resources.resw" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\Rodel.Timer\Strings\zh-Hant\Resources.resw" Link="Strings\zh-Hant\Resources.resw" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

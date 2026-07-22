@@ -39,7 +39,6 @@ public sealed partial class MainView
             FolderIconCatalog.Resolve(folder.Icon),
             Brush.CreateSolid(colors.AccentTextFillColorPrimary),
             Brush.CreateSolid(colors.AccentFillColorDefault.MultiplyAlpha(0.14f)),
-            colors.TextFillColorPrimary,
             colors.TextFillColorSecondary,
             new TextFormat(TextFormat.DefaultFontFamily, 13f, TextFormat.SemiBoldWeight),
             new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.NormalWeight));
@@ -62,7 +61,6 @@ public sealed partial class MainView
         return new HistoryRowView(
             entry.Title,
             $"{duration}  \u00B7  {created}",
-            colors.TextFillColorPrimary,
             colors.TextFillColorSecondary,
             new TextFormat(TextFormat.DefaultFontFamily, 13f, TextFormat.SemiBoldWeight),
             new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.NormalWeight),

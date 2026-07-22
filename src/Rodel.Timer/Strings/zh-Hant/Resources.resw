@@ -41,6 +41,10 @@
   <data name="CompactOverlay" xml:space="preserve"><value>緊湊懸浮窗</value></data>
   <data name="ExitCompactOverlay" xml:space="preserve"><value>退出緊湊懸浮窗</value></data>
   <data name="CompactOverlayHelp" xml:space="preserve"><value>在始終置頂的小視窗中僅顯示必要的計時控制元件</value></data>
+  <data name="PinWindow" xml:space="preserve"><value>固定視窗</value></data>
+  <data name="PinWindowHelp" xml:space="preserve"><value>讓完整計時器視窗保持置頂，同時仍可調整視窗大小</value></data>
+  <data name="UnpinWindow" xml:space="preserve"><value>取消固定視窗</value></data>
+  <data name="UnpinWindowHelp" xml:space="preserve"><value>取消視窗置頂，並恢復緊湊懸浮窗和最大化功能</value></data>
   <data name="AddFolder" xml:space="preserve"><value>新增分組</value></data>
   <data name="AddFolderHelp" xml:space="preserve"><value>建立用於整理計時記錄的分組</value></data>
   <data name="EditFolder" xml:space="preserve"><value>編輯分組</value></data>
