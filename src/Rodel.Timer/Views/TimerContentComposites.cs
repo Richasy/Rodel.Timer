@@ -187,7 +187,8 @@ public readonly partial record struct NormalTimerFooterView(
     string TodaysFocusLabel)
 {
     /// <summary>The full-width bottom plane; the middle column collapses to two columns unless a material fallback is showing.</summary>
-    public Ui Body => Border(
+    public Ui Body => Stack(
+        Divider.Horizontal(),
         Stack(
             Stack(
                 Text(
@@ -219,11 +220,10 @@ public readonly partial record struct NormalTimerFooterView(
                 .VAlign(VerticalAlignment.Center)
                 .Weight(1f))
             .Orientation(Orientation.Horizontal)
-            .Spacing(18f))
-        .Background(Brush.Theme(ThemeColorToken.LayerFillColorDefault))
-        .BorderBrush(Brush.Theme(ThemeColorToken.DividerStrokeColorDefault))
-        .BorderThickness(1f)
-        .Padding(TimerVisuals.Spacing.XXLarge, Layout.FooterVerticalPadding);
+            .Spacing(18f)
+            .Padding(TimerVisuals.Spacing.XXLarge, Layout.FooterVerticalPadding))
+        .Spacing(0f)
+        .Background(Brush.Theme(ThemeColorToken.LayerFillColorDefault));
 }
 
 /// <summary>
