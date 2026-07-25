@@ -40,7 +40,8 @@ public readonly partial record struct NormalTimerStageView(
     bool IsRunning,
     string SessionTitle,
     string StatusCaption,
-    string ActionLabel)
+    string ActionLabel,
+    bool AnimateClock)
 {
     /// <summary>The centred stage with no enclosing card or opaque surface: a heavy clock over a fading axis, the caption below it, then the centred title editor and the primary action, the whole block vertically centred.</summary>
     public Ui Body => Overlay(
@@ -53,13 +54,10 @@ public readonly partial record struct NormalTimerStageView(
                     .HAlign(HorizontalAlignment.Center)
                     .VAlign(VerticalAlignment.Center)
                     .Visible(Layout.ShowAxisDecoration),
-                AnimatedText(
-                    TimerFormat.Clock(Elapsed),
-                    new TextFormat(
-                        TextFormat.DefaultFontFamily,
-                        Layout.ClockSize,
-                        TextFormat.BoldWeight,
-                        TextAlignment.Center))
+                When(
+                    AnimateClock,
+                    AnimatedText(TimerFormat.Clock(Elapsed), ClockStyle),
+                    Text(TimerFormat.Clock(Elapsed), ClockStyle))
                     .HAlign(HorizontalAlignment.Center)
                     .VAlign(VerticalAlignment.Center))
                 .Padding(0f, -(Layout.GlowHeight - (Layout.ClockSize * 1.5f)) / 2f),
@@ -106,6 +104,13 @@ public readonly partial record struct NormalTimerStageView(
     /// <summary>The circular primary action: zero padding + a radius that keeps a perfect circle at the 64 epx hero diameter.</summary>
     internal static ButtonStyle PrimaryActionStyle =>
         default(ButtonStyle).Padding(0f).CornerRadius(TimerVisuals.Height.PrimaryAction / 2f);
+
+    /// <summary>The clock's block style; shared by the rolling and the still label so turning the animation off changes only the motion.</summary>
+    internal TextFormat ClockStyle => new(
+        TextFormat.DefaultFontFamily,
+        Layout.ClockSize,
+        TextFormat.BoldWeight,
+        TextAlignment.Center);
 
     /// <summary>
     /// The fading axis rule line behind the clock: a bounds-relative horizontal gradient that fades in from
@@ -172,9 +177,68 @@ public readonly partial record struct NormalTimerStageView(
     };
 }
 
+/// <summary>The footer's leading Folders command — present only in the side-panel layout, where the footer owns the entry points.</summary>
+[Composite]
+public readonly partial record struct FooterFoldersCommandView(
+    TimerChrome Chrome,
+    ThemeColors Colors)
+{
+    /// <summary>The icon-only command that slides the folders panel in from the leading edge.</summary>
+    public Ui Body => Overlay(
+        Button(
+            Icon.Fluent(FluentSymbol.FolderList, FluentIconVariant.Regular, TimerVisuals.IconSize.Medium),
+            Chrome.ShowFoldersPanel,
+            TimerVisuals.Ghost(Colors))
+            .Style(TimerVisuals.Buttons.Icon)
+            .Width(TimerVisuals.Height.Icon)
+            .Height(TimerVisuals.Height.Icon)
+            .VAlign(VerticalAlignment.Center)
+            .AccessKey("F")
+            .ToolTip(Resources.Folders)
+            .Automation(FoldersAutomation));
+
+    internal static AutomationInfo FoldersAutomation => new()
+    {
+        Name = Resources.Folders,
+        HelpText = Resources.FoldersHelp,
+        AutomationId = TimerAutomationIds.FoldersPanelToggle,
+        AccessKey = "F",
+    };
+}
+
+/// <summary>The footer's trailing History command — present only in the side-panel layout.</summary>
+[Composite]
+public readonly partial record struct FooterHistoryCommandView(
+    TimerChrome Chrome,
+    ThemeColors Colors)
+{
+    /// <summary>The icon-only command that slides the history panel in from the trailing edge.</summary>
+    public Ui Body => Overlay(
+        Button(
+            Icon.Fluent(FluentSymbol.History, FluentIconVariant.Regular, TimerVisuals.IconSize.Medium),
+            Chrome.ShowHistoryPanel,
+            TimerVisuals.Ghost(Colors))
+            .Style(TimerVisuals.Buttons.Icon)
+            .Width(TimerVisuals.Height.Icon)
+            .Height(TimerVisuals.Height.Icon)
+            .VAlign(VerticalAlignment.Center)
+            .AccessKey("H")
+            .ToolTip(Resources.History)
+            .Automation(HistoryAutomation));
+
+    internal static AutomationInfo HistoryAutomation => new()
+    {
+        Name = Resources.History,
+        HelpText = Resources.HistoryHelp,
+        AutomationId = TimerAutomationIds.HistoryPanelToggle,
+        AccessKey = "H",
+    };
+}
+
 /// <summary>The full-width normal footer: current folder, an optional material-fallback caution, and today's focus.</summary>
 [Composite]
 public readonly partial record struct NormalTimerFooterView(
+    TimerChrome Chrome,
     ThemeColors Colors,
     TimerNormalLayout Layout,
     string FolderName,
@@ -182,44 +246,69 @@ public readonly partial record struct NormalTimerFooterView(
     bool IsBackgroundFallback,
     string BackgroundStatus,
     string CurrentFolderLabel,
-    string TodaysFocusLabel)
+    string TodaysFocusLabel,
+    bool ShowPanelCommands)
 {
-    /// <summary>The full-width bottom plane; the middle column collapses to two columns unless a material fallback is showing.</summary>
+    /// <summary>
+    /// The full-width bottom plane at a DEFINITE height. The middle column collapses to two columns unless a material
+    /// fallback is showing, and the side-panel layout adds a command button beside each outer column — the footer is
+    /// the only entry point to folders and history in that mode.
+    /// </summary>
     public Ui Body => Stack(
         Divider.Horizontal(),
         Stack(
             Stack(
-                Text(
-                    CurrentFolderLabel,
-                    new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.SemiBoldWeight),
-                    Colors.TextFillColorSecondary),
-                Text(
-                    FolderName,
-                    new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight)))
-                .Spacing(2f)
+                When(ShowPanelCommands, new FooterFoldersCommandView(Chrome, Colors)),
+                Stack(
+                    Text(
+                        CurrentFolderLabel,
+                        new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.SemiBoldWeight),
+                        Colors.TextFillColorSecondary),
+                    Text(
+                        FolderName,
+                        new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight)))
+                    .Spacing(2f)
+                    .VAlign(VerticalAlignment.Center))
+                .Orientation(Orientation.Horizontal)
+                .Spacing(TimerVisuals.Spacing.Small)
                 .VAlign(VerticalAlignment.Center)
                 .Weight(1f),
             When(
                 Layout.ShowMiddleStatus && IsBackgroundFallback,
                 new NormalFooterStatusView(BackgroundStatus, Colors)),
             Stack(
-                Text(
-                    TodaysFocusLabel,
-                    new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.SemiBoldWeight, TextAlignment.Trailing),
-                    Colors.TextFillColorSecondary)
-                    .HAlign(HorizontalAlignment.Right),
-                Text(
-                    FocusSummary,
-                    new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight, TextAlignment.Trailing))
-                    .HAlign(HorizontalAlignment.Right))
-                .Spacing(2f)
+                Stack(
+                    Text(
+                        TodaysFocusLabel,
+                        new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.SemiBoldWeight, TextAlignment.Trailing),
+                        Colors.TextFillColorSecondary)
+                        .HAlign(HorizontalAlignment.Right),
+                    Text(
+                        FocusSummary,
+                        new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight, TextAlignment.Trailing))
+                        .HAlign(HorizontalAlignment.Right))
+                    .Spacing(2f)
+                    .VAlign(VerticalAlignment.Center)
+                    .Weight(1f),
+                When(ShowPanelCommands, new FooterHistoryCommandView(Chrome, Colors)))
+                .Orientation(Orientation.Horizontal)
+                .Spacing(TimerVisuals.Spacing.Small)
                 .VAlign(VerticalAlignment.Center)
                 .Weight(1f))
             .Orientation(Orientation.Horizontal)
             .Spacing(18f)
-            .Padding(TimerVisuals.Spacing.XXLarge, Layout.FooterVerticalPadding))
+            .Padding(HorizontalPadding, Layout.FooterVerticalPadding)
+            .Height(Layout.FooterHeight - TimerNormalLayoutResolver.FooterDividerHeight))
         .Spacing(0f)
         .Background(Brush.Theme(ThemeColorToken.LayerFillColorDefault));
+
+    /// <summary>
+    /// The footer's horizontal inset. With the panel commands present it drops to the side panels' own gutter, so each
+    /// command button sits flush with the edge of the card it opens; without them the wider hero inset is kept.
+    /// </summary>
+    internal float HorizontalPadding => ShowPanelCommands
+        ? TimerSidePanelLayoutResolver.Inset
+        : TimerVisuals.Spacing.XXLarge;
 }
 
 /// <summary>
@@ -241,21 +330,34 @@ public readonly partial record struct NormalTimerView(
     string CurrentFolderLabel,
     string TodaysFocusLabel,
     string StatusCaption,
-    string ActionLabel)
+    string ActionLabel,
+    bool AnimateClock,
+    bool ShowPanelCommands)
 {
     /// <summary>The open timer stage and full-width footer, with no enclosing hero card.</summary>
+    /// <remarks>
+    /// The footer is <b>keyed</b> on the values it can only read at mount — a composite container's <c>.Padding</c> and
+    /// a per-child <c>.Height</c> are applied when the subtree is built, not diffed — so switching the layout mode (or
+    /// crossing the short-window breakpoint) remounts it with the right gutter and the right definite height. That
+    /// height is what <see cref="TimerSidePanelLayoutResolver"/> measures the side panels' band against, so the two must
+    /// never drift apart.
+    /// </remarks>
     public Ui Body => Stack(
-        new NormalTimerStageView(Chrome, Colors, Layout, Elapsed, IsRunning, SessionTitle, StatusCaption, ActionLabel)
+        new NormalTimerStageView(Chrome, Colors, Layout, Elapsed, IsRunning, SessionTitle, StatusCaption, ActionLabel, AnimateClock)
             .Weight(1f),
-        new NormalTimerFooterView(
-            Colors,
-            Layout,
-            FolderName,
-            FocusSummary,
-            IsBackgroundFallback,
-            BackgroundStatus,
-            CurrentFolderLabel,
-            TodaysFocusLabel));
+        Keyed(
+            (ShowPanelCommands, Layout.FooterVerticalPadding),
+            new NormalTimerFooterView(
+                Chrome,
+                Colors,
+                Layout,
+                FolderName,
+                FocusSummary,
+                IsBackgroundFallback,
+                BackgroundStatus,
+                CurrentFolderLabel,
+                TodaysFocusLabel,
+                ShowPanelCommands)));
 }
 
 /// <summary>The folder and running-state context that Tight removes from all three trees.</summary>
@@ -290,7 +392,8 @@ public readonly partial record struct CompactAdaptiveView(
     string FolderName,
     TimeSpan Elapsed,
     bool IsRunning,
-    string StatusCaption)
+    string StatusCaption,
+    bool AnimateClock)
 {
     internal static readonly GridLength[] Columns = [GridLength.Star(1f), GridLength.Auto];
     internal static readonly GridLength[] TightRows = [GridLength.Auto];
@@ -304,13 +407,10 @@ public readonly partial record struct CompactAdaptiveView(
             Layout.ShowContext,
             new CompactContextView(FolderName, StatusCaption, Colors, Layout.ClockSize))
             .Cell(0, 0),
-        AnimatedText(
-            TimerFormat.Clock(Elapsed),
-            new TextFormat(
-                TextFormat.DefaultFontFamily,
-                Layout.ClockSize,
-                TextFormat.SemiBoldWeight,
-                TextAlignment.Leading))
+        When(
+            AnimateClock,
+            AnimatedText(TimerFormat.Clock(Elapsed), ClockStyle),
+            Text(TimerFormat.Clock(Elapsed), ClockStyle))
             .HAlign(HorizontalAlignment.Left)
             .VAlign(VerticalAlignment.Center)
             .Cell(0, ClockRow),
@@ -334,6 +434,13 @@ public readonly partial record struct CompactAdaptiveView(
 
     internal GridLength[] RowTracks =>
         Layout.ShowContext ? DetailedRows : TightRows;
+
+    /// <summary>The compact clock's block style; shared by the rolling and the still label.</summary>
+    internal TextFormat ClockStyle => new(
+        TextFormat.DefaultFontFamily,
+        Layout.ClockSize,
+        TextFormat.SemiBoldWeight,
+        TextAlignment.Leading);
 
     internal int ClockRow => Layout.ShowContext ? 1 : 0;
 
@@ -361,11 +468,12 @@ public readonly partial record struct CompactTimerView(
     string FolderName,
     TimeSpan Elapsed,
     bool IsRunning,
-    string StatusCaption)
+    string StatusCaption,
+    bool AnimateClock)
 {
     /// <summary>The capped content band; the 32 epx title bar owns Exit and the native Close button.</summary>
     public Ui Body => Overlay(
-        new CompactAdaptiveView(Chrome, Colors, Layout, FolderName, Elapsed, IsRunning, StatusCaption)
+        new CompactAdaptiveView(Chrome, Colors, Layout, FolderName, Elapsed, IsRunning, StatusCaption, AnimateClock)
             .VAlign(VerticalAlignment.Center))
         .Padding(Layout.OuterHorizontalPadding, 8f);
 }

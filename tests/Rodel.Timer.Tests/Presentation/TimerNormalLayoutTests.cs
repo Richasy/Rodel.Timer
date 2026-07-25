@@ -16,6 +16,10 @@ public sealed class TimerNormalLayoutTests
         Assert.AreEqual(880f, layout.AxisTotalWidth, "the axis line caps at 880 (86% of 1100 = 946 > 880).");
         Assert.AreEqual(36f, layout.StageVerticalPadding);
         Assert.AreEqual(14f, layout.FooterVerticalPadding);
+        Assert.AreEqual(
+            1f + (2f * 14f) + TimerNormalLayoutResolver.FooterContentHeight,
+            layout.FooterHeight,
+            "the footer's definite height is the divider plus its padding plus the content band.");
     }
 
     [TestMethod]
@@ -29,6 +33,10 @@ public sealed class TimerNormalLayoutTests
         Assert.AreEqual(190f, layout.GlowHeight, "a short window uses the compact glow ellipse height.");
         Assert.AreEqual(18f, layout.StageVerticalPadding);
         Assert.AreEqual(10f, layout.FooterVerticalPadding);
+        Assert.AreEqual(
+            1f + (2f * 10f) + TimerNormalLayoutResolver.FooterContentHeight,
+            layout.FooterHeight,
+            "a short window's footer is shorter by exactly its reduced padding.");
     }
 
     [TestMethod]

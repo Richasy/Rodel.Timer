@@ -387,7 +387,9 @@ public sealed partial class TimerAppStore
             current.Language,
             current.FontFamily,
             current.DailyTargetMinutes,
-            current.LastSeenVersion));
+            current.LastSeenVersion,
+            current.LayoutMode,
+            current.ClockAnimationEnabled));
         CommitMutation();
     }
 
@@ -405,7 +407,9 @@ public sealed partial class TimerAppStore
             current.Language,
             current.FontFamily,
             current.DailyTargetMinutes,
-            current.LastSeenVersion));
+            current.LastSeenVersion,
+            current.LayoutMode,
+            current.ClockAnimationEnabled));
         CommitMutation();
     }
 
@@ -425,7 +429,9 @@ public sealed partial class TimerAppStore
             language,
             current.FontFamily,
             current.DailyTargetMinutes,
-            current.LastSeenVersion));
+            current.LastSeenVersion,
+            current.LayoutMode,
+            current.ClockAnimationEnabled));
         CommitMutation();
     }
 
@@ -445,7 +451,9 @@ public sealed partial class TimerAppStore
             current.Language,
             fontFamily,
             current.DailyTargetMinutes,
-            current.LastSeenVersion));
+            current.LastSeenVersion,
+            current.LayoutMode,
+            current.ClockAnimationEnabled));
         CommitMutation();
     }
 
@@ -464,7 +472,50 @@ public sealed partial class TimerAppStore
             current.Language,
             current.FontFamily,
             dailyTargetMinutes,
-            current.LastSeenVersion));
+            current.LastSeenVersion,
+            current.LayoutMode,
+            current.ClockAnimationEnabled));
+        CommitMutation();
+    }
+
+    /// <summary>Sets the shell layout mode, preserving every other preference.</summary>
+    /// <param name="layoutMode">The new layout mode.</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="layoutMode"/> is not a defined mode.</exception>
+    /// <exception cref="InvalidOperationException">The workspace has not been loaded, or the store is closing.</exception>
+    /// <exception cref="ObjectDisposedException">The store has been disposed.</exception>
+    public void UpdateLayoutMode(TimerLayoutMode layoutMode)
+    {
+        EnsureMutable();
+        TimerPreferences current = Workspace.Preferences;
+        Workspace.UpdatePreferences(new TimerPreferences(
+            current.Theme,
+            current.Background,
+            current.Language,
+            current.FontFamily,
+            current.DailyTargetMinutes,
+            current.LastSeenVersion,
+            layoutMode,
+            current.ClockAnimationEnabled));
+        CommitMutation();
+    }
+
+    /// <summary>Sets whether the clock rolls its digits, preserving every other preference.</summary>
+    /// <param name="clockAnimationEnabled">Whether the rolling-digit animation is enabled.</param>
+    /// <exception cref="InvalidOperationException">The workspace has not been loaded, or the store is closing.</exception>
+    /// <exception cref="ObjectDisposedException">The store has been disposed.</exception>
+    public void UpdateClockAnimation(bool clockAnimationEnabled)
+    {
+        EnsureMutable();
+        TimerPreferences current = Workspace.Preferences;
+        Workspace.UpdatePreferences(new TimerPreferences(
+            current.Theme,
+            current.Background,
+            current.Language,
+            current.FontFamily,
+            current.DailyTargetMinutes,
+            current.LastSeenVersion,
+            current.LayoutMode,
+            clockAnimationEnabled));
         CommitMutation();
     }
 
@@ -482,7 +533,9 @@ public sealed partial class TimerAppStore
             current.Language,
             current.FontFamily,
             current.DailyTargetMinutes,
-            lastSeenVersion));
+            lastSeenVersion,
+            current.LayoutMode,
+            current.ClockAnimationEnabled));
         CommitMutation();
     }
 

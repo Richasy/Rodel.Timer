@@ -26,6 +26,8 @@ internal static class TimerDataMapper
                 FontFamily = workspace.Preferences.FontFamily,
                 DailyTargetMinutes = workspace.Preferences.DailyTargetMinutes,
                 LastSeenVersion = workspace.Preferences.LastSeenVersion,
+                LayoutMode = workspace.Preferences.LayoutMode.ToString(),
+                ClockAnimationEnabled = workspace.Preferences.ClockAnimationEnabled,
             },
             Folders =
             [
@@ -81,7 +83,9 @@ internal static class TimerDataMapper
             document.Preferences.Language,
             document.Preferences.FontFamily,
             document.Preferences.DailyTargetMinutes,
-            document.Preferences.LastSeenVersion);
+            document.Preferences.LastSeenVersion,
+            MapLayoutMode(document.Preferences.LayoutMode),
+            document.Preferences.ClockAnimationEnabled ?? true);
 
         IEnumerable<TimerFolder> folders = document.Folders.Select(folder => new TimerFolder(
             folder!.Id,
@@ -98,6 +102,22 @@ internal static class TimerDataMapper
             entry.Comment));
 
         return TimerWorkspace.Restore(folders, entries, document.SelectedFolderId, preferences);
+    }
+
+    // The layout mode is an OPTIONAL, additive field: a document written before it existed (or by a build that does not
+    // know it) simply has no value and falls back to the default flyout layout. An unrecognized value is treated the
+    // same way rather than failing the whole load — a presentation preference must never make the data unreadable.
+    private static TimerLayoutMode MapLayoutMode(string? persisted)
+    {
+        if (string.IsNullOrWhiteSpace(persisted))
+        {
+            return TimerLayoutMode.Flyout;
+        }
+
+        return Enum.TryParse(persisted.Trim(), ignoreCase: true, out TimerLayoutMode layoutMode)
+            && Enum.IsDefined(layoutMode)
+                ? layoutMode
+                : TimerLayoutMode.Flyout;
     }
 
     private static TimerBackgroundMode MapBackground(int schemaVersion, string? persisted)

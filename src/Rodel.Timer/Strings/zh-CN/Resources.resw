@@ -110,9 +110,15 @@
   <data name="LanguageDescription" xml:space="preserve"><value>设置显示语言</value></data>
   <data name="FontDescription" xml:space="preserve"><value>选择应用使用的字体</value></data>
   <data name="DailyTargetDescription" xml:space="preserve"><value>每天的专注目标（分钟）</value></data>
+  <data name="Layout" xml:space="preserve"><value>布局</value></data>
+  <data name="LayoutDescription" xml:space="preserve"><value>选择分组和历史记录的打开位置</value></data>
+  <data name="LayoutFlyout" xml:space="preserve"><value>标题栏浮出</value></data>
+  <data name="LayoutSidePanel" xml:space="preserve"><value>底部侧边面板</value></data>
+  <data name="ClockAnimation" xml:space="preserve"><value>滚动计时</value></data>
+  <data name="ClockAnimationDescription" xml:space="preserve"><value>时间变化时滚动数字；关闭后使用静态时钟</value></data>
   <data name="OpenOnGitHub" xml:space="preserve"><value>在 GitHub 上打开</value></data>
   <data name="WhatsNewTitle" xml:space="preserve"><value>新版内容</value></data>
-  <data name="WhatsNewBody" xml:space="preserve"><value>工作计时器现已基于 Sprout 完整重写，采用 Fluent Design，支持实时语言和主题切换、无障碍控件，并可安全迁移你现有的数据。</value></data>
+  <data name="WhatsNewBody" xml:space="preserve"><value>两个新设置，把界面交还给你：&#10;&#10;• 布局 —— 分组和历史记录既可以留在标题栏浮出面板里，也可以移到底部：左右两端各有一个按钮，点击后从对应一侧滑出列表。&#10;&#10;• 滚动计时 —— 关掉数字滚动动画，专注时使用安静的静态时钟。&#10;&#10;两项都在「设置」中，即时生效并自动记住。</value></data>
   <data name="Save" xml:space="preserve"><value>保存</value></data>
   <data name="Cancel" xml:space="preserve"><value>取消</value></data>
   <data name="Delete" xml:space="preserve"><value>删除</value></data>

@@ -2,7 +2,8 @@ namespace Rodel.Timer.Core.Settings;
 
 /// <summary>
 /// The immutable set of user-configurable preferences attached to a <see cref="Workspace.TimerWorkspace"/>:
-/// theme, window background, language, font, and the daily time target used to track progress toward a day's goal.
+/// theme, window background, language, font, the daily time target used to track progress toward a day's goal, the
+/// shell layout, and whether the clock rolls its digits.
 /// </summary>
 public sealed record TimerPreferences
 {
@@ -38,15 +39,19 @@ public sealed record TimerPreferences
     /// <param name="fontFamily">The preferred font family. Must not be null, empty, or whitespace-only.</param>
     /// <param name="dailyTargetMinutes">The daily time target, in minutes. Must be between 1 and <see cref="MaximumDailyTargetMinutes"/>.</param>
     /// <param name="lastSeenVersion">The application version that last wrote these preferences, or <see langword="null"/> if unknown.</param>
+    /// <param name="layoutMode">Where the folders and history lists are hosted.</param>
+    /// <param name="clockAnimationEnabled">Whether the clock rolls its digits when the elapsed time changes.</param>
     /// <exception cref="ArgumentException"><paramref name="language"/> is not a supported language, or <paramref name="fontFamily"/> is null, empty, or whitespace-only.</exception>
-    /// <exception cref="ArgumentOutOfRangeException"><paramref name="theme"/> or <paramref name="background"/> is undefined, or <paramref name="dailyTargetMinutes"/> is outside the valid range.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="theme"/>, <paramref name="background"/>, or <paramref name="layoutMode"/> is undefined, or <paramref name="dailyTargetMinutes"/> is outside the valid range.</exception>
     public TimerPreferences(
         TimerThemeMode theme,
         TimerBackgroundMode background,
         string language,
         string fontFamily,
         int dailyTargetMinutes,
-        string? lastSeenVersion = null)
+        string? lastSeenVersion = null,
+        TimerLayoutMode layoutMode = TimerLayoutMode.Flyout,
+        bool clockAnimationEnabled = true)
     {
         if (!Enum.IsDefined(theme))
         {
@@ -58,10 +63,17 @@ public sealed record TimerPreferences
             throw new ArgumentOutOfRangeException(nameof(background));
         }
 
+        if (!Enum.IsDefined(layoutMode))
+        {
+            throw new ArgumentOutOfRangeException(nameof(layoutMode));
+        }
+
         Theme = theme;
         Background = background;
         Language = NormalizeLanguage(language);
         FontFamily = NormalizeFontFamily(fontFamily);
+        LayoutMode = layoutMode;
+        ClockAnimationEnabled = clockAnimationEnabled;
 
         if (dailyTargetMinutes is < 1 or > MaximumDailyTargetMinutes)
         {
@@ -75,7 +87,7 @@ public sealed record TimerPreferences
         LastSeenVersion = string.IsNullOrWhiteSpace(lastSeenVersion) ? null : lastSeenVersion.Trim();
     }
 
-    /// <summary>The default preferences: system theme, English language, the default font, and the default daily target.</summary>
+    /// <summary>The default preferences: system theme, English language, the default font, the default daily target, the flyout layout, and a rolling clock.</summary>
     public static TimerPreferences Default { get; } = new(
         TimerThemeMode.System,
         TimerBackgroundMode.Mica,
@@ -97,6 +109,15 @@ public sealed record TimerPreferences
 
     /// <summary>The daily time target, in minutes; between 1 and <see cref="MaximumDailyTargetMinutes"/>.</summary>
     public int DailyTargetMinutes { get; }
+
+    /// <summary>Where the folders and history lists are hosted (title-bar flyouts or footer-launched side panels).</summary>
+    public TimerLayoutMode LayoutMode { get; }
+
+    /// <summary>
+    /// Whether the clock rolls its digits when the elapsed time changes. Turning it off draws a plain, still label —
+    /// the per-second motion is the single most distracting element on the stage for some users.
+    /// </summary>
+    public bool ClockAnimationEnabled { get; }
 
     /// <summary>The application version that last wrote these preferences, or <see langword="null"/> if unknown.</summary>
     public string? LastSeenVersion { get; }

@@ -30,6 +30,13 @@ public sealed partial class MainView
     {
         IsCompactPresenter = isCompact;
 
+        // The compact overlay has no footer commands and no room for a panel, so an open side panel is dropped on the
+        // way in rather than left floating over the mini timer.
+        if (isCompact)
+        {
+            CloseSidePanelImmediately();
+        }
+
         // Collapse the extended title bar to the standard 32 epx band while compact (its brand + command band is also
         // torn out of all three trees by the title bar's When(!IsCompact) switch), and restore the 48 epx tall band on
         // exit so the brand + settings + compact commands return. The window material is degraded to the opaque themed
@@ -83,6 +90,18 @@ public sealed partial class MainView
     {
         _store.UpdateBackground(background);
         ApplyBackgroundCore(background);
+    }
+
+    /// <summary>
+    /// Persists the shell layout choice and closes any open side panel. The panel must go at once (not through its
+    /// exit transition) because leaving the flyout layout also removes the footer command it was launched from — a
+    /// lingering panel would outlive its own entry point.
+    /// </summary>
+    /// <param name="layoutMode">The selected layout mode.</param>
+    public void ApplyLayoutMode(TimerLayoutMode layoutMode)
+    {
+        CloseSidePanelImmediately();
+        _store.UpdateLayoutMode(layoutMode);
     }
 
     /// <summary>Sets the window caption from the current-language <see cref="Resources.AppName"/> (call after a language switch).</summary>

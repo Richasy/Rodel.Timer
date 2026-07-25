@@ -283,6 +283,71 @@ public sealed class TimerDataRepositoryTests
         Assert.IsEmpty(Directory.GetFiles(directory.Path, "*.tmp"));
     }
 
+    [TestMethod]
+    public async Task SaveAndLoad_RoundTripsTheLayoutModeAndTheClockAnimationFlag()
+    {
+        using var directory = new TemporaryDirectory();
+        string path = directory.File("timer-data.json");
+        using var repository = new TimerDataRepository(path);
+        TimerWorkspace workspace = CreateWorkspace();
+        workspace.UpdatePreferences(new TimerPreferences(
+            TimerThemeMode.Dark,
+            TimerBackgroundMode.Acrylic,
+            TimerPreferences.EnglishLanguage,
+            "Segoe UI",
+            480,
+            "2.0.0",
+            TimerLayoutMode.SidePanel,
+            clockAnimationEnabled: false));
+
+        await repository.SaveAsync(workspace);
+        TimerWorkspace? loaded = await repository.LoadAsync();
+
+        Assert.IsNotNull(loaded);
+        Assert.AreEqual(TimerLayoutMode.SidePanel, loaded.Preferences.LayoutMode);
+        Assert.IsFalse(loaded.Preferences.ClockAnimationEnabled);
+
+        string json = await File.ReadAllTextAsync(path);
+        StringAssert.Contains(json, "\"layoutMode\": \"SidePanel\"");
+        StringAssert.Contains(json, "\"clockAnimationEnabled\": false");
+    }
+
+    [TestMethod]
+    public async Task Load_DocumentWithoutTheNewPreferences_FallsBackToTheDefaults()
+    {
+        using var directory = new TemporaryDirectory();
+        string path = directory.File("timer-data.json");
+
+        // A document written before the layout / clock-animation preferences existed: both keys are simply absent.
+        await File.WriteAllTextAsync(path, SchemaVersion3Document("Mica"));
+        using var repository = new TimerDataRepository(path);
+
+        TimerWorkspace? loaded = await repository.LoadAsync();
+
+        Assert.IsNotNull(loaded);
+        Assert.AreEqual(TimerLayoutMode.Flyout, loaded.Preferences.LayoutMode);
+        Assert.IsTrue(loaded.Preferences.ClockAnimationEnabled);
+    }
+
+    [TestMethod]
+    public async Task Load_UnknownLayoutMode_FallsBackToFlyoutRatherThanFailingTheLoad()
+    {
+        using var directory = new TemporaryDirectory();
+        string path = directory.File("timer-data.json");
+        await File.WriteAllTextAsync(
+            path,
+            SchemaVersion3Document("Mica").Replace(
+                "\"fontFamily\": \"Segoe UI\"",
+                "\"fontFamily\": \"Segoe UI\",\n    \"layoutMode\": \"HolographicDrawer\"",
+                StringComparison.Ordinal));
+        using var repository = new TimerDataRepository(path);
+
+        TimerWorkspace? loaded = await repository.LoadAsync();
+
+        Assert.IsNotNull(loaded);
+        Assert.AreEqual(TimerLayoutMode.Flyout, loaded.Preferences.LayoutMode);
+    }
+
     private static TimerWorkspace CreateWorkspace(TimerBackgroundMode background = TimerBackgroundMode.Acrylic)
     {
         var first = new TimerFolder(

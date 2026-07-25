@@ -50,13 +50,18 @@ public sealed class ReadyTreeAccessibilityAuditTests
     private static SemanticsNode BuildClosedNormalTree(
         TreeBuilder? builder = null,
         bool isPinned = false,
-        bool isMaximized = false)
+        bool isMaximized = false,
+        bool isSidePanelLayout = false)
     {
         builder ??= new TreeBuilder();
         TimerWindowPinBehavior pinBehavior = TimerWindowPinPolicy.Resolve(isPinned, isMaximized);
         SemanticsNode root = builder.Node(SemanticsRole.Window, "Rodel Timer", automationId: null, interactive: false);
-        _ = root.Add(builder.Node(SemanticsRole.Button, "Folders", TimerAutomationIds.FoldersToggle, interactive: true));
-        _ = root.Add(builder.Node(SemanticsRole.Button, "History", TimerAutomationIds.HistoryToggle, interactive: true));
+        if (!isSidePanelLayout)
+        {
+            _ = root.Add(builder.Node(SemanticsRole.Button, "Folders", TimerAutomationIds.FoldersToggle, interactive: true));
+            _ = root.Add(builder.Node(SemanticsRole.Button, "History", TimerAutomationIds.HistoryToggle, interactive: true));
+        }
+
         if (pinBehavior.ShowCompactOverlayButton)
         {
             _ = root.Add(builder.Node(SemanticsRole.Button, "Compact overlay", TimerAutomationIds.Compact, interactive: true));
@@ -70,6 +75,33 @@ public sealed class ReadyTreeAccessibilityAuditTests
         _ = root.Add(builder.Node(SemanticsRole.Button, "Settings", TimerAutomationIds.Settings, interactive: true));
         _ = root.Add(builder.Node(SemanticsRole.Button, "Start timer", TimerAutomationIds.StartStop, interactive: true));
         _ = root.Add(builder.Node(SemanticsRole.Edit, "Session title", TimerAutomationIds.Title, interactive: true));
+        if (isSidePanelLayout)
+        {
+            _ = root.Add(builder.Node(SemanticsRole.Button, "Folders", TimerAutomationIds.FoldersPanelToggle, interactive: true));
+            _ = root.Add(builder.Node(SemanticsRole.Button, "History", TimerAutomationIds.HistoryPanelToggle, interactive: true));
+        }
+
+        return root;
+    }
+
+    private static SemanticsNode BuildFoldersPanelOpenTree(out List<string> rowIds)
+    {
+        var builder = new TreeBuilder();
+        SemanticsNode root = BuildClosedNormalTree(builder, isSidePanelLayout: true);
+        SemanticsNode panel = builder.Node(SemanticsRole.Pane, "Folders", TimerAutomationIds.FoldersPanel, interactive: false);
+        SemanticsNode list = builder.Node(SemanticsRole.List, "Folders", automationId: null, interactive: false);
+        _ = root.Add(panel);
+        _ = panel.Add(builder.Node(SemanticsRole.Button, "Add folder", TimerAutomationIds.AddFolder, interactive: true));
+        _ = panel.Add(list);
+
+        rowIds = [];
+        for (int i = 0; i < Folders.Length; i++)
+        {
+            string id = TimerAutomationIds.FolderSelect(Folders[i]);
+            rowIds.Add(id);
+            _ = list.Add(builder.Node(SemanticsRole.ListItem, $"Folder {i}", id, interactive: true));
+        }
+
         return root;
     }
 
@@ -143,6 +175,8 @@ public sealed class ReadyTreeAccessibilityAuditTests
         TimerAutomationIds.Title,
         TimerAutomationIds.FoldersToggle,
         TimerAutomationIds.HistoryToggle,
+        TimerAutomationIds.FoldersPanelToggle,
+        TimerAutomationIds.HistoryPanelToggle,
         TimerAutomationIds.PinWindow,
     ];
 
@@ -199,6 +233,32 @@ public sealed class ReadyTreeAccessibilityAuditTests
         Assert.AreEqual(ids.Count, ids.Distinct(StringComparer.Ordinal).Count());
         Assert.IsTrue(ContainsAutomationId(root, TimerAutomationIds.HistoryFlyout));
         Assert.IsTrue(ContainsAutomationId(root, TimerAutomationIds.HistoryMenu(Entries[0])));
+    }
+
+    [TestMethod]
+    public void SidePanelLayoutTree_MovesTheListCommandsToTheFooterWithoutDuplicatingThem()
+    {
+        SemanticsNode root = BuildClosedNormalTree(isSidePanelLayout: true);
+
+        AssertAuditClean(root);
+        Assert.IsFalse(
+            ContainsAutomationId(root, TimerAutomationIds.FoldersToggle),
+            "the title-bar drop-downs are torn out so the footer commands are the single entry point.");
+        Assert.IsFalse(ContainsAutomationId(root, TimerAutomationIds.HistoryToggle));
+        Assert.IsTrue(ContainsAutomationId(root, TimerAutomationIds.FoldersPanelToggle));
+        Assert.IsTrue(ContainsAutomationId(root, TimerAutomationIds.HistoryPanelToggle));
+        Assert.IsFalse(ContainsAutomationId(root, TimerAutomationIds.FoldersPanel), "a closed panel leaves no landmark behind.");
+    }
+
+    [TestMethod]
+    public void FoldersPanelOpenTree_IsCleanAndRowsAreUnique()
+    {
+        SemanticsNode root = BuildFoldersPanelOpenTree(out List<string> rowIds);
+
+        AssertAuditClean(root);
+        Assert.AreEqual(rowIds.Count, rowIds.Distinct(StringComparer.Ordinal).Count());
+        Assert.IsTrue(ContainsAutomationId(root, TimerAutomationIds.FoldersPanel));
+        Assert.IsFalse(ContainsAutomationId(root, TimerAutomationIds.HistoryPanel), "only one panel is ever open.");
     }
 
     [TestMethod]

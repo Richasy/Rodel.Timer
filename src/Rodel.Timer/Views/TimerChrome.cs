@@ -1,5 +1,6 @@
 using Rodel.Timer.Core.Folders;
 using Rodel.Timer.Core.History;
+using Rodel.Timer.Core.Settings;
 using Rodel.Timer.Presentation;
 
 using Sprout;
@@ -40,6 +41,8 @@ public sealed class TimerChrome
         BuildFolderContextMenu = main.BuildFolderContextMenu;
         BuildHistoryContextMenu = main.BuildHistoryContextMenu;
         ShowHistoryDetails = main.ShowHistoryDetailsDialog;
+        ShowFoldersPanel = main.ShowFoldersPanel;
+        ShowHistoryPanel = main.ShowHistoryPanel;
     }
 
     /// <summary>The live theme colours resolved from the hosting window's current theme.</summary>
@@ -89,6 +92,26 @@ public sealed class TimerChrome
 
     /// <summary>Whether the hosting window's effective theme is dark — used to pick a dark/light material recipe.</summary>
     public bool IsDarkTheme => _window.ActualTheme == ThemeMode.Dark;
+
+    /// <summary>The hosting window's extended title-bar band height in effective pixels (the top of the content band).</summary>
+    public float TitleBarHeight => _window.TitleBarHeight;
+
+    /// <summary>
+    /// Whether the shell hosts folders and history as footer-launched side panels rather than title-bar flyouts
+    /// (reactive: it reads the store's preferences).
+    /// </summary>
+    public bool IsSidePanelLayout => _main.Preferences.LayoutMode == TimerLayoutMode.SidePanel;
+
+    /// <summary>Whether the clock rolls its digits on every change (reactive: it reads the store's preferences).</summary>
+    public bool IsClockAnimated => _main.Preferences.ClockAnimationEnabled;
+
+    /// <summary>Whether the open side panel has settled on screen (reactive; drives the card's slide and fade).</summary>
+    public bool IsSidePanelShown => _main.IsSidePanelShown;
+
+    /// <summary>Resolves the live footprint of a side panel (reactive: it reads the viewport).</summary>
+    /// <param name="side">The edge the panel docks to.</param>
+    /// <returns>The resolved footprint.</returns>
+    public TimerSidePanelLayout SidePanelLayout(TimerSidePanelSide side) => _main.SidePanelLayout(side);
 
     /// <summary>The current folders (reactive; a fresh reference on every store revision).</summary>
     public IReadOnlyList<TimerFolder> Folders => _main.Folders;
@@ -155,4 +178,10 @@ public sealed class TimerChrome
 
     /// <summary>Opens the session-details dialog for a history entry (a row left-click / invoke).</summary>
     public Action<Guid> ShowHistoryDetails { get; }
+
+    /// <summary>Opens the folders side panel from the footer's leading command.</summary>
+    public Action ShowFoldersPanel { get; }
+
+    /// <summary>Opens the history side panel from the footer's trailing command.</summary>
+    public Action ShowHistoryPanel { get; }
 }

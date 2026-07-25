@@ -45,6 +45,18 @@ public static class TimerAutomationIds
     /// <summary>The History flyout content Group.</summary>
     public const string HistoryFlyoutContent = "RodelTimer.History.Content";
 
+    /// <summary>The footer Folders command of the side-panel layout.</summary>
+    public const string FoldersPanelToggle = "RodelTimer.Main.FoldersPanelToggle";
+
+    /// <summary>The footer History command of the side-panel layout.</summary>
+    public const string HistoryPanelToggle = "RodelTimer.Main.HistoryPanelToggle";
+
+    /// <summary>The Folders side panel Pane.</summary>
+    public const string FoldersPanel = "RodelTimer.Folders.Panel";
+
+    /// <summary>The History side panel Pane.</summary>
+    public const string HistoryPanel = "RodelTimer.History.Panel";
+
     /// <summary>The add-folder button in the folder pane.</summary>
     public const string AddFolder = "RodelTimer.Main.AddFolder";
 
@@ -68,6 +80,12 @@ public static class TimerAutomationIds
 
     /// <summary>The settings daily-target number box.</summary>
     public const string SettingsDailyTarget = "RodelTimer.Settings.DailyTarget";
+
+    /// <summary>The settings shell-layout combo box.</summary>
+    public const string SettingsLayout = "RodelTimer.Settings.Layout";
+
+    /// <summary>The settings clock-animation toggle switch.</summary>
+    public const string SettingsClockAnimation = "RodelTimer.Settings.ClockAnimation";
 
     /// <summary>The settings open-source link.</summary>
     public const string SettingsOpenSource = "RodelTimer.Settings.OpenSource";

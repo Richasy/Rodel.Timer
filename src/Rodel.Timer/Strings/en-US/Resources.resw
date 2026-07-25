@@ -110,9 +110,15 @@
   <data name="LanguageDescription" xml:space="preserve"><value>Set the display language</value></data>
   <data name="FontDescription" xml:space="preserve"><value>Pick the font used across the app</value></data>
   <data name="DailyTargetDescription" xml:space="preserve"><value>Your daily focus goal in minutes</value></data>
+  <data name="Layout" xml:space="preserve"><value>Layout</value></data>
+  <data name="LayoutDescription" xml:space="preserve"><value>Choose where the folders and history lists open from</value></data>
+  <data name="LayoutFlyout" xml:space="preserve"><value>Title bar flyouts</value></data>
+  <data name="LayoutSidePanel" xml:space="preserve"><value>Footer side panels</value></data>
+  <data name="ClockAnimation" xml:space="preserve"><value>Rolling clock</value></data>
+  <data name="ClockAnimationDescription" xml:space="preserve"><value>Roll the digits when the time changes; turn it off for a still clock</value></data>
   <data name="OpenOnGitHub" xml:space="preserve"><value>Open on GitHub</value></data>
   <data name="WhatsNewTitle" xml:space="preserve"><value>What's new</value></data>
-  <data name="WhatsNewBody" xml:space="preserve"><value>Working Timer is a complete Sprout-based rewrite with Fluent Design, live language and theme switching, accessible controls, and safe migration of your existing data.</value></data>
+  <data name="WhatsNewBody" xml:space="preserve"><value>Two new settings put the shell back under your control:&#10;&#10;• Layout — keep the folders and history lists in the title-bar flyouts, or move them to the footer, where a command at each end slides its list in from that side of the window.&#10;&#10;• Rolling clock — turn the digit roll off for a still, quiet clock while you focus.&#10;&#10;Both are under Settings, apply immediately, and are remembered.</value></data>
   <data name="Save" xml:space="preserve"><value>Save</value></data>
   <data name="Cancel" xml:space="preserve"><value>Cancel</value></data>
   <data name="Delete" xml:space="preserve"><value>Delete</value></data>

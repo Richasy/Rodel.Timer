@@ -25,7 +25,44 @@ public sealed class TimerAppStoreMutationTests
         AssertBumpsRevisionByOne(harness, store => store.UpdateLanguage("zh-CN"));
         AssertBumpsRevisionByOne(harness, store => store.UpdateFontFamily("Consolas"));
         AssertBumpsRevisionByOne(harness, store => store.UpdateDailyTarget(120));
+        AssertBumpsRevisionByOne(harness, store => store.UpdateLayoutMode(TimerLayoutMode.SidePanel));
+        AssertBumpsRevisionByOne(harness, store => store.UpdateClockAnimation(false));
         AssertBumpsRevisionByOne(harness, store => store.UpdateLastSeenVersion("1.2.3"));
+    }
+
+    [TestMethod]
+    public void EveryPreferenceMutation_PreservesEveryOtherPreference()
+    {
+        using var harness = new TimerStoreHarness();
+        harness.LoadToReady();
+
+        harness.Store.UpdateTheme(TimerThemeMode.Dark);
+        harness.Store.UpdateBackground(TimerBackgroundMode.AcrylicThin);
+        harness.Store.UpdateLanguage(TimerPreferences.ChineseLanguage);
+        harness.Store.UpdateFontFamily("Consolas");
+        harness.Store.UpdateDailyTarget(120);
+        harness.Store.UpdateLayoutMode(TimerLayoutMode.SidePanel);
+        harness.Store.UpdateClockAnimation(false);
+        harness.Store.UpdateLastSeenVersion("1.2.3");
+
+        TimerPreferences preferences = harness.Store.Preferences;
+        Assert.AreEqual(TimerThemeMode.Dark, preferences.Theme);
+        Assert.AreEqual(TimerBackgroundMode.AcrylicThin, preferences.Background);
+        Assert.AreEqual(TimerPreferences.ChineseLanguage, preferences.Language);
+        Assert.AreEqual("Consolas", preferences.FontFamily);
+        Assert.AreEqual(120, preferences.DailyTargetMinutes);
+        Assert.AreEqual(TimerLayoutMode.SidePanel, preferences.LayoutMode);
+        Assert.IsFalse(preferences.ClockAnimationEnabled);
+        Assert.AreEqual("1.2.3", preferences.LastSeenVersion, "the last mutation must not have dropped the earlier ones.");
+    }
+
+    [TestMethod]
+    public void UpdateLayoutMode_UndefinedValue_Throws()
+    {
+        using var harness = new TimerStoreHarness();
+        harness.LoadToReady();
+
+        _ = Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => harness.Store.UpdateLayoutMode((TimerLayoutMode)42));
     }
 
     [TestMethod]

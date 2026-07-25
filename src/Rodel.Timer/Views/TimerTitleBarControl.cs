@@ -70,6 +70,7 @@ public sealed partial class TimerTitleBarControl : Control
                 Layout.ShowCommandLabels,
                 _chrome.IsWindowPinned,
                 _chrome.IsWindowMaximized,
+                !_chrome.IsSidePanelLayout,
                 Resources.AppName),
             new CompactTimerTitleBarView(_chrome, Colors)));
 
@@ -232,6 +233,64 @@ public readonly partial record struct WindowPinButtonView(
 }
 
 /// <summary>
+/// The title bar's Folders + History drop-down commands. They are the entry points of the
+/// <see cref="Core.Settings.TimerLayoutMode.Flyout"/> layout only — the side-panel layout removes them from all three
+/// trees so the footer commands are the single, unambiguous way in.
+/// </summary>
+[Composite]
+public readonly partial record struct TimerTitleBarCommandsView(
+    Flyout FoldersFlyout,
+    Flyout HistoryFlyout,
+    ThemeColors Colors,
+    bool ShowCommandLabels)
+{
+    /// <summary>The two anchored drop-down commands.</summary>
+    public Ui Body => Stack(
+        DropDownButton(
+            new TimerTitleBarDropDownContentView(
+                FluentSymbol.FolderList,
+                Resources.Folders,
+                ShowCommandLabels),
+            FoldersFlyout)
+            .Style(CommandStyle)
+            .Palette(TimerVisuals.Ghost(Colors))
+            .MinWidth(TimerVisuals.Height.Icon)
+            .Height(TimerVisuals.Height.Icon)
+            .VAlign(VerticalAlignment.Center)
+            .AccessKey("F")
+            .ToolTip(ShowCommandLabels ? null : Resources.Folders)
+            .Automation(TimerTitleBarView.FoldersAutomation),
+        DropDownButton(
+            new TimerTitleBarDropDownContentView(
+                FluentSymbol.History,
+                Resources.History,
+                ShowCommandLabels),
+            HistoryFlyout)
+            .Style(CommandStyle)
+            .Palette(TimerVisuals.Ghost(Colors))
+            .MinWidth(TimerVisuals.Height.Icon)
+            .Height(TimerVisuals.Height.Icon)
+            .VAlign(VerticalAlignment.Center)
+            .AccessKey("H")
+            .ToolTip(ShowCommandLabels ? null : Resources.History)
+            .Automation(TimerTitleBarView.HistoryAutomation))
+        .Orientation(Orientation.Horizontal)
+        .Spacing(TimerVisuals.Spacing.Small);
+
+    /// <summary>
+    /// The title-bar command drop-down style. WinUI DropDownButtons size to their content, so the buttons carry only a
+    /// <see cref="TimerVisuals.Height.Icon"/> minimum width (a fixed width clipped the icon + label + chevron), the native
+    /// 4 epx control corner, and the control's own decorative chevron (shown only with the label). The zero horizontal
+    /// padding in icon-only mode centres the lone glyph in the minimum-width square.
+    /// </summary>
+    internal DropDownButtonStyle CommandStyle =>
+        default(DropDownButtonStyle)
+            .Padding(ShowCommandLabels ? 11f : 0f, 5f)
+            .CornerRadius(TimerVisuals.Radius.App)
+            .ChevronVisible(ShowCommandLabels);
+}
+
+/// <summary>
 /// The extended title-bar row: brand and anchored Folders/History commands at the leading edge, an untouched drag
 /// region, then compact/pin/settings commands before the system caption buttons.
 /// </summary>
@@ -245,6 +304,7 @@ public readonly partial record struct TimerTitleBarView(
     bool ShowCommandLabels,
     bool IsWindowPinned,
     bool IsWindowMaximized,
+    bool ShowListCommands,
     string AppName)
 {
     /// <summary>The responsive extended-title-bar content.</summary>
@@ -259,34 +319,10 @@ public readonly partial record struct TimerTitleBarView(
                 new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight))
                 .VAlign(VerticalAlignment.Center)
                 .Visible(ShowBrandLabel),
-            DropDownButton(
-                new TimerTitleBarDropDownContentView(
-                    FluentSymbol.FolderList,
-                    Resources.Folders,
-                    ShowCommandLabels),
-                FoldersFlyout)
-                .Style(CommandStyle)
-                .Palette(TimerVisuals.Ghost(Colors))
-                .MinWidth(TimerVisuals.Height.Icon)
-                .Height(TimerVisuals.Height.Icon)
-                .VAlign(VerticalAlignment.Center)
-                .AccessKey("F")
-                .ToolTip(ShowCommandLabels ? null : Resources.Folders)
-                .Automation(FoldersAutomation),
-            DropDownButton(
-                new TimerTitleBarDropDownContentView(
-                    FluentSymbol.History,
-                    Resources.History,
-                    ShowCommandLabels),
-                HistoryFlyout)
-                .Style(CommandStyle)
-                .Palette(TimerVisuals.Ghost(Colors))
-                .MinWidth(TimerVisuals.Height.Icon)
-                .Height(TimerVisuals.Height.Icon)
-                .VAlign(VerticalAlignment.Center)
-                .AccessKey("H")
-                .ToolTip(ShowCommandLabels ? null : Resources.History)
-                .Automation(HistoryAutomation))
+            When(
+                ShowListCommands,
+                new TimerTitleBarCommandsView(FoldersFlyout, HistoryFlyout, Colors, ShowCommandLabels))
+                .VAlign(VerticalAlignment.Center))
             .Orientation(Orientation.Horizontal)
             .Spacing(TimerVisuals.Spacing.Small)
             .VAlign(VerticalAlignment.Center)
@@ -314,18 +350,6 @@ public readonly partial record struct TimerTitleBarView(
         .Orientation(Orientation.Horizontal)
         .Spacing(TimerVisuals.Spacing.Small)
         .Padding(TimerVisuals.Spacing.Medium, 0f, TimerVisuals.Spacing.Small, 0f);
-
-    /// <summary>
-    /// The title-bar command drop-down style. WinUI DropDownButtons size to their content, so the buttons carry only a
-    /// <see cref="TimerVisuals.Height.Icon"/> minimum width (a fixed width clipped the icon + label + chevron), the native
-    /// 4 epx control corner, and the control's own decorative chevron (shown only with the label). The zero horizontal
-    /// padding in icon-only mode centres the lone glyph in the minimum-width square.
-    /// </summary>
-    internal DropDownButtonStyle CommandStyle =>
-        default(DropDownButtonStyle)
-            .Padding(ShowCommandLabels ? 11f : 0f, 5f)
-            .CornerRadius(TimerVisuals.Radius.App)
-            .ChevronVisible(ShowCommandLabels);
 
     internal static AutomationInfo FoldersAutomation => new()
     {

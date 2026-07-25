@@ -55,4 +55,11 @@ internal sealed class TimerPreferencesData
     public int DailyTargetMinutes { get; set; }
 
     public string? LastSeenVersion { get; set; }
+
+    // Added after schema 3 shipped. Both are OPTIONAL (null = "absent"), so a document written by an older build still
+    // loads and a document written by this build still loads in an older build — which is why the schema version was
+    // not bumped for them: an additive, defaulted field is not a breaking change in either direction.
+    public string? LayoutMode { get; set; }
+
+    public bool? ClockAnimationEnabled { get; set; }
 }

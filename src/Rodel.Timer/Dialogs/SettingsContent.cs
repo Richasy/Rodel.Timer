@@ -42,6 +42,10 @@ public sealed class SettingsSectionsChrome
     /// <inheritdoc/>
     public int LanguageIndex => _owner.LanguageIndex;
     /// <inheritdoc/>
+    public int LayoutIndex => _owner.LayoutIndex;
+    /// <inheritdoc/>
+    public bool IsClockAnimated => _owner.IsClockAnimated;
+    /// <inheritdoc/>
     public ThemeColors Colors => _owner.Colors;
     /// <inheritdoc/>
     public Action<int> ThemeChanged => _owner.OnThemeChanged;
@@ -53,6 +57,10 @@ public sealed class SettingsSectionsChrome
     public Action<NumberBoxValueChangedEventArgs> TargetChanged => _owner.OnTargetChanged;
     /// <inheritdoc/>
     public Action<int> LanguageChanged => _owner.OnLanguageChanged;
+    /// <inheritdoc/>
+    public Action<int> LayoutChanged => _owner.OnLayoutChanged;
+    /// <inheritdoc/>
+    public Action<bool> ClockAnimationChanged => _owner.OnClockAnimationChanged;
 }
 
 /// <summary>The interactive three-tree content hosted by the Settings ScrollView.</summary>
@@ -96,6 +104,26 @@ public sealed partial class SettingsSectionsControl : Control
             .Description(Resources.WindowBackgroundDescription)
             .Icon(new FluentIcon(FluentSymbol.Color))
             .WrapThreshold(SettingsContent.CardWrapThreshold),
+        SettingsCard(
+            Resources.Layout,
+            ComboBox([Resources.LayoutFlyout, Resources.LayoutSidePanel])
+                .SelectedIndex(_chrome.LayoutIndex)
+                .OnSelectionChanged(_chrome.LayoutChanged)
+                .FaceplateSizing(ComboBoxFaceplateSizing.SelectedItem)
+                .Automation(SettingsContent.LayoutAutomation)
+                .LayoutBox(minWidth: SettingsContent.SettingsEditorMinWidth, maxWidth: SettingsContent.SettingsEditorMaxWidth))
+            .Description(Resources.LayoutDescription)
+            .Icon(new FluentIcon(FluentSymbol.PanelLeft))
+            .WrapThreshold(SettingsContent.CardWrapThreshold),
+        SettingsCard(
+            Resources.ClockAnimation,
+            ToggleSwitch()
+                .IsOn(_chrome.IsClockAnimated)
+                .OnToggled(_chrome.ClockAnimationChanged))
+            .Description(Resources.ClockAnimationDescription)
+            .Icon(new FluentIcon(FluentSymbol.Timer))
+            .WrapThreshold(SettingsContent.CardWrapThreshold)
+            .Automation(SettingsContent.ClockAnimationAutomation),
         SettingsCard(
             Resources.Font,
             ComboBox(_chrome.Fonts.Select(static font => font.DisplayName))
@@ -224,6 +252,8 @@ public sealed partial class SettingsContent : Control
         };
         FontIndex = ResolveFontIndex(preferences.FontFamily);
         TargetMinutes = preferences.DailyTargetMinutes;
+        LayoutIndex = (int)preferences.LayoutMode;
+        IsClockAnimated = preferences.ClockAnimationEnabled;
     }
 
     /// <summary>
@@ -254,6 +284,12 @@ public sealed partial class SettingsContent : Control
 
     /// <summary>The daily target in minutes.</summary>
     public partial double TargetMinutes { get; private set; }
+
+    /// <summary>The selected shell-layout index, matching <see cref="TimerLayoutMode"/>.</summary>
+    public partial int LayoutIndex { get; private set; }
+
+    /// <summary>Whether the clock rolls its digits.</summary>
+    public partial bool IsClockAnimated { get; private set; }
 
     internal IReadOnlyList<FontChoice> Fonts => _fonts;
 
@@ -290,6 +326,19 @@ public sealed partial class SettingsContent : Control
     {
         Name = Resources.DailyTarget,
         AutomationId = TimerAutomationIds.SettingsDailyTarget,
+    };
+
+    internal static AutomationInfo LayoutAutomation => new()
+    {
+        Name = Resources.Layout,
+        AutomationId = TimerAutomationIds.SettingsLayout,
+    };
+
+    internal static AutomationInfo ClockAnimationAutomation => new()
+    {
+        Name = Resources.ClockAnimation,
+        HelpText = Resources.ClockAnimationDescription,
+        AutomationId = TimerAutomationIds.SettingsClockAnimation,
     };
 
     internal static AutomationInfo OpenSourceAutomation => new()
@@ -359,5 +408,22 @@ public sealed partial class SettingsContent : Control
         int minutes = Math.Clamp((int)Math.Round(args.NewValue), 1, TimerPreferences.MaximumDailyTargetMinutes);
         TargetMinutes = minutes;
         _main.Store.UpdateDailyTarget(minutes);
+    }
+
+    internal void OnLayoutChanged(int index)
+    {
+        if (index < 0 || !Enum.IsDefined((TimerLayoutMode)index))
+        {
+            return;
+        }
+
+        LayoutIndex = index;
+        _main.ApplyLayoutMode((TimerLayoutMode)index);
+    }
+
+    internal void OnClockAnimationChanged(bool isOn)
+    {
+        IsClockAnimated = isOn;
+        _main.Store.UpdateClockAnimation(isOn);
     }
 }

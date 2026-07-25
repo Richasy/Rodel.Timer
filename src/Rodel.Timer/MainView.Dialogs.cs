@@ -19,8 +19,21 @@ namespace Rodel.Timer;
 /// <summary>Dialog and menu surface of <see cref="MainView"/> (folder editing, history commands, settings, what's new).</summary>
 public sealed partial class MainView
 {
-    /// <summary>The current product version, compared against the persisted last-seen version for the what's-new dialog.</summary>
-    internal const string CurrentVersion = "2.0.0";
+    /// <summary>
+    /// The current product version, compared against the persisted last-seen version for the what's-new dialog. Bump it
+    /// in the same change as the <c>SproutAppxVersion</c> / <c>Package.appxmanifest</c> version whenever a release adds
+    /// something the notice should announce — the notice fires precisely on the mismatch between this and the value
+    /// persisted by the previous run, so an unbumped version means an upgrade ships silently.
+    /// </summary>
+    internal const string CurrentVersion = "2.2607.3.0";
+
+    /// <summary>
+    /// The release the shipped <see cref="Resources.WhatsNewBody"/> describes. It is deliberately <b>separate</b> from
+    /// <see cref="CurrentVersion"/>: bump this one only when the notice text itself is rewritten, so a later
+    /// bug-fix release raises <see cref="CurrentVersion"/> and upgrades silently instead of replaying these notes at a
+    /// user who has already read them.
+    /// </summary>
+    internal const string WhatsNewVersion = "2.2607.3.0";
 
     /// <summary>
     /// The version shown on the About surface. When the app is packaged this is the installed <b>package identity</b>
@@ -432,7 +445,8 @@ public sealed partial class MainView
         WhatsNewAction action = WhatsNewPolicy.Decide(
             _store.Bootstrap.Value!.Origin,
             _store.Preferences.LastSeenVersion,
-            CurrentVersion);
+            CurrentVersion,
+            WhatsNewVersion);
 
         switch (action)
         {

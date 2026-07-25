@@ -9,6 +9,7 @@ namespace Rodel.Timer.Presentation;
 /// <param name="ShowAxisDecoration">Whether the axis line is shown (hidden on a narrow window so the clock stays centred).</param>
 /// <param name="StageVerticalPadding">The timer stage''s top/bottom padding.</param>
 /// <param name="FooterVerticalPadding">The footer''s top/bottom padding.</param>
+/// <param name="FooterHeight">The footer''s DEFINITE total height (divider + padding + content band).</param>
 public readonly record struct TimerNormalLayout(
     bool ShowMiddleStatus,
     float ClockSize,
@@ -17,7 +18,8 @@ public readonly record struct TimerNormalLayout(
     float GlowHeight,
     bool ShowAxisDecoration,
     float StageVerticalPadding,
-    float FooterVerticalPadding);
+    float FooterVerticalPadding,
+    float FooterHeight);
 
 /// <summary>Resolves the open normal workspace without scaling the whole view.</summary>
 public static class TimerNormalLayoutResolver
@@ -27,6 +29,17 @@ public static class TimerNormalLayoutResolver
 
     /// <summary>The height below which the stage and clock use their short-window metrics.</summary>
     public const double ShortThreshold = 560d;
+
+    /// <summary>
+    /// The footer's inner content band height. The footer is given a DEFINITE height (rather than hugging its two
+    /// stacked label lines) so the side-panel resolver knows exactly where the band above the footer ends — the same
+    /// "definite extent, not a hug" rule the folder / history rows already follow. 40 epx clears the 11 + 2 + 14 epx
+    /// label stack and the 36 epx footer command buttons with room to spare.
+    /// </summary>
+    public const float FooterContentHeight = 40f;
+
+    /// <summary>The footer's top divider thickness.</summary>
+    public const float FooterDividerHeight = 1f;
 
     /// <summary>Resolves normal-workspace metrics from the effective-pixel client size.</summary>
     public static TimerNormalLayout Resolve(double width, double height)
@@ -43,6 +56,7 @@ public static class TimerNormalLayoutResolver
         float axisTotal = (float)Math.Min(880d, width * 0.86d);
         float glowWidth = (float)Math.Min(700d, width * 0.78d);
         float glowHeight = shortWindow ? 190f : 320f;
+        float footerPadding = shortWindow ? 10f : 14f;
 
         return new(
             ShowMiddleStatus: width >= NarrowThreshold,
@@ -52,6 +66,7 @@ public static class TimerNormalLayoutResolver
             GlowHeight: glowHeight,
             ShowAxisDecoration: width >= NarrowThreshold,
             StageVerticalPadding: shortWindow ? 18f : 36f,
-            FooterVerticalPadding: shortWindow ? 10f : 14f);
+            FooterVerticalPadding: footerPadding,
+            FooterHeight: FooterDividerHeight + (2f * footerPadding) + FooterContentHeight);
     }
 }

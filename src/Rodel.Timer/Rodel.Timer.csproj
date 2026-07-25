@@ -11,7 +11,7 @@
     <Description>A focused, minimal Windows count-up timer.</Description>
     <PublishAot>true</PublishAot>
     <SproutPackageFormat>Msix</SproutPackageFormat>
-    <SproutAppxVersion>2.0.0.0</SproutAppxVersion>
+    <SproutAppxVersion>2.2607.3.0</SproutAppxVersion>
     <SproutDefaultLanguage>en-US</SproutDefaultLanguage>
     <SproutLocalizationNamespace>Rodel.Timer</SproutLocalizationNamespace>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
