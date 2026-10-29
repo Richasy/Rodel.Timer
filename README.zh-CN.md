@@ -116,15 +116,14 @@ tests/
 
 ## 🚀 构建与运行
 
-> ⚠️ **外部暂时无法构建。** Working Timer 依赖 **[Sprout](https://github.com/Richasy/Sprout)**，而 Sprout 目前仍在
-> **内部开发**、**尚未公开发行任何包**。`NuGet.config` 把 `Sprout*` 包解析到一个本地打包源
-> （`..\Sprout\artifacts\local-feed`），它依赖尚未公开的 Sprout 仓库，因此外部开发者在此 `dotnet restore` 会失败。
-> 待 Sprout 发布到 nuget.org 后，再补充公开的构建步骤。
+> **构建需要 Sprout 包源的访问权限。** `NuGet.config` 从需要身份验证的
+> [Sprout Azure Artifacts 源](https://pkgs.dev.azure.com/zrichasy/_packaging/sprout/nuget/v3/index.json) 解析 `Sprout*` 包。
+> 请在用户级 NuGet 配置中以源名称 `sprout` 配置 Packaging Read 凭据，凭据不要写入仓库。
+> 完整包集版本固定在 `Directory.Packages.props`，无需本地 Sprout 源码目录。
 >
 > **只想使用应用？** 直接从 **[Microsoft Store](https://apps.microsoft.com/detail/9N71W9G714RK)** 免费安装，无需构建。
 
-作为参考，等 Sprout 包就绪后，本应用可用 **.NET 10 SDK** 在 Windows 10 (19041)+ 上构建（Sprout 版本固定在
-`Directory.Packages.props`）：
+配置包源访问权限后，可用 **.NET 10 SDK** 在 Windows 10 (19041)+ 上构建：
 
 ```pwsh
 dotnet build   Rodel.Timer.slnx
@@ -133,6 +132,20 @@ dotnet publish src\Rodel.Timer\Rodel.Timer.csproj -c Release -r win-x64
 ```
 
 `dotnet publish` 会在 `artifacts/bin/Rodel.Timer/Release/.../publish` 下产出 NativeAOT 可执行文件与已签名的 MSIX 包。
+
+编码约定、兼容性决策和验证范围见[代码风格](docs/code-style.md)与 [Sprout 升级审查记录](docs/sprout-upgrade-review.md)。
+
+若要生成 Microsoft Store 上传包，先把产品的 `Package.StoreAssociation.xml` 放在
+`src\Rodel.Timer\Rodel.Timer.csproj` 旁边（该关联文件已被 Git 忽略），然后运行：
+
+```pwsh
+dotnet msbuild src\Rodel.Timer\Rodel.Timer.csproj -restore -t:SproutCreateRelease `
+  -p:Configuration=Release -p:SproutPackageDistribution=Store `
+  '-p:SproutPackageRids=win-x64|win-arm64'
+```
+
+这会生成一个未签名的 `.msixupload`，包含 x64/Arm64 bundle 及匹配的 NativeAOT 符号包。
+包版本由 `SproutAppxVersion` 指定，Microsoft 会在认证后为包签名。
 
 ---
 

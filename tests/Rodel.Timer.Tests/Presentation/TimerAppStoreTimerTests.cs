@@ -241,6 +241,38 @@ public sealed class TimerAppStoreTimerTests
     }
 
     [TestMethod]
+    public void TodayTotal_RefreshesAcrossMidnightWhileIdle_WithoutSavingOrTickingTheClock()
+    {
+        using var harness = new TimerStoreHarness();
+        harness.LoadToReady();
+        harness.Store.StartTimer();
+        harness.Time.Advance(TimeSpan.FromMinutes(1));
+        harness.Store.StopTimer("Yesterday's focus");
+        int revision = harness.Store.Revision;
+        int displayTick = harness.Store.DisplayTick;
+        TimeSpan observedTotal = TimeSpan.Zero;
+        int observations = 0;
+        using var effect = new Sprout.Reactive.Effect(() =>
+        {
+            observedTotal = harness.Store.TodayTotal;
+            observations++;
+        });
+
+        harness.Store.Tick();
+        Assert.AreEqual(1, observations, "Ordinary idle ticks must not invalidate today's total.");
+        Assert.AreEqual(TimeSpan.FromMinutes(1), observedTotal);
+
+        harness.Time.Advance(TimeSpan.FromDays(1));
+        harness.Store.Tick();
+
+        Assert.AreEqual(TimeSpan.Zero, observedTotal);
+        Assert.AreEqual(2, observations);
+        Assert.AreEqual(revision, harness.Store.Revision, "A calendar change is not a workspace mutation.");
+        Assert.AreEqual(displayTick, harness.Store.DisplayTick, "The idle clock must remain still.");
+        Assert.AreEqual(0, harness.SaveCount);
+    }
+
+    [TestMethod]
     public void Elapsed_IsMonotonicAcrossSuccessiveReads()
     {
         using var harness = new TimerStoreHarness();

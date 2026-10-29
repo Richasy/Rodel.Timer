@@ -104,6 +104,28 @@ public sealed class LegacyWorkTimerImporterTests
     }
 
     [TestMethod]
+    [DataRow("999")]
+    [DataRow("-1")]
+    [DataRow("unknown")]
+    public void Import_RepairsUndefinedThemeWithoutAbortingMigration(string theme)
+    {
+        var snapshot = new LegacyWorkTimerSnapshot(
+            "[]",
+            "[]",
+            new Dictionary<string, string> { ["Theme"] = theme });
+
+        LegacyImportResult result = CreateImporter().Import(
+            snapshot,
+            Guid.NewGuid(),
+            DateTimeOffset.UnixEpoch);
+
+        Assert.AreEqual(TimerThemeMode.System, result.Workspace.Preferences.Theme);
+        Assert.HasCount(1, result.Workspace.Folders);
+        Assert.HasCount(1, result.Warnings);
+        StringAssert.Contains(result.Warnings[0], $"Legacy theme '{theme}' is unsupported");
+    }
+
+    [TestMethod]
     public void Import_RehomesHistoryThatReferencesAMissingFolder()
     {
         var snapshot = new LegacyWorkTimerSnapshot(

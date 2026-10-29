@@ -101,27 +101,11 @@ public sealed class App : Application, IDisposable
     // Application.SystemLanguage). OnDataLoaded later re-applies the same value idempotently once the store has loaded.
     private static void ApplyStartupLanguage()
     {
-        string preference = ReadPersistedLanguagePreference() ?? TimerPreferences.SystemLanguage;
+        string preference = StartupLanguagePreference.Read(AppDataPaths.TimerDataFile())
+            ?? TimerPreferences.SystemLanguage;
         string effective = LanguageResolver.ResolveEffective(preference, MainView.OsCulture());
         Localizer.CurrentLanguage = effective;
         LanguageApply.PinThreadCulture(effective);
-    }
-
-    // Peeks the persisted language preference synchronously before the first frame mounts, so the UI mounts in the
-    // resolved language with no flash. A missing workspace (first run) or an unreadable/corrupt file yields null, so the
-    // caller follows the system; the store's own async load surfaces any real read failure later.
-    private static string? ReadPersistedLanguagePreference()
-    {
-        try
-        {
-            using var repository = new TimerDataRepository(AppDataPaths.TimerDataFile());
-            var workspace = repository.LoadAsync().GetAwaiter().GetResult();
-            return workspace?.Preferences.Language;
-        }
-        catch (TimerDataAccessException)
-        {
-            return null;
-        }
     }
 
     private async void LoadDataAsync()

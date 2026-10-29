@@ -68,23 +68,19 @@ public sealed partial class MoveHistoryContent : Control
         SelectedIndex >= 0 && SelectedIndex < _folders.Count ? _folders[SelectedIndex].Id : Guid.Empty;
 
     /// <inheritdoc/>
-    public Ui Body => Overlay(
-        Stack(
+    public Ui Body => Overlay([
+        Column([
             Text(
-                Resources.MoveToFolder,
-                new TextFormat(TextFormat.DefaultFontFamily, 13f, TextFormat.SemiBoldWeight),
-                Colors.TextFillColorSecondary),
-            ComboBox(_folders.Select(f => f.Name))
-                .SelectedIndex(SelectedIndex)
-                .OnSelectionChanged(OnSelectionChanged)
-                .MaxDropDownHeight(320f)
-                .Automation(new AutomationInfo
+               Resources.MoveToFolder,
+               new TextFormat(TextFormat.DefaultFontFamily, 13f, TextFormat.SemiBoldWeight),
+               Colors.TextFillColorSecondary),
+            ComboBox(_folders.Select(f => f.Name)).SelectedIndex(SelectedIndex).OnSelectionChanged(OnSelectionChanged).MaxDropDownHeight(320f).Automation(new AutomationInfo
                 {
                     Name = Resources.MoveToFolder,
                     AutomationId = TimerAutomationIds.MoveHistoryFolder,
-                }))
-            .Spacing(TimerVisuals.Spacing.Small)
-            .Width(TimerVisuals.MaxWidth.Caption));
+                })
+        ]).Spacing(TimerVisuals.Spacing.Small).Width(TimerVisuals.MaxWidth.Caption)
+    ]);
 
     private void OnSelectionChanged(int index) => SelectedIndex = index;
 }

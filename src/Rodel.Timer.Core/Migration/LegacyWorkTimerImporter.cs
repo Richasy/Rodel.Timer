@@ -339,7 +339,7 @@ public sealed class LegacyWorkTimerImporter
             return _defaultPreferences.Theme;
         }
 
-        if (Enum.TryParse(value, ignoreCase: true, out TimerThemeMode theme))
+        if (Enum.TryParse(value, ignoreCase: true, out TimerThemeMode theme) && Enum.IsDefined(theme))
         {
             return theme;
         }

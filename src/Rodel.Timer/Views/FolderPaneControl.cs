@@ -20,7 +20,7 @@ namespace Rodel.Timer;
 /// The visual content of a folder ListItem. The ItemsView container owns selection, focus, context gestures, and UIA;
 /// this view draws only the folder glyph, name, and created date.
 /// </summary>
-[Composite]
+[View]
 public readonly partial record struct FolderRowView(
     string Name,
     string CreatedText,
@@ -33,32 +33,26 @@ public readonly partial record struct FolderRowView(
 {
     /// <summary>The transparent row content inset from the container's selection indicator.</summary>
     public Ui Body => Border(
-        Stack(
+        Row([
             Border(
                 Icon.Fluent(IconSymbol, FluentIconVariant.Regular, TimerVisuals.IconSize.Medium, IconBrush)
-                    .HAlign(HorizontalAlignment.Center)
-                    .VAlign(VerticalAlignment.Center))
+                    .HAlign(HorizontalAlignment.Center).VAlign(VerticalAlignment.Center))
                 .Background(TileBrush)
                 .CornerRadius(TimerVisuals.Radius.App)
                 .Width(TimerVisuals.IconSize.Tile)
                 .Height(TimerVisuals.IconSize.Tile),
-            Stack(
+            Column([
                 Text(Name, NameStyle),
-                Text(CreatedText, DateStyle, DateInk))
-                .Spacing(2f)
-                .VAlign(VerticalAlignment.Center)
-                .Weight(1f))
-            .Orientation(Orientation.Horizontal)
-            .Spacing(10f)
-            .VAlign(VerticalAlignment.Center))
-        .Padding(16f, 7f, 7f, 7f);
+                Text(CreatedText, DateStyle, DateInk)
+            ]).Spacing(2f).VAlign(VerticalAlignment.Center).Weight(1f)
+        ]).Spacing(10f).VAlign(VerticalAlignment.Center)).Padding(16f, 7f, 7f, 7f);
 }
 
 /// <summary>
 /// A controlled single-select folder list. Stable Guid keys preserve row identity, and each container fresh-builds an
 /// owned context menu for mouse, touch/pen, and keyboard context gestures.
 /// </summary>
-[Composite]
+[View]
 public readonly partial record struct FolderListView(
     IReadOnlyList<FolderRowData> Rows,
     Func<FolderRowData, FolderRowView> BuildRow,
@@ -67,7 +61,7 @@ public readonly partial record struct FolderListView(
     Func<FolderRowData, IFlyout> BuildContextMenu)
 {
     /// <summary>The bounded, virtualized list hosted directly by the anchored flyout.</summary>
-    public Ui Body => Overlay(BuildItemsView());
+    public Ui Body => Overlay([BuildItemsView()]);
 
     internal ItemsView BuildItemsView() =>
         TimerRowListFactory.Folders(
@@ -108,19 +102,17 @@ public sealed partial class FolderPaneControl : Control
     }
 
     /// <summary>The section header (own padding) over a divider, then the controlled folder list (own padding).</summary>
-    public Ui Body => Stack(
-        Stack(
-            Stack(
+    public Ui Body => Column([
+        Row([
+            Column([
                 Text(
-                    Resources.Folders,
-                    new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight)),
+                   Resources.Folders,
+                   new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight)),
                 Text(
                     Resources.FoldersFlyoutSubtitle,
                     new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.NormalWeight),
-                    Colors.TextFillColorSecondary))
-                .Spacing(2f)
-                .VAlign(VerticalAlignment.Center)
-                .Weight(1f),
+                    Colors.TextFillColorSecondary)
+            ]).Spacing(2f).VAlign(VerticalAlignment.Center).Weight(1f),
             Button(
                 Icon.Fluent(FluentSymbol.Add, FluentIconVariant.Regular, TimerVisuals.IconSize.Medium),
                 _chrome.ShowAddFolderDialog,
@@ -130,19 +122,16 @@ public sealed partial class FolderPaneControl : Control
                 .Height(TimerVisuals.Height.Icon)
                 .AccessKey("A")
                 .ToolTip(Resources.AddFolder)
-                .Automation(AddAutomation))
-            .Orientation(Orientation.Horizontal)
-            .Spacing(TimerVisuals.Spacing.Small)
-            .Padding(16f, 13f, 14f, 11f),
+                .Automation(AddAutomation)
+        ]).Spacing(TimerVisuals.Spacing.Small).Padding(16f, 13f, 14f, 11f),
         Divider.Horizontal(),
         new FolderListView(
             Rows,
             _chrome.BuildFolderRow,
             SelectedIndices,
             _onSelectionChanged,
-            _buildContextMenu)
-            .Height(TimerAnchoredSurfaceLayoutResolver.ListHeight(Rows.Count)))
-        .Spacing(0f);
+            _buildContextMenu).Height(TimerAnchoredSurfaceLayoutResolver.ListHeight(Rows.Count))
+    ]).Spacing(0f);
 
     private IReadOnlyList<FolderRowData> Rows => _chrome.FolderRows;
 

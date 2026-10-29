@@ -25,7 +25,7 @@ public sealed partial class MainView
     /// something the notice should announce — the notice fires precisely on the mismatch between this and the value
     /// persisted by the previous run, so an unbumped version means an upgrade ships silently.
     /// </summary>
-    internal const string CurrentVersion = "2.2607.3.0";
+    internal const string CurrentVersion = "2.2609.2.0";
 
     /// <summary>
     /// The release the shipped <see cref="Resources.WhatsNewBody"/> describes. It is deliberately <b>separate</b> from
@@ -33,7 +33,7 @@ public sealed partial class MainView
     /// bug-fix release raises <see cref="CurrentVersion"/> and upgrades silently instead of replaying these notes at a
     /// user who has already read them.
     /// </summary>
-    internal const string WhatsNewVersion = "2.2607.3.0";
+    internal const string WhatsNewVersion = "2.2609.2.0";
 
     /// <summary>
     /// The version shown on the About surface. When the app is packaged this is the installed <b>package identity</b>

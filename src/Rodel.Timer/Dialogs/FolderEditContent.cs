@@ -25,7 +25,7 @@ namespace Rodel.Timer.Dialogs;
 /// <param name="Palette">The resolved button palette (accent when selected).</param>
 /// <param name="OnPick">Selects this icon.</param>
 /// <param name="Info">The cell's accessibility info (name + id).</param>
-[Composite]
+[View]
 public readonly partial record struct IconCellView(
     FluentSymbol Symbol,
     ButtonPalette Palette,
@@ -33,49 +33,43 @@ public readonly partial record struct IconCellView(
     AutomationInfo Info)
 {
     /// <summary>A square glyph button sized for the picker grid, centred in its (stretched) grid cell.</summary>
-    public Ui Body => Overlay(
+    public Ui Body => Overlay([
         Button(
-            Icon.Fluent(Symbol, FluentIconVariant.Regular, TimerVisuals.IconSize.Medium),
-            OnPick,
-            Palette)
-            .Style(TimerVisuals.Buttons.Icon)
-            .Width(44f)
-            .Height(44f)
-            .HAlign(HorizontalAlignment.Center)
-            .Automation(Info));
+           Icon.Fluent(Symbol, FluentIconVariant.Regular, TimerVisuals.IconSize.Medium),
+           OnPick,
+           Palette).Style(TimerVisuals.Buttons.Icon).Width(44f).Height(44f).HAlign(HorizontalAlignment.Center).Automation(Info)
+    ]);
 }
 
 /// <summary>
-/// The scrolling, uniform-grid icon picker of the folder editor — a <c>[Composite]</c> value view hosting the
+/// The scrolling, uniform-grid icon picker of the folder editor — a <c>[View]</c> value view hosting the
 /// 40-glyph repeater. The host re-supplies the <see cref="Choices"/> list (rebuilt from the current selection and the
 /// theme/language revision) on every render, so the stable, icon-keyed repeater rebinds only the cells whose value
 /// actually changed — the grid identity, scroll position, and keyboard focus are preserved (no whole-grid remount).
 /// </summary>
 /// <param name="Choices">The icon choices to render, each flagged with whether it is the selected icon.</param>
 /// <param name="Template">The cell template resolving each choice to a highlighted <see cref="IconCellView"/>.</param>
-[Composite]
+[View]
 public readonly partial record struct IconPickerView(
     IReadOnlyList<IconChoice> Choices,
     Func<IconChoice, IconCellView> Template)
 {
     /// <summary>A vertically scrolling uniform grid of icon cells.</summary>
-    public Ui Body => Overlay(
+    public Ui Body => Overlay([
         ScrollView(
-            ItemsRepeater(
-                Choices,
-                static c => c.Icon,
-                Template,
-                new UniformGridLayout
-                {
-                    ItemWidth = 44f,
-                    ItemHeight = 44f,
-                    ColumnSpacing = 8f,
-                    RowSpacing = 8f,
-                    ItemsStretch = UniformGridItemsStretch.Fill,
-                }))
-            .Vertical(ScrollMode.Auto)
-            .HorizontalScrollBar(ScrollBarVisibility.Hidden)
-            .Height(260f));
+           ItemsRepeater(
+               Choices,
+               static c => c.Icon,
+               Template,
+               new UniformGridLayout
+               {
+                   ItemWidth = 44f,
+                   ItemHeight = 44f,
+                   ColumnSpacing = 8f,
+                   RowSpacing = 8f,
+                   ItemsStretch = UniformGridItemsStretch.Fill,
+               })).Vertical(ScrollMode.Auto).HorizontalScrollBar(ScrollBarVisibility.Hidden).Height(260f)
+    ]);
 }
 
 /// <summary>
@@ -123,24 +117,24 @@ public sealed partial class FolderEditContent : Control
     }
 
     /// <inheritdoc/>
-    public Ui Body => Overlay(
-        Stack(
+    public Ui Body => Overlay([
+        Column([
             TextBox()
-                .Text(FolderName)
-                .OnTextChanged(SetName)
-                .Placeholder(Resources.FolderNamePlaceholder)
-                .Automation(new AutomationInfo
-                {
-                    Name = Resources.FolderName,
-                    AutomationId = "RodelTimer.FolderEdit.Name",
-                }),
+               .Text(FolderName)
+               .OnTextChanged(SetName)
+               .Placeholder(Resources.FolderNamePlaceholder)
+               .Automation(new AutomationInfo
+               {
+                   Name = Resources.FolderName,
+                   AutomationId = "RodelTimer.FolderEdit.Name",
+               }),
             Text(
                 Resources.ChooseIcon,
                 new TextFormat(TextFormat.DefaultFontFamily, 13f, TextFormat.NormalWeight),
                 Colors.TextFillColorSecondary),
-            new IconPickerView(FolderIconCatalog.Choices(SelectedIcon, _main.ThemeStamp), BuildCell))
-            .Spacing(TimerVisuals.Spacing.Medium)
-            .Width(TimerVisuals.MaxWidth.FolderDialog));
+            new IconPickerView(FolderIconCatalog.Choices(SelectedIcon, _main.ThemeStamp), BuildCell)
+        ]).Spacing(TimerVisuals.Spacing.Medium).Width(TimerVisuals.MaxWidth.FolderDialog)
+    ]);
 
     /// <summary>
     /// Resolves one icon choice to its cell, reading the theme palette and the localized name <b>live</b> on each call.

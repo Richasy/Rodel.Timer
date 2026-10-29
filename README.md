@@ -122,17 +122,16 @@ tests/
 
 ## 🚀 Build & run
 
-> ⚠️ **Not yet buildable outside Richasy.** Working Timer depends on **[Sprout](https://github.com/Richasy/Sprout)**,
-> which is still in **private development** with **no publicly released packages**. `NuGet.config` resolves the
-> `Sprout*` packages from a local pack feed (`..\Sprout\artifacts\local-feed`) that requires the not‑yet‑public Sprout
-> repository, so `dotnet restore` will fail for external developers. Public build steps will follow once Sprout ships
-> to nuget.org.
+> **Sprout feed access is required.** `NuGet.config` resolves `Sprout*` packages from the authenticated
+> [Sprout Azure Artifacts feed](https://pkgs.dev.azure.com/zrichasy/_packaging/sprout/nuget/v3/index.json).
+> Configure its Packaging Read credential in your user-level NuGet configuration using the source name `sprout`.
+> Credentials belong outside this repository. The complete package-set version is pinned in `Directory.Packages.props`;
+> a local Sprout checkout is unnecessary.
 >
 > **Just want to use the app?** Install it free from the
 > **[Microsoft Store](https://apps.microsoft.com/detail/9N71W9G714RK)** — no build required.
 
-For reference, once the Sprout packages are available the app builds with the **.NET 10 SDK** on Windows 10 (19041)+
-(the Sprout versions are pinned in `Directory.Packages.props`):
+With feed access configured, build with the **.NET 10 SDK** on Windows 10 (19041)+:
 
 ```pwsh
 dotnet build   Rodel.Timer.slnx
@@ -142,6 +141,21 @@ dotnet publish src\Rodel.Timer\Rodel.Timer.csproj -c Release -r win-x64
 
 `dotnet publish` emits the NativeAOT executable and a signed MSIX package under
 `artifacts/bin/Rodel.Timer/Release/.../publish`.
+
+See [code style](docs/code-style.md) and the [Sprout upgrade review](docs/sprout-upgrade-review.md) for authoring
+conventions, compatibility decisions, and validation limits.
+
+For a Microsoft Store upload, place the product's `Package.StoreAssociation.xml` beside
+`src\Rodel.Timer\Rodel.Timer.csproj` (the association file is ignored by Git), then run:
+
+```pwsh
+dotnet msbuild src\Rodel.Timer\Rodel.Timer.csproj -restore -t:SproutCreateRelease `
+  -p:Configuration=Release -p:SproutPackageDistribution=Store `
+  '-p:SproutPackageRids=win-x64|win-arm64'
+```
+
+This produces one unsigned `.msixupload` containing the x64/Arm64 bundle and matching NativeAOT symbols.
+The package version comes from `SproutAppxVersion`; Microsoft signs the package after certification.
 
 ---
 

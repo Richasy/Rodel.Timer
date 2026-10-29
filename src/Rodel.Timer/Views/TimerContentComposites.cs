@@ -16,22 +16,22 @@ using static Sprout.Markup;
 namespace Rodel.Timer;
 
 /// <summary>The middle footer column, mounted only when the normal layout is wide enough AND the window material is in fallback.</summary>
-[Composite]
+[View]
 public readonly partial record struct NormalFooterStatusView(
     string BackgroundStatus,
     ThemeColors Colors)
 {
     /// <summary>The material-fallback caution line — the running / ready state now lives under the clock, so the footer only carries the (rare) material warning.</summary>
-    public Ui Body => Stack(
+    public Ui Body => Column([
         Text(
-            BackgroundStatus,
-            new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.NormalWeight, TextAlignment.Center),
-            Colors.SystemFillColorCaution)
-            .HAlign(HorizontalAlignment.Center));
+           BackgroundStatus,
+           new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.NormalWeight, TextAlignment.Center),
+           Colors.SystemFillColorCaution).HAlign(HorizontalAlignment.Center)
+    ]);
 }
 
 /// <summary>The open-canvas timer stage: status, broken axis and clock, title editor, then primary action.</summary>
-[Composite]
+[View]
 public readonly partial record struct NormalTimerStageView(
     TimerChrome Chrome,
     ThemeColors Colors,
@@ -44,62 +44,40 @@ public readonly partial record struct NormalTimerStageView(
     bool AnimateClock)
 {
     /// <summary>The centred stage with no enclosing card or opaque surface: a heavy clock over a fading axis, the caption below it, then the centred title editor and the primary action, the whole block vertically centred.</summary>
-    public Ui Body => Overlay(
-        Stack(
-            Overlay(
-                Rectangle(ClockGlowBrush(Colors, Chrome.IsDarkTheme), new Size(Layout.GlowWidth, Layout.GlowHeight))
-                    .HAlign(HorizontalAlignment.Center)
-                    .VAlign(VerticalAlignment.Center),
-                Rectangle(AxisFadeBrush(Colors), new Size(Layout.AxisTotalWidth, 1f))
-                    .HAlign(HorizontalAlignment.Center)
-                    .VAlign(VerticalAlignment.Center)
-                    .Visible(Layout.ShowAxisDecoration),
+    public Ui Body => Overlay([
+        Column([
+            Overlay([
+                Rectangle(ClockGlowBrush(Colors, Chrome.IsDarkTheme), new Size(Layout.GlowWidth, Layout.GlowHeight)).HAlign(HorizontalAlignment.Center).VAlign(VerticalAlignment.Center),
+                Rectangle(AxisFadeBrush(Colors), new Size(Layout.AxisTotalWidth, 1f)).HAlign(HorizontalAlignment.Center).VAlign(VerticalAlignment.Center).Visible(Layout.ShowAxisDecoration),
                 When(
                     AnimateClock,
                     AnimatedText(TimerFormat.Clock(Elapsed), ClockStyle),
-                    Text(TimerFormat.Clock(Elapsed), ClockStyle))
-                    .HAlign(HorizontalAlignment.Center)
-                    .VAlign(VerticalAlignment.Center))
-                .Padding(0f, -(Layout.GlowHeight - (Layout.ClockSize * 1.5f)) / 2f),
+                    Text(TimerFormat.Clock(Elapsed), ClockStyle)).HAlign(HorizontalAlignment.Center).VAlign(VerticalAlignment.Center)
+            ]).Padding(0f, -(Layout.GlowHeight - (Layout.ClockSize * 1.5f)) / 2f),
             Text(
                 StatusCaption,
                 new TextFormat(TextFormat.DefaultFontFamily, 13f, TextFormat.NormalWeight, TextAlignment.Center),
-                Colors.TextFillColorSecondary)
-                .HAlign(HorizontalAlignment.Center),
+                Colors.TextFillColorSecondary).HAlign(HorizontalAlignment.Center),
             TextBox()
                 .Text(SessionTitle)
                 .OnTextChanged(Chrome.SetSessionTitle)
                 .Placeholder(Resources.SessionTitlePlaceholder)
-                .Centered()
-                .FontSize(16f)
-                .Padding(13f, 9f)
-                .Automation(TitleAutomation)
-                .MaxWidth(TimerVisuals.MaxWidth.SessionField)
-                .HAlign(HorizontalAlignment.Center),
-            Stack(
+                .Centered().FontSize(16f).Padding(13f, 9f).Automation(TitleAutomation).MaxWidth(TimerVisuals.MaxWidth.SessionField).HAlign(HorizontalAlignment.Center),
+            Column([
                 Button(
-                    Icon.Fluent(
-                        IsRunning ? FluentSymbol.Stop : FluentSymbol.Play,
-                        FluentIconVariant.Filled,
-                        TimerVisuals.IconSize.Large),
-                    Chrome.StartOrStop,
-                    ButtonPalette.FromTheme(Colors, ButtonColorScheme.Accent))
-                    .Style(PrimaryActionStyle)
-                    .Width(TimerVisuals.Height.PrimaryAction)
-                    .Height(TimerVisuals.Height.PrimaryAction)
-                    .HAlign(HorizontalAlignment.Center)
-                    .Automation(StartStopAutomation),
+                   Icon.Fluent(
+                       IsRunning ? FluentSymbol.Stop : FluentSymbol.Play,
+                       FluentIconVariant.Filled,
+                       TimerVisuals.IconSize.Large),
+                   Chrome.StartOrStop,
+                   ButtonPalette.FromTheme(Colors, ButtonColorScheme.Accent)).Style(PrimaryActionStyle).Width(TimerVisuals.Height.PrimaryAction).Height(TimerVisuals.Height.PrimaryAction).HAlign(HorizontalAlignment.Center).Automation(StartStopAutomation),
                 Text(
                     ActionLabel,
                     new TextFormat(TextFormat.DefaultFontFamily, 12f, TextFormat.SemiBoldWeight),
-                    Colors.TextFillColorSecondary)
-                    .HAlign(HorizontalAlignment.Center))
-                .Spacing(TimerVisuals.Spacing.XSmall)
-                .HAlign(HorizontalAlignment.Center))
-            .Spacing(TimerVisuals.Spacing.Medium)
-            .HAlign(HorizontalAlignment.Center)
-            .VAlign(VerticalAlignment.Center))
-        .Padding(TimerVisuals.Spacing.XLarge, Layout.StageVerticalPadding);
+                    Colors.TextFillColorSecondary).HAlign(HorizontalAlignment.Center)
+            ]).Spacing(TimerVisuals.Spacing.XSmall).HAlign(HorizontalAlignment.Center)
+        ]).Spacing(TimerVisuals.Spacing.Medium).HAlign(HorizontalAlignment.Center).VAlign(VerticalAlignment.Center)
+    ]).Padding(TimerVisuals.Spacing.XLarge, Layout.StageVerticalPadding);
 
     /// <summary>The circular primary action: zero padding + a radius that keeps a perfect circle at the 64 epx hero diameter.</summary>
     internal static ButtonStyle PrimaryActionStyle =>
@@ -178,24 +156,25 @@ public readonly partial record struct NormalTimerStageView(
 }
 
 /// <summary>The footer's leading Folders command — present only in the side-panel layout, where the footer owns the entry points.</summary>
-[Composite]
+[View]
 public readonly partial record struct FooterFoldersCommandView(
     TimerChrome Chrome,
     ThemeColors Colors)
 {
     /// <summary>The icon-only command that slides the folders panel in from the leading edge.</summary>
-    public Ui Body => Overlay(
+    public Ui Body => Overlay([
         Button(
-            Icon.Fluent(FluentSymbol.FolderList, FluentIconVariant.Regular, TimerVisuals.IconSize.Medium),
-            Chrome.ShowFoldersPanel,
-            TimerVisuals.Ghost(Colors))
-            .Style(TimerVisuals.Buttons.Icon)
-            .Width(TimerVisuals.Height.Icon)
-            .Height(TimerVisuals.Height.Icon)
-            .VAlign(VerticalAlignment.Center)
-            .AccessKey("F")
-            .ToolTip(Resources.Folders)
-            .Automation(FoldersAutomation));
+           Icon.Fluent(FluentSymbol.FolderList, FluentIconVariant.Regular, TimerVisuals.IconSize.Medium),
+           Chrome.ShowFoldersPanel,
+           TimerVisuals.Ghost(Colors))
+           .Style(TimerVisuals.Buttons.Icon)
+           .Width(TimerVisuals.Height.Icon)
+           .Height(TimerVisuals.Height.Icon)
+           .VAlign(VerticalAlignment.Center)
+           .AccessKey("F")
+           .ToolTip(Resources.Folders)
+           .Automation(FoldersAutomation)
+    ]);
 
     internal static AutomationInfo FoldersAutomation => new()
     {
@@ -207,24 +186,25 @@ public readonly partial record struct FooterFoldersCommandView(
 }
 
 /// <summary>The footer's trailing History command — present only in the side-panel layout.</summary>
-[Composite]
+[View]
 public readonly partial record struct FooterHistoryCommandView(
     TimerChrome Chrome,
     ThemeColors Colors)
 {
     /// <summary>The icon-only command that slides the history panel in from the trailing edge.</summary>
-    public Ui Body => Overlay(
+    public Ui Body => Overlay([
         Button(
-            Icon.Fluent(FluentSymbol.History, FluentIconVariant.Regular, TimerVisuals.IconSize.Medium),
-            Chrome.ShowHistoryPanel,
-            TimerVisuals.Ghost(Colors))
-            .Style(TimerVisuals.Buttons.Icon)
-            .Width(TimerVisuals.Height.Icon)
-            .Height(TimerVisuals.Height.Icon)
-            .VAlign(VerticalAlignment.Center)
-            .AccessKey("H")
-            .ToolTip(Resources.History)
-            .Automation(HistoryAutomation));
+           Icon.Fluent(FluentSymbol.History, FluentIconVariant.Regular, TimerVisuals.IconSize.Medium),
+           Chrome.ShowHistoryPanel,
+           TimerVisuals.Ghost(Colors))
+           .Style(TimerVisuals.Buttons.Icon)
+           .Width(TimerVisuals.Height.Icon)
+           .Height(TimerVisuals.Height.Icon)
+           .VAlign(VerticalAlignment.Center)
+           .AccessKey("H")
+           .ToolTip(Resources.History)
+           .Automation(HistoryAutomation)
+    ]);
 
     internal static AutomationInfo HistoryAutomation => new()
     {
@@ -236,7 +216,7 @@ public readonly partial record struct FooterHistoryCommandView(
 }
 
 /// <summary>The full-width normal footer: current folder, an optional material-fallback caution, and today's focus.</summary>
-[Composite]
+[View]
 public readonly partial record struct NormalTimerFooterView(
     TimerChrome Chrome,
     ThemeColors Colors,
@@ -254,53 +234,38 @@ public readonly partial record struct NormalTimerFooterView(
     /// fallback is showing, and the side-panel layout adds a command button beside each outer column — the footer is
     /// the only entry point to folders and history in that mode.
     /// </summary>
-    public Ui Body => Stack(
+    public Ui Body => Column([
         Divider.Horizontal(),
-        Stack(
-            Stack(
+        Row([
+            Row([
                 When(ShowPanelCommands, new FooterFoldersCommandView(Chrome, Colors)),
-                Stack(
+                Column([
                     Text(
-                        CurrentFolderLabel,
-                        new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.SemiBoldWeight),
-                        Colors.TextFillColorSecondary),
+                       CurrentFolderLabel,
+                       new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.SemiBoldWeight),
+                       Colors.TextFillColorSecondary),
                     Text(
                         FolderName,
-                        new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight)))
-                    .Spacing(2f)
-                    .VAlign(VerticalAlignment.Center))
-                .Orientation(Orientation.Horizontal)
-                .Spacing(TimerVisuals.Spacing.Small)
-                .VAlign(VerticalAlignment.Center)
-                .Weight(1f),
+                        new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight))
+                ]).Spacing(2f).VAlign(VerticalAlignment.Center)
+            ]).Spacing(TimerVisuals.Spacing.Small).VAlign(VerticalAlignment.Center).Weight(1f),
             When(
                 Layout.ShowMiddleStatus && IsBackgroundFallback,
                 new NormalFooterStatusView(BackgroundStatus, Colors)),
-            Stack(
-                Stack(
+            Row([
+                Column([
                     Text(
-                        TodaysFocusLabel,
-                        new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.SemiBoldWeight, TextAlignment.Trailing),
-                        Colors.TextFillColorSecondary)
-                        .HAlign(HorizontalAlignment.Right),
+                       TodaysFocusLabel,
+                       new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.SemiBoldWeight, TextAlignment.Trailing),
+                       Colors.TextFillColorSecondary).HAlign(HorizontalAlignment.Right),
                     Text(
                         FocusSummary,
-                        new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight, TextAlignment.Trailing))
-                        .HAlign(HorizontalAlignment.Right))
-                    .Spacing(2f)
-                    .VAlign(VerticalAlignment.Center)
-                    .Weight(1f),
-                When(ShowPanelCommands, new FooterHistoryCommandView(Chrome, Colors)))
-                .Orientation(Orientation.Horizontal)
-                .Spacing(TimerVisuals.Spacing.Small)
-                .VAlign(VerticalAlignment.Center)
-                .Weight(1f))
-            .Orientation(Orientation.Horizontal)
-            .Spacing(18f)
-            .Padding(HorizontalPadding, Layout.FooterVerticalPadding)
-            .Height(Layout.FooterHeight - TimerNormalLayoutResolver.FooterDividerHeight))
-        .Spacing(0f)
-        .Background(Brush.Theme(ThemeColorToken.LayerFillColorDefault));
+                        new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight, TextAlignment.Trailing)).HAlign(HorizontalAlignment.Right)
+                ]).Spacing(2f).VAlign(VerticalAlignment.Center).Weight(1f),
+                When(ShowPanelCommands, new FooterHistoryCommandView(Chrome, Colors))
+            ]).Spacing(TimerVisuals.Spacing.Small).VAlign(VerticalAlignment.Center).Weight(1f)
+        ]).Spacing(18f).Padding(HorizontalPadding, Layout.FooterVerticalPadding).Height(Layout.FooterHeight - TimerNormalLayoutResolver.FooterDividerHeight)
+    ]).Spacing(0f).Background(Brush.Theme(ThemeColorToken.LayerFillColorDefault));
 
     /// <summary>
     /// The footer's horizontal inset. With the panel commands present it drops to the side panels' own gutter, so each
@@ -315,7 +280,7 @@ public readonly partial record struct NormalTimerFooterView(
 /// The open normal workspace: a large rolling clock floats directly on the window canvas between two broken axis
 /// segments, with the title and primary action on the same centre line and one full-width status footer at the bottom.
 /// </summary>
-[Composite]
+[View]
 public readonly partial record struct NormalTimerView(
     TimerChrome Chrome,
     ThemeColors Colors,
@@ -342,9 +307,8 @@ public readonly partial record struct NormalTimerView(
     /// height is what <see cref="TimerSidePanelLayoutResolver"/> measures the side panels' band against, so the two must
     /// never drift apart.
     /// </remarks>
-    public Ui Body => Stack(
-        new NormalTimerStageView(Chrome, Colors, Layout, Elapsed, IsRunning, SessionTitle, StatusCaption, ActionLabel, AnimateClock)
-            .Weight(1f),
+    public Ui Body => Column([
+        new NormalTimerStageView(Chrome, Colors, Layout, Elapsed, IsRunning, SessionTitle, StatusCaption, ActionLabel, AnimateClock).Weight(1f),
         Keyed(
             (ShowPanelCommands, Layout.FooterVerticalPadding),
             new NormalTimerFooterView(
@@ -357,11 +321,12 @@ public readonly partial record struct NormalTimerView(
                 BackgroundStatus,
                 CurrentFolderLabel,
                 TodaysFocusLabel,
-                ShowPanelCommands)));
+                ShowPanelCommands))
+    ]);
 }
 
 /// <summary>The folder and running-state context that Tight removes from all three trees.</summary>
-[Composite]
+[View]
 public readonly partial record struct CompactContextView(
     string FolderName,
     string StatusCaption,
@@ -369,22 +334,22 @@ public readonly partial record struct CompactContextView(
     float ClockSize)
 {
     /// <summary>The folder name over the timer state, aligned with the clock's leading edge.</summary>
-    public Ui Body => Stack(
+    public Ui Body => Column([
         Text(
-            FolderName,
-            new TextFormat(TextFormat.DefaultFontFamily, 9f, TextFormat.SemiBoldWeight),
-            Colors.TextFillColorSecondary),
+           FolderName,
+           new TextFormat(TextFormat.DefaultFontFamily, 9f, TextFormat.SemiBoldWeight),
+           Colors.TextFillColorSecondary),
         Text(
             StatusCaption,
-            new TextFormat(TextFormat.DefaultFontFamily, MathF.Max(11f, ClockSize * 0.3f), TextFormat.SemiBoldWeight)))
-        .Spacing(2f);
+            new TextFormat(TextFormat.DefaultFontFamily, MathF.Max(11f, ClockSize * 0.3f), TextFormat.SemiBoldWeight))
+    ]).Spacing(2f);
 }
 
 /// <summary>
 /// One stable two-column compact grid. Track/cell metrics adapt between Tight, Balanced, and Wide while the primary
 /// Button keeps identity; only the optional context subtree is structurally removed in Tight.
 /// </summary>
-[Composite]
+[View]
 public readonly partial record struct CompactAdaptiveView(
     TimerChrome Chrome,
     ThemeColors Colors,
@@ -403,34 +368,23 @@ public readonly partial record struct CompactAdaptiveView(
     public Ui Body => Grid(
         Columns,
         RowTracks,
-        When(
-            Layout.ShowContext,
-            new CompactContextView(FolderName, StatusCaption, Colors, Layout.ClockSize))
-            .Cell(0, 0),
-        When(
-            AnimateClock,
-            AnimatedText(TimerFormat.Clock(Elapsed), ClockStyle),
-            Text(TimerFormat.Clock(Elapsed), ClockStyle))
-            .HAlign(HorizontalAlignment.Left)
-            .VAlign(VerticalAlignment.Center)
-            .Cell(0, ClockRow),
-        Button(
-            Icon.Fluent(
-                IsRunning ? FluentSymbol.Stop : FluentSymbol.Play,
-                FluentIconVariant.Filled,
-                TimerVisuals.IconSize.Large),
-            Chrome.StartOrStop,
-            ButtonPalette.FromTheme(Colors, ButtonColorScheme.Accent))
-            .Style(ActionStyle)
-            .Width(Layout.ActionSize)
-            .Height(Layout.ActionSize)
-            .HAlign(HorizontalAlignment.Right)
-            .VAlign(VerticalAlignment.Center)
-            .Cell(1, 0, rowSpan: ActionRowSpan)
-            .Automation(StartStopAutomation))
-        .ColumnSpacing(Layout.ColumnGap)
-        .RowSpacing(2f)
-        .Padding(Layout.HorizontalPadding, 0f);
+        [
+            When(
+               Layout.ShowContext,
+               new CompactContextView(FolderName, StatusCaption, Colors, Layout.ClockSize)).Cell(0, 0),
+            When(
+                AnimateClock,
+                AnimatedText(TimerFormat.Clock(Elapsed), ClockStyle),
+                Text(TimerFormat.Clock(Elapsed), ClockStyle)).HAlign(HorizontalAlignment.Left).VAlign(VerticalAlignment.Center).Cell(0, ClockRow),
+            Button(
+                Icon.Fluent(
+                    IsRunning ? FluentSymbol.Stop : FluentSymbol.Play,
+                    FluentIconVariant.Filled,
+                    TimerVisuals.IconSize.Large),
+                Chrome.StartOrStop,
+                ButtonPalette.FromTheme(Colors, ButtonColorScheme.Accent)).Style(ActionStyle).Width(Layout.ActionSize).Height(Layout.ActionSize).HAlign(HorizontalAlignment.Right).VAlign(VerticalAlignment.Center).Cell(1, 0, rowSpan: ActionRowSpan).Automation(StartStopAutomation)
+        ]
+    ).ColumnSpacing(Layout.ColumnGap).RowSpacing(2f).Padding(Layout.HorizontalPadding, 0f);
 
     internal GridLength[] RowTracks =>
         Layout.ShowContext ? DetailedRows : TightRows;
@@ -460,7 +414,7 @@ public readonly partial record struct CompactAdaptiveView(
 }
 
 /// <summary>The compact-overlay content selected by the pure width+height resolver.</summary>
-[Composite]
+[View]
 public readonly partial record struct CompactTimerView(
     TimerChrome Chrome,
     ThemeColors Colors,
@@ -472,8 +426,7 @@ public readonly partial record struct CompactTimerView(
     bool AnimateClock)
 {
     /// <summary>The capped content band; the 32 epx title bar owns Exit and the native Close button.</summary>
-    public Ui Body => Overlay(
-        new CompactAdaptiveView(Chrome, Colors, Layout, FolderName, Elapsed, IsRunning, StatusCaption, AnimateClock)
-            .VAlign(VerticalAlignment.Center))
-        .Padding(Layout.OuterHorizontalPadding, 8f);
+    public Ui Body => Overlay([
+        new CompactAdaptiveView(Chrome, Colors, Layout, FolderName, Elapsed, IsRunning, StatusCaption, AnimateClock).VAlign(VerticalAlignment.Center)
+    ]).Padding(Layout.OuterHorizontalPadding, 8f);
 }

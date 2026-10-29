@@ -130,4 +130,43 @@ public sealed class TimerAppStoreSaveTests
         Assert.HasCount(1, harness.SavedWorkspaces);
         Assert.AreSame(harness.Store.Bootstrap.Value!.Workspace, harness.SavedWorkspaces[0]);
     }
+
+    [TestMethod]
+    public async Task FlushSave_AfterASettledFailure_PerformsAFreshSave()
+    {
+        using var harness = new TimerStoreHarness();
+        harness.LoadToReady();
+        harness.NextSaveError = new IOException("disk unavailable");
+        harness.Store.UpdateDailyTarget(90);
+        harness.Scheduler.Advance(TimeSpan.FromMilliseconds(500));
+        harness.Scheduler.DrainUntilIdle();
+        Assert.IsTrue(harness.Store.SaveState.IsError);
+
+        Task retry = harness.Store.FlushSaveAsync();
+
+        Assert.AreEqual(2, harness.SaveCount, "Retry must run a new write even after the debounce has settled.");
+        harness.Scheduler.DrainUntilIdle();
+        await retry;
+        Assert.IsTrue(harness.Store.SaveState.IsSuccess);
+        Assert.AreEqual(90, harness.SavedWorkspaces[^1].Preferences.DailyTargetMinutes);
+    }
+
+    [TestMethod]
+    public async Task FlushSave_AfterARepeatedFailure_KeepsTheErrorObservable()
+    {
+        using var harness = new TimerStoreHarness();
+        harness.LoadToReady();
+        harness.NextSaveError = new IOException("first failure");
+        harness.Store.UpdateDailyTarget(90);
+        harness.Scheduler.Advance(TimeSpan.FromMilliseconds(500));
+        harness.Scheduler.DrainUntilIdle();
+        harness.NextSaveError = new IOException("still unavailable");
+
+        Task retry = harness.Store.FlushSaveAsync();
+        harness.Scheduler.DrainUntilIdle();
+        await retry;
+
+        Assert.AreEqual(2, harness.SaveCount);
+        Assert.AreEqual("still unavailable", harness.Store.SaveState.Error?.Message);
+    }
 }

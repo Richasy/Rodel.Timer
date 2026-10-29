@@ -28,39 +28,40 @@ public sealed partial class TimerContentControl : Control
     }
 
     /// <summary>The compact or full timer content, chosen by the live compact-overlay flag.</summary>
-    public Ui Body => Overlay(
+    public Ui Body => Overlay([
         When(
-            _chrome.IsCompact,
-            new CompactTimerView(
-                _chrome,
-                Colors,
-                Rodel.Timer.Presentation.TimerCompactLayoutResolver.Resolve(
-                    _chrome.ViewportWidth,
-                    _chrome.ViewportHeight),
-                _chrome.SelectedFolderName,
-                _chrome.Elapsed,
-                _chrome.IsRunning,
-                _chrome.IsRunning ? Resources.TimerRunning : Resources.TimerReady,
-                _chrome.IsClockAnimated),
-            new NormalTimerView(
-                _chrome,
-                Colors,
-                Rodel.Timer.Presentation.TimerNormalLayoutResolver.Resolve(
-                    _chrome.ViewportWidth,
-                    _chrome.ViewportHeight),
-                _chrome.SelectedFolderName,
-                _chrome.Elapsed,
-                _chrome.IsRunning,
-                _chrome.SessionTitle,
-                _chrome.FocusSummaryText,
-                _chrome.IsBackgroundFallback,
-                _chrome.BackgroundStatusText,
-                Resources.CurrentFolder,
-                Resources.TodaysFocus,
-                _chrome.IsRunning ? Resources.TimerRunning : Resources.TimerReady,
-                _chrome.IsRunning ? Resources.StopTimer : Resources.StartTimer,
-                _chrome.IsClockAnimated,
-                _chrome.IsSidePanelLayout)));
+           _chrome.IsCompact,
+           new CompactTimerView(
+               _chrome,
+               Colors,
+               Rodel.Timer.Presentation.TimerCompactLayoutResolver.Resolve(
+                   _chrome.ViewportWidth,
+                   _chrome.ViewportHeight),
+               _chrome.SelectedFolderName,
+               _chrome.Elapsed,
+               _chrome.IsRunning,
+               _chrome.IsRunning ? Resources.TimerRunning : Resources.TimerReady,
+               _chrome.IsClockAnimated),
+           new NormalTimerView(
+               _chrome,
+               Colors,
+               Rodel.Timer.Presentation.TimerNormalLayoutResolver.Resolve(
+                   _chrome.ViewportWidth,
+                   _chrome.ViewportHeight),
+               _chrome.SelectedFolderName,
+               _chrome.Elapsed,
+               _chrome.IsRunning,
+               _chrome.SessionTitle,
+               _chrome.FocusSummaryText,
+               _chrome.IsBackgroundFallback,
+               _chrome.BackgroundStatusText,
+               Resources.CurrentFolder,
+               Resources.TodaysFocus,
+               _chrome.IsRunning ? Resources.TimerRunning : Resources.TimerReady,
+               _chrome.IsRunning ? Resources.StopTimer : Resources.StartTimer,
+               _chrome.IsClockAnimated,
+               _chrome.IsSidePanelLayout))
+    ]);
 
     private Sprout.Theming.ThemeColors Colors
     {

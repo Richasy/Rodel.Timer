@@ -118,7 +118,7 @@
   <data name="ClockAnimationDescription" xml:space="preserve"><value>Roll the digits when the time changes; turn it off for a still clock</value></data>
   <data name="OpenOnGitHub" xml:space="preserve"><value>Open on GitHub</value></data>
   <data name="WhatsNewTitle" xml:space="preserve"><value>What's new</value></data>
-  <data name="WhatsNewBody" xml:space="preserve"><value>Two new settings put the shell back under your control:&#10;&#10;• Layout — keep the folders and history lists in the title-bar flyouts, or move them to the footer, where a command at each end slides its list in from that side of the window.&#10;&#10;• Rolling clock — turn the digit roll off for a still, quiet clock while you focus.&#10;&#10;Both are under Settings, apply immediately, and are remembered.</value></data>
+  <data name="WhatsNewBody" xml:space="preserve"><value>Performance improvements.</value></data>
   <data name="Save" xml:space="preserve"><value>Save</value></data>
   <data name="Cancel" xml:space="preserve"><value>Cancel</value></data>
   <data name="Delete" xml:space="preserve"><value>Delete</value></data>

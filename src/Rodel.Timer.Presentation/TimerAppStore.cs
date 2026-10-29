@@ -48,6 +48,7 @@ public sealed partial class TimerAppStore
     private readonly Func<TimerWorkspace, CancellationToken, Task> _saveWorkspace;
     private readonly TimeProvider _timeProvider;
     private readonly TimeZoneInfo _timeZone;
+    private readonly IScheduler _scheduler;
     private readonly Func<Guid> _idFactory;
 
     private readonly LatestOperation<TimerBootstrapResult> _bootstrap;
@@ -103,8 +104,10 @@ public sealed partial class TimerAppStore
         _saveWorkspace = saveWorkspace;
         _timeProvider = timeProvider;
         _timeZone = timeZone;
+        _scheduler = scheduler;
         _idFactory = idFactory ?? Guid.NewGuid;
         _session = new TimerSession(timeProvider);
+        LocalDate = ReadLocalDate();
 
         _bootstrap = new LatestOperation<TimerBootstrapResult>(loadWorkspace, scheduler, Lifetime);
         _saveOperation = new SequentialOperation<bool>(SaveWorkAsync, scheduler, Lifetime);
@@ -135,6 +138,8 @@ public sealed partial class TimerAppStore
 
     /// <summary>A reactive tick counter bumped by <see cref="Tick"/> while running, so <see cref="Elapsed"/> re-renders each tick without the store owning a timer.</summary>
     public partial int DisplayTick { get; private set; }
+
+    private partial DateOnly LocalDate { get; set; }
 
     /// <summary>The folders of the loaded workspace, as a fresh array rebuilt once per <c>(workspace, revision)</c>. Reading it before the workspace has loaded throws.</summary>
     /// <exception cref="InvalidOperationException">The workspace has not been loaded yet.</exception>
@@ -214,8 +219,8 @@ public sealed partial class TimerAppStore
 
     /// <summary>
     /// The total duration of all <em>completed</em> history entries whose creation instant falls on today's local
-    /// date (in the store's time zone). It reads <see cref="Revision"/> only — not the tick — so it recomputes when
-    /// history changes but not on every tick, and it deliberately excludes the in-flight running session.
+    /// date (in the store's time zone). It follows history and local-date changes without invalidating on every clock
+    /// tick, and it deliberately excludes the in-flight running session.
     /// </summary>
     /// <exception cref="InvalidOperationException">The workspace has not been loaded yet.</exception>
     public TimeSpan TodayTotal
@@ -224,9 +229,7 @@ public sealed partial class TimerAppStore
         {
             _ = Revision;
             TimerWorkspace workspace = Workspace;
-            DateTimeOffset localNow = TimeZoneInfo.ConvertTime(_timeProvider.GetUtcNow(), _timeZone);
-            DateOnly today = DateOnly.FromDateTime(localNow.DateTime);
-            return workspace.GetTotalDuration(today, _timeZone);
+            return workspace.GetTotalDuration(LocalDate, _timeZone);
         }
     }
 
@@ -592,13 +595,14 @@ public sealed partial class TimerAppStore
     }
 
     /// <summary>
-    /// Advances the reactive tick so <see cref="Elapsed"/> re-renders. It is a no-op when no session is running. The
-    /// store owns no timer — the application drives this from its own UI-thread timer.
+    /// Refreshes the local date, including while idle, and advances the elapsed clock only during a running session.
+    /// The store owns no timer — the application drives this from its own UI-thread timer.
     /// </summary>
     /// <exception cref="ObjectDisposedException">The store has been disposed.</exception>
     public void Tick()
     {
         ThrowIfDisposed();
+        LocalDate = ReadLocalDate();
         if (!IsRunning)
         {
             return;
@@ -608,8 +612,8 @@ public sealed partial class TimerAppStore
     }
 
     /// <summary>
-    /// Flushes any pending debounced save immediately and awaits it. It neither closes the store nor blocks future
-    /// mutations, and it does not rethrow a save failure (the outcome stays observable in <see cref="SaveState"/>);
+    /// Flushes any pending debounced save immediately, or retries the last failed write, and awaits it. It neither
+    /// closes the store nor blocks future mutations, and it does not rethrow a save failure (the outcome stays observable in <see cref="SaveState"/>);
     /// use <see cref="CloseAsync"/> for the shutdown flush that rethrows.
     /// </summary>
     /// <returns>A task that completes when the flushed save settles.</returns>
@@ -617,7 +621,13 @@ public sealed partial class TimerAppStore
     public Task FlushSaveAsync()
     {
         ThrowIfDisposed();
+        bool hadPending = _saveDebouncer.IsPending;
         _saveDebouncer.Flush();
+        if (!hadPending && SaveState.IsError)
+        {
+            RequestSave();
+        }
+
         return _lastSaveTask;
     }
 
@@ -659,15 +669,17 @@ public sealed partial class TimerAppStore
         {
             _closing = true;
 
-            bool hadPending = _saveDebouncer.IsPending;
-            _saveDebouncer.Flush();
-            if (!hadPending && SaveState.IsError)
+            Task pending = FlushSaveAsync();
+            try
             {
-                RequestSave();
+                await pending.ConfigureAwait(false);
+            }
+            finally
+            {
+                // Closing state and the save signal belong to the same home thread as ordinary mutations.
+                await _scheduler.SwitchToUIThreadAsync();
             }
 
-            Task pending = _lastSaveTask;
-            await pending.ConfigureAwait(false);
             SaveState.Rethrow();
             reservation.TrySetResult();
         }
@@ -687,6 +699,9 @@ public sealed partial class TimerAppStore
     }
 
     private void RequestSave() => _lastSaveTask = _saveOperation.Run();
+
+    private DateOnly ReadLocalDate() =>
+        DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(_timeProvider.GetUtcNow(), _timeZone).DateTime);
 
     private void CommitMutation()
     {

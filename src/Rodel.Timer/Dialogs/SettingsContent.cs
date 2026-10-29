@@ -74,19 +74,18 @@ public sealed partial class SettingsSectionsControl : Control
         _chrome = chrome ?? throw new ArgumentNullException(nameof(chrome));
     }
 
+    // Resources is generated in the same compilation. The explicit string type below selects Description(string)
+    // before those accessors exist, so the DSL can retain and update the SettingsCard fluent chain.
     /// <summary>Appearance, Focus, Regional, and About groups in reading order.</summary>
-    public Ui Body => Stack(
+    public Ui Body => Column([
         SettingsCard(
-            Resources.Theme,
-            ComboBox([Resources.ThemeSystem, Resources.ThemeLight, Resources.ThemeDark])
-                .SelectedIndex(_chrome.ThemeIndex)
-                .OnSelectionChanged(_chrome.ThemeChanged)
-                .FaceplateSizing(ComboBoxFaceplateSizing.SelectedItem)
-                .Automation(SettingsContent.ThemeAutomation)
-                .LayoutBox(minWidth: SettingsContent.SettingsEditorMinWidth, maxWidth: SettingsContent.SettingsEditorMaxWidth))
-            .Description(Resources.ThemeDescription)
-            .Icon(new FluentIcon(FluentSymbol.WeatherMoon))
-            .WrapThreshold(SettingsContent.CardWrapThreshold),
+           Resources.Theme,
+           ComboBox([Resources.ThemeSystem, Resources.ThemeLight, Resources.ThemeDark])
+               .SelectedIndex(_chrome.ThemeIndex)
+               .OnSelectionChanged(_chrome.ThemeChanged)
+               .FaceplateSizing(ComboBoxFaceplateSizing.SelectedItem)
+               .Automation(SettingsContent.ThemeAutomation)
+               .LayoutBox(minWidth: SettingsContent.SettingsEditorMinWidth, maxWidth: SettingsContent.SettingsEditorMaxWidth)).Description((string)Resources.ThemeDescription).Icon(new FluentIcon(FluentSymbol.WeatherMoon)).WrapThreshold(SettingsContent.CardWrapThreshold),
         SettingsCard(
             Resources.WindowBackground,
             ComboBox(
@@ -100,10 +99,7 @@ public sealed partial class SettingsSectionsControl : Control
                 .OnSelectionChanged(_chrome.BackgroundChanged)
                 .FaceplateSizing(ComboBoxFaceplateSizing.SelectedItem)
                 .Automation(SettingsContent.BackgroundAutomation)
-                .LayoutBox(minWidth: SettingsContent.SettingsEditorMinWidth, maxWidth: SettingsContent.SettingsEditorMaxWidth))
-            .Description(Resources.WindowBackgroundDescription)
-            .Icon(new FluentIcon(FluentSymbol.Color))
-            .WrapThreshold(SettingsContent.CardWrapThreshold),
+                .LayoutBox(minWidth: SettingsContent.SettingsEditorMinWidth, maxWidth: SettingsContent.SettingsEditorMaxWidth)).Description((string)Resources.WindowBackgroundDescription).Icon(new FluentIcon(FluentSymbol.Color)).WrapThreshold(SettingsContent.CardWrapThreshold),
         SettingsCard(
             Resources.Layout,
             ComboBox([Resources.LayoutFlyout, Resources.LayoutSidePanel])
@@ -111,19 +107,12 @@ public sealed partial class SettingsSectionsControl : Control
                 .OnSelectionChanged(_chrome.LayoutChanged)
                 .FaceplateSizing(ComboBoxFaceplateSizing.SelectedItem)
                 .Automation(SettingsContent.LayoutAutomation)
-                .LayoutBox(minWidth: SettingsContent.SettingsEditorMinWidth, maxWidth: SettingsContent.SettingsEditorMaxWidth))
-            .Description(Resources.LayoutDescription)
-            .Icon(new FluentIcon(FluentSymbol.PanelLeft))
-            .WrapThreshold(SettingsContent.CardWrapThreshold),
+                .LayoutBox(minWidth: SettingsContent.SettingsEditorMinWidth, maxWidth: SettingsContent.SettingsEditorMaxWidth)).Description((string)Resources.LayoutDescription).Icon(new FluentIcon(FluentSymbol.PanelLeft)).WrapThreshold(SettingsContent.CardWrapThreshold),
         SettingsCard(
             Resources.ClockAnimation,
             ToggleSwitch()
                 .IsOn(_chrome.IsClockAnimated)
-                .OnToggled(_chrome.ClockAnimationChanged))
-            .Description(Resources.ClockAnimationDescription)
-            .Icon(new FluentIcon(FluentSymbol.Timer))
-            .WrapThreshold(SettingsContent.CardWrapThreshold)
-            .Automation(SettingsContent.ClockAnimationAutomation),
+                .OnToggled(_chrome.ClockAnimationChanged)).Description((string)Resources.ClockAnimationDescription).Icon(new FluentIcon(FluentSymbol.Timer)).WrapThreshold(SettingsContent.CardWrapThreshold).Automation(SettingsContent.ClockAnimationAutomation),
         SettingsCard(
             Resources.Font,
             ComboBox(_chrome.Fonts.Select(static font => font.DisplayName))
@@ -132,10 +121,7 @@ public sealed partial class SettingsSectionsControl : Control
                 .MaxDropDownHeight(320f)
                 .FaceplateSizing(ComboBoxFaceplateSizing.SelectedItem)
                 .Automation(SettingsContent.FontAutomation)
-                .LayoutBox(minWidth: SettingsContent.SettingsEditorMinWidth, maxWidth: SettingsContent.SettingsEditorMaxWidth))
-            .Description(Resources.FontDescription)
-            .Icon(new FluentIcon(FluentSymbol.TextFont))
-            .WrapThreshold(SettingsContent.CardWrapThreshold),
+                .LayoutBox(minWidth: SettingsContent.SettingsEditorMinWidth, maxWidth: SettingsContent.SettingsEditorMaxWidth)).Description((string)Resources.FontDescription).Icon(new FluentIcon(FluentSymbol.TextFont)).WrapThreshold(SettingsContent.CardWrapThreshold),
         SettingsCard(
             Resources.DailyTarget,
             NumberBox(_chrome.TargetMinutes, _chrome.TargetChanged)
@@ -146,10 +132,7 @@ public sealed partial class SettingsSectionsControl : Control
                 .AcceptsOnlyNumericInput()
                 .Formatter(new DecimalNumberFormatter { MaxFractionDigits = 0 })
                 .Automation(SettingsContent.DailyTargetAutomation)
-                .LayoutBox(width: SettingsContent.SettingsNumberBoxWidth))
-            .Description(Resources.DailyTargetDescription)
-            .Icon(new FluentIcon(FluentSymbol.Target))
-            .WrapThreshold(SettingsContent.CardWrapThreshold),
+                .LayoutBox(width: SettingsContent.SettingsNumberBoxWidth)).Description((string)Resources.DailyTargetDescription).Icon(new FluentIcon(FluentSymbol.Target)).WrapThreshold(SettingsContent.CardWrapThreshold),
         SettingsCard(
             Resources.Language,
             ComboBox([Resources.LanguageSystem, Resources.LanguageEnglish, Resources.LanguageChinese, Resources.LanguageTraditionalChinese])
@@ -157,12 +140,9 @@ public sealed partial class SettingsSectionsControl : Control
                 .OnSelectionChanged(_chrome.LanguageChanged)
                 .FaceplateSizing(ComboBoxFaceplateSizing.SelectedItem)
                 .Automation(SettingsContent.LanguageAutomation)
-                .LayoutBox(minWidth: SettingsContent.SettingsEditorMinWidth, maxWidth: SettingsContent.SettingsEditorMaxWidth))
-            .Description(Resources.LanguageDescription)
-            .Icon(new FluentIcon(FluentSymbol.LocalLanguage))
-            .WrapThreshold(SettingsContent.CardWrapThreshold),
-        Keyed(Localizer.CurrentLanguage, new AboutSettingsView(_chrome.Colors)))
-        .Spacing(TimerVisuals.Spacing.Small);
+                .LayoutBox(minWidth: SettingsContent.SettingsEditorMinWidth, maxWidth: SettingsContent.SettingsEditorMaxWidth)).Description((string)Resources.LanguageDescription).Icon(new FluentIcon(FluentSymbol.LocalLanguage)).WrapThreshold(SettingsContent.CardWrapThreshold),
+        Keyed(Localizer.CurrentLanguage, new AboutSettingsView(_chrome.Colors))
+    ]).Spacing(TimerVisuals.Spacing.Small);
 }
 
 /// <summary>
@@ -174,26 +154,23 @@ public sealed partial class SettingsSectionsControl : Control
 /// <c>SettingsExpander</c> now reconciles its master content + item rows in place (Sprout ADR 0404), so a theme switch
 /// re-colours the threaded palette without a remount.
 /// </summary>
-[Composite]
+[View]
 public readonly partial record struct AboutSettingsView(ThemeColors Colors)
 {
     /// <summary>The About expander.</summary>
-    public Ui Body => Overlay(
-        SettingsExpander(Resources.AppName)
-            .Icon(new ImageIcon(TimerAssets.AppLogoHandle()) { Size = new Size(20f, 20f) })
-            .WrapThreshold(SettingsContent.CardWrapThreshold)
-            .Content(Text(
+    public Ui Body => Overlay([
+        SettingsExpander(Resources.AppName).Icon(new ImageIcon(TimerAssets.AppLogoHandle()) { Size = new Size(20f, 20f) }).WrapThreshold(SettingsContent.CardWrapThreshold).Content(Text(
                 $"v{MainView.DisplayVersion}",
                 new TextFormat(TextFormat.DefaultFontFamily, 13f, TextFormat.NormalWeight),
-                Colors.TextFillColorSecondary))
-            .Items(
+                Colors.TextFillColorSecondary)).Items(
                 SettingsCard(
                     Resources.AppDescription,
                     HyperlinkButton(
                         Resources.OpenOnGitHub,
                         HyperlinkButtonPalette.FromTheme(Colors))
                         .OnClick(() => TimerLauncher.OpenUrl(TimerLinks.OpenSourceUri)))
-                    .Automation(SettingsContent.OpenSourceAutomation)));
+                    .Automation(SettingsContent.OpenSourceAutomation))
+    ]);
 }
 
 /// <summary>
@@ -294,9 +271,7 @@ public sealed partial class SettingsContent : Control
     internal IReadOnlyList<FontChoice> Fonts => _fonts;
 
     /// <inheritdoc/>
-    public Ui Body => Overlay(
-        new SettingsSectionsControl(_sections)
-            .Width(TimerVisuals.MaxWidth.Dialog));
+    public Ui Body => Overlay([new SettingsSectionsControl(_sections).Width(TimerVisuals.MaxWidth.Dialog)]);
 
     internal static AutomationInfo ThemeAutomation => new()
     {

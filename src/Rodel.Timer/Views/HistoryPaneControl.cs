@@ -23,7 +23,7 @@ namespace Rodel.Timer;
 /// The visual content of a history ListItem. The ItemsView container owns focus, all context gestures, and UIA; this
 /// view draws only the clock tile and the session's title/detail.
 /// </summary>
-[Composite]
+[View]
 public readonly partial record struct HistoryRowView(
     string Title,
     string Secondary,
@@ -35,32 +35,26 @@ public readonly partial record struct HistoryRowView(
 {
     /// <summary>The transparent history row content; the ItemContainer owns the 4 epx hover/selection chrome.</summary>
     public Ui Body => Border(
-        Stack(
+        Row([
             Border(
                 Icon.Fluent(FluentSymbol.Clock, FluentIconVariant.Regular, TimerVisuals.IconSize.Medium, IconBrush)
-                    .HAlign(HorizontalAlignment.Center)
-                    .VAlign(VerticalAlignment.Center))
+                    .HAlign(HorizontalAlignment.Center).VAlign(VerticalAlignment.Center))
                 .Background(TileBrush)
                 .CornerRadius(TimerVisuals.Radius.App)
                 .Width(TimerVisuals.IconSize.Tile)
                 .Height(TimerVisuals.IconSize.Tile),
-            Stack(
+            Column([
                 Text(Title, TitleStyle),
-                Text(Secondary, SecondaryStyle, SecondaryInk))
-                .Spacing(2f)
-                .VAlign(VerticalAlignment.Center)
-                .Weight(1f))
-            .Orientation(Orientation.Horizontal)
-            .Spacing(10f)
-            .VAlign(VerticalAlignment.Center))
-        .Padding(9f, 7f, 7f, 7f);
+                Text(Secondary, SecondaryStyle, SecondaryInk)
+            ]).Spacing(2f).VAlign(VerticalAlignment.Center).Weight(1f)
+        ]).Spacing(10f).VAlign(VerticalAlignment.Center)).Padding(9f, 7f, 7f, 7f);
 }
 
 /// <summary>
 /// An honest non-selecting history list: every stable Guid-keyed container is a focusable ListItem with x-of-y
 /// semantics and a fresh owned context menu, but no fake Invoke or SelectionItem pattern.
 /// </summary>
-[Composite]
+[View]
 public readonly partial record struct HistoryListView(
     IReadOnlyList<HistoryRowData> Rows,
     Func<HistoryRowData, HistoryRowView> BuildRow,
@@ -70,7 +64,7 @@ public readonly partial record struct HistoryListView(
     ThemeColors Colors)
 {
     /// <summary>The bounded history list over a localized empty state.</summary>
-    public Ui Body => Overlay(
+    public Ui Body => Overlay([
         BuildItemsView(),
         Text(
             Resources.NoHistory,
@@ -80,11 +74,8 @@ public readonly partial record struct HistoryListView(
                 TextFormat.NormalWeight,
                 TextAlignment.Center,
                 TextWrapping.Wrap),
-            Colors.TextFillColorSecondary)
-            .MaxWidth(260f)
-            .HAlign(HorizontalAlignment.Center)
-            .VAlign(VerticalAlignment.Center)
-            .Visible(Rows.Count == 0));
+            Colors.TextFillColorSecondary).MaxWidth(260f).HAlign(HorizontalAlignment.Center).VAlign(VerticalAlignment.Center).Visible(Rows.Count == 0)
+    ]);
 
     internal ItemsView BuildItemsView()
     {
@@ -120,17 +111,16 @@ public sealed partial class HistoryPaneControl : Control
     }
 
     /// <summary>The section header (own padding) over a divider, then the history list (own padding).</summary>
-    public Ui Body => Stack(
-        Stack(
+    public Ui Body => Column([
+        Column([
             Text(
-                Resources.History,
-                new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight)),
+               Resources.History,
+               new TextFormat(TextFormat.DefaultFontFamily, 14f, TextFormat.SemiBoldWeight)),
             Text(
                 HistorySubtitle,
                 new TextFormat(TextFormat.DefaultFontFamily, 11f, TextFormat.NormalWeight),
-                Colors.TextFillColorSecondary))
-            .Spacing(2f)
-            .Padding(16f, 13f, 14f, 11f),
+                Colors.TextFillColorSecondary)
+        ]).Spacing(2f).Padding(16f, 13f, 14f, 11f),
         Divider.Horizontal(),
         new HistoryListView(
             _chrome.HistoryRows,
@@ -138,9 +128,8 @@ public sealed partial class HistoryPaneControl : Control
             _buildAutomation,
             _buildContextMenu,
             data => _chrome.ShowHistoryDetails(data.Entry.Id),
-            Colors)
-            .Height(TimerAnchoredSurfaceLayoutResolver.ListHeight(_chrome.HistoryRows.Count)))
-        .Spacing(0f);
+            Colors).Height(TimerAnchoredSurfaceLayoutResolver.ListHeight(_chrome.HistoryRows.Count))
+    ]).Spacing(0f);
 
     [SuppressMessage(
         "Performance",

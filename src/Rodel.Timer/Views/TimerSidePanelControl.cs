@@ -72,7 +72,7 @@ public sealed partial class TimerFoldersPanelControl : Control
     }
 
     /// <summary>The folder pane inside the translated, faded acrylic card.</summary>
-    public Ui Body => Overlay(
+    public Ui Body => Overlay([
         Transform(
             Opacity(
                 Border(new FolderPaneControl(_chrome, _close))
@@ -86,7 +86,8 @@ public sealed partial class TimerFoldersPanelControl : Control
                 .Opacity(_chrome.IsSidePanelShown ? 1f : 0f)
                 .OpacityTransition(OpacityTransition.Fast))
             .Translation(TimerSidePanelCard.Translation(Layout, _chrome.IsSidePanelShown))
-            .TransformTransition(TimerSidePanelCard.Slide));
+            .TransformTransition(TimerSidePanelCard.Slide)
+    ]);
 
     private TimerSidePanelLayout Layout => _chrome.SidePanelLayout(TimerSidePanelSide.Left);
 
@@ -117,7 +118,7 @@ public sealed partial class TimerHistoryPanelControl : Control
     }
 
     /// <summary>The history pane inside the translated, faded acrylic card.</summary>
-    public Ui Body => Overlay(
+    public Ui Body => Overlay([
         Transform(
             Opacity(
                 Border(new HistoryPaneControl(_chrome))
@@ -131,7 +132,8 @@ public sealed partial class TimerHistoryPanelControl : Control
                 .Opacity(_chrome.IsSidePanelShown ? 1f : 0f)
                 .OpacityTransition(OpacityTransition.Fast))
             .Translation(TimerSidePanelCard.Translation(Layout, _chrome.IsSidePanelShown))
-            .TransformTransition(TimerSidePanelCard.Slide));
+            .TransformTransition(TimerSidePanelCard.Slide)
+    ]);
 
     private TimerSidePanelLayout Layout => _chrome.SidePanelLayout(TimerSidePanelSide.Right);
 

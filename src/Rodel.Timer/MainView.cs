@@ -24,6 +24,7 @@ public sealed partial class MainView : Control, ILanguageApplyTarget
     private readonly TimerAppStore _store;
     private readonly IReadOnlyList<FontChoice> _fonts;
     private readonly TimerChrome _chrome;
+    private readonly TimerContentControl _content;
     private readonly TimerWindowBackground _windowBackground;
 
     /// <summary>Creates the product view over a window and its reactive store.</summary>
@@ -37,6 +38,7 @@ public sealed partial class MainView : Control, ILanguageApplyTarget
         _store = store ?? throw new ArgumentNullException(nameof(store));
         _fonts = fonts ?? throw new ArgumentNullException(nameof(fonts));
         _chrome = new TimerChrome(window, this);
+        _content = new TimerContentControl(_chrome);
         _windowBackground = new TimerWindowBackground(window);
         ViewportWidth = 1100d;
         ViewportHeight = 720d;
@@ -186,10 +188,11 @@ public sealed partial class MainView : Control, ILanguageApplyTarget
     /// subtree keeps its semantics node, which would leak the retry button into the accessibility tree while the shell
     /// is healthy).
     /// </remarks>
-    public Ui Body => Overlay(
-        new TimerContentControl(Chrome),
+    public Ui Body => Overlay([
+        _content,
         When(IsBootstrapping, new TimerLoadingView(Chrome, ThemeStamp)),
-        When(HasBlockingMessage, new TimerMessageView(Chrome, MessageTitle, MessageDetail, ThemeStamp)));
+        When(HasBlockingMessage, new TimerMessageView(Chrome, MessageTitle, MessageDetail, ThemeStamp))
+    ]);
 
     /// <inheritdoc/>
     protected override IDisposable? OnMounted()

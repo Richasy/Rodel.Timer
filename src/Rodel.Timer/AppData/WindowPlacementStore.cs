@@ -1,8 +1,8 @@
+using Rodel.Timer.Presentation;
+
 using Sprout;
 
 using Windows.Storage;
-
-using Rodel.Timer.Presentation;
 
 namespace Rodel.Timer.AppData;
 

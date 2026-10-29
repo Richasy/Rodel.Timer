@@ -286,6 +286,7 @@ public sealed partial class MainView
             try
             {
                 await _store.FlushSaveAsync().ConfigureAwait(true);
+                _store.SaveState.Rethrow();
                 SaveErrorMessage = string.Empty;
             }
             catch (Exception exception) when (

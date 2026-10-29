@@ -67,6 +67,27 @@ public sealed class TimerAppStoreCloseTests
     }
 
     [TestMethod]
+    public async Task Close_Failure_ReopensOnlyAfterTheHomeSchedulerCommitsIt()
+    {
+        using var harness = new TimerStoreHarness();
+        harness.LoadToReady();
+        harness.NextSaveError = new IOException("close save failed");
+        harness.Store.UpdateDailyTarget(90);
+
+        Task close = harness.Store.CloseAsync();
+        harness.Scheduler.DrainOnce();
+
+        Assert.IsTrue(harness.Store.SaveState.IsError, "The save result has reached the home scheduler.");
+        Assert.IsFalse(close.IsCompleted, "Close must marshal its own state transition through the home scheduler.");
+        Assert.Throws<InvalidOperationException>(() => harness.Store.UpdateDailyTarget(91));
+
+        harness.Scheduler.DrainUntilIdle();
+        await Assert.ThrowsAsync<IOException>(() => close);
+        harness.Store.UpdateDailyTarget(91);
+        Assert.AreEqual(91, harness.Store.Preferences.DailyTargetMinutes);
+    }
+
+    [TestMethod]
     public void Close_ConcurrentCalls_ObserveTheSameTask()
     {
         using var harness = new TimerStoreHarness();

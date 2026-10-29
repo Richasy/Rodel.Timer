@@ -9,7 +9,7 @@
   <Identity
     Name="60520B029E250.WorkingTimer"
     Publisher="CN=9EFA2047-A580-400B-A5B2-0C7ABB0DB5C0"
-    Version="2.2607.3.0" />
+    Version="2.2609.2.0" />
 
   <Properties>
     <DisplayName>ms-resource:AppName</DisplayName>

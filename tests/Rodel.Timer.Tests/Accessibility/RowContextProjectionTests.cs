@@ -69,8 +69,10 @@ public sealed class RowContextProjectionTests
         Assert.HasCount(2, interactions);
         Assert.IsTrue(interactions.All(static item => item.Focusable && item.ContextFlyout is not null));
 
-        IFlyout first = interactions[0].ContextFlyout!();
-        IFlyout second = interactions[0].ContextFlyout!();
+        IFlyout? first = interactions[0].ContextFlyout!();
+        IFlyout? second = interactions[0].ContextFlyout!();
+        Assert.IsNotNull(first);
+        Assert.IsNotNull(second);
         Assert.AreNotSame(first, second);
         Assert.AreEqual(2, builds);
     }
@@ -112,10 +114,12 @@ public sealed class RowContextProjectionTests
         Assert.IsTrue(interaction.Focusable);
         Assert.IsNotNull(interaction.ContextFlyout);
 
-        var first = (MenuFlyout)interaction.ContextFlyout();
+        var first = (MenuFlyout?)interaction.ContextFlyout();
+        Assert.IsNotNull(first);
         Assert.IsFalse(((MenuFlyoutItem)first.Items[0]).IsEnabled);
         canMove = true;
-        var second = (MenuFlyout)interaction.ContextFlyout();
+        var second = (MenuFlyout?)interaction.ContextFlyout();
+        Assert.IsNotNull(second);
         Assert.AreNotSame(first, second);
         Assert.IsTrue(((MenuFlyoutItem)second.Items[0]).IsEnabled);
     }

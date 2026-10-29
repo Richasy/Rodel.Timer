@@ -118,7 +118,7 @@
   <data name="ClockAnimationDescription" xml:space="preserve"><value>時間變化時滾動數字；關閉後使用靜態時鐘</value></data>
   <data name="OpenOnGitHub" xml:space="preserve"><value>在 GitHub 上開啟</value></data>
   <data name="WhatsNewTitle" xml:space="preserve"><value>新版內容</value></data>
-  <data name="WhatsNewBody" xml:space="preserve"><value>兩個新設定，把介面交還給你：&#10;&#10;• 版面配置 —— 分組和歷史記錄既可以留在標題列快顯面板裡，也可以移到底部：左右兩端各有一個按鈕，點擊後從對應一側滑出清單。&#10;&#10;• 滾動計時 —— 關掉數字滾動動畫，專注時使用安靜的靜態時鐘。&#10;&#10;兩項都在「設定」中，即時生效並自動記住。</value></data>
+  <data name="WhatsNewBody" xml:space="preserve"><value>效能最佳化。</value></data>
   <data name="Save" xml:space="preserve"><value>儲存</value></data>
   <data name="Cancel" xml:space="preserve"><value>取消</value></data>
   <data name="Delete" xml:space="preserve"><value>刪除</value></data>

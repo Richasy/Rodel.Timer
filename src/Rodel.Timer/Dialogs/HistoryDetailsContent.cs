@@ -67,9 +67,9 @@ public sealed partial class HistoryDetailsContent : Control
     }
 
     /// <inheritdoc/>
-    public Ui Body => Overlay(
-        Stack(
-            Stack(
+    public Ui Body => Overlay([
+        Column([
+            Column([
                 Text(Resources.SessionTitle, LabelStyle, Colors.TextFillColorSecondary),
                 TextBox()
                     .Text(Title)
@@ -79,45 +79,40 @@ public sealed partial class HistoryDetailsContent : Control
                     {
                         Name = Resources.SessionTitle,
                         AutomationId = "RodelTimer.HistoryDetails.Title",
-                    }))
-                .Spacing(TimerVisuals.Spacing.XSmall),
+                    })
+            ]).Spacing(TimerVisuals.Spacing.XSmall),
             Border(
-                Stack(
-                    Stack(
+                Column([
+                    Row([
                         Text(Resources.Folders, LabelStyle, Colors.TextFillColorSecondary).Weight(1f),
-                        Text(_folderName, ValueStyle))
-                        .Orientation(Orientation.Horizontal)
-                        .Spacing(TimerVisuals.Spacing.Medium),
-                    Stack(
+                        Text(_folderName, ValueStyle)
+                    ]).Spacing(TimerVisuals.Spacing.Medium),
+                    Row([
                         Text(Resources.RecordedAt, LabelStyle, Colors.TextFillColorSecondary).Weight(1f),
-                        Text(_recordedAt, ValueStyle))
-                        .Orientation(Orientation.Horizontal)
-                        .Spacing(TimerVisuals.Spacing.Medium),
-                    Stack(
+                        Text(_recordedAt, ValueStyle)
+                    ]).Spacing(TimerVisuals.Spacing.Medium),
+                    Row([
                         Text(Resources.Duration, LabelStyle, Colors.TextFillColorSecondary).Weight(1f),
-                        Text(_duration, ValueStyle))
-                        .Orientation(Orientation.Horizontal)
-                        .Spacing(TimerVisuals.Spacing.Medium))
-                    .Spacing(TimerVisuals.Spacing.Small))
+                        Text(_duration, ValueStyle)
+                    ]).Spacing(TimerVisuals.Spacing.Medium)
+                ]).Spacing(TimerVisuals.Spacing.Small))
                 .Background(Brush.CreateSolid(Colors.CardBackgroundFillColorDefault))
                 .CornerRadius(TimerVisuals.Radius.Control)
                 .Padding(14f, 12f, 14f, 12f),
-            Stack(
+            Column([
                 Text(Resources.Comment, LabelStyle, Colors.TextFillColorSecondary),
                 TextBox()
                     .Text(Comment)
                     .OnTextChanged(value => Comment = value ?? string.Empty)
                     .Placeholder(Resources.CommentPlaceholder)
-                    .AcceptsReturn()
-                    .Height(96f)
-                    .Automation(new AutomationInfo
+                    .AcceptsReturn().Height(96f).Automation(new AutomationInfo
                     {
                         Name = Resources.Comment,
                         AutomationId = "RodelTimer.HistoryDetails.Comment",
-                    }))
-                .Spacing(TimerVisuals.Spacing.XSmall))
-            .Spacing(TimerVisuals.Spacing.Medium)
-            .Width(TimerVisuals.MaxWidth.FolderDialog));
+                    })
+            ]).Spacing(TimerVisuals.Spacing.XSmall)
+        ]).Spacing(TimerVisuals.Spacing.Medium).Width(TimerVisuals.MaxWidth.FolderDialog)
+    ]);
 
     private void SetTitle(string? value)
     {
